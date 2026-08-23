@@ -147,9 +147,9 @@
       font-size: 13px;
       color: #ccc;
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      max-width: 250px;
+      max-width: 280px;
     }
-    .announcement-header {
+    .panel-header {
       font-weight: bold;
       color: #00c3e3;
       margin-bottom: 5px;
@@ -157,10 +157,12 @@
       justify-content: space-between;
       align-items: center;
     }
-    .announcement-content {
-      display: none;
+    .panel-content {
       margin-top: 5px;
       line-height: 1.5;
+    }
+    .announcement-content {
+      display: none;
     }
     .toggle-text {
       font-size: 11px;
@@ -168,8 +170,7 @@
       cursor: pointer;
       text-decoration: underline;
     }
-    .edit-btn {
-      display: none;
+    .small-btn {
       background: none;
       border: 1px solid #00c3e3;
       color: #00c3e3;
@@ -177,19 +178,33 @@
       padding: 2px 5px;
       font-size: 11px;
       cursor: pointer;
+      margin-left: 5px;
     }
-    .edit-btn:hover {
+    .small-btn:hover {
       background: #00c3e3;
       color: #000;
     }
-    #edit-announcement-textarea {
+    .action-btn {
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 6px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .action-btn:hover {
+      background: #666;
+    }
+    .edit-textarea {
       width: 100%;
       background: #121212;
       color: #fff;
       border: 1px solid #444;
       border-radius: 5px;
       padding: 5px;
-      font-size: 13px;
+      font-size: 12px;
       resize: vertical;
       min-height: 60px;
       display: none;
@@ -207,12 +222,7 @@
       margin-top: 5px;
       font-weight: bold;
     }
-    .maintenance-log {
-      font-size: 12px;
-      color: #888;
-      line-height: 1.5;
-    }
-    #auth-modal {
+    .modal-overlay {
       display: none;
       position: fixed;
       top: 0;
@@ -229,7 +239,7 @@
       background: #1e1e1e;
       padding: 30px;
       border-radius: 20px;
-      width: 300px;
+      width: 320px;
       display: flex;
       flex-direction: column;
       gap: 15px;
@@ -240,7 +250,7 @@
       text-align: center;
       color: #00c3e3;
     }
-    .modal-content input {
+    .modal-content input, .modal-content textarea {
       padding: 12px;
       border-radius: 10px;
       border: 1px solid #444;
@@ -248,8 +258,9 @@
       color: #fff;
       outline: none;
       transition: 0.3s;
+      resize: vertical;
     }
-    .modal-content input:focus {
+    .modal-content input:focus, .modal-content textarea:focus {
       border-color: #00c3e3;
     }
     .modal-btns {
@@ -273,6 +284,20 @@
     .btn-submit {
       background: #00c3e3;
       color: #000;
+    }
+    .report-item {
+      background: #121212;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .red-border {
+      border: 2px solid #ff416c;
+    }
+    .yellow-border {
+      border: 2px solid #ffd700;
     }
     .content-wrapper {
       width: 100%;
@@ -504,33 +529,73 @@
 
   <div id="left-info-panel">
     <div class="info-box">
-      <div class="announcement-header">
+      <div class="panel-header">
         社團公告
-        <button class="edit-btn" id="edit-announcement-btn" onclick="toggleEditAnnouncement()">編輯</button>
+        <button class="small-btn" id="edit-announcement-btn" style="display:none;" onclick="toggleEditAnnouncement()">編輯</button>
       </div>
       <div class="toggle-text" id="toggle-announcement-text" onclick="toggleAnnouncement()">[點擊查看]</div>
-      <div class="announcement-content" id="announcement-display">
-        讀取中...
-      </div>
-      <textarea id="edit-announcement-textarea"></textarea>
+      <div class="panel-content announcement-content" id="announcement-display">讀取中...</div>
+      <textarea class="edit-textarea" id="edit-announcement-textarea"></textarea>
       <button class="save-btn" id="save-announcement-btn" onclick="saveAnnouncement()">儲存</button>
     </div>
     
-    <div class="info-box maintenance-log">
-      維修紀錄：<br>
-      - 2026/08/23
+    <div class="info-box">
+      <div class="panel-header">
+        維修紀錄
+        <div>
+          <button class="action-btn" onclick="openReportModal()">錯誤回報</button>
+          <button class="small-btn" id="edit-maintenance-btn" style="display:none;" onclick="toggleEditMaintenance()">編輯</button>
+        </div>
+      </div>
+      <div class="panel-content" id="maintenance-display" style="font-size:12px; color:#888; white-space: pre-wrap;">讀取中...</div>
+      <textarea class="edit-textarea" id="edit-maintenance-textarea"></textarea>
+      <button class="save-btn" id="save-maintenance-btn" onclick="saveMaintenance()">儲存</button>
+      
+      <div id="admin-settings-container" style="display:none; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+        <button class="action-btn" style="width:100%; margin:0;" onclick="openPwdModal()">修改系統密碼</button>
+      </div>
     </div>
   </div>
 
-  <button id="auth-btn-float" onclick="openModal()">社幹<br>認證</button>
+  <button id="auth-btn-float" onclick="openAuthModal()">社幹<br>認證</button>
 
-  <div id="auth-modal">
+  <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
       <h3>社幹認證</h3>
       <input type="password" id="auth-password" placeholder="請輸入密碼">
       <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn-cancel" onclick="closeAuthModal()">取消</button>
         <button class="btn-submit" onclick="verifyOfficer()">確認</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="report-modal" class="modal-overlay">
+    <div class="modal-content" style="width: 380px;">
+      <h3>錯誤回報</h3>
+      <textarea id="report-input" placeholder="請描述遇到的問題..." style="height: 80px;"></textarea>
+      <div class="modal-btns" style="margin-top: 5px;">
+        <button class="btn-cancel" onclick="closeReportModal()">取消</button>
+        <button class="btn-submit" onclick="submitReport()">送出</button>
+      </div>
+      <div id="admin-reports-section" style="display:none; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">
+        <h4 style="color:#00c3e3; margin-bottom: 10px; font-size:14px;">回報列表 (管理員)</h4>
+        <div id="report-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pwd-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>修改系統密碼</h3>
+      <label style="font-size:12px; color:#aaa;">一般社幹密碼</label>
+      <input type="text" id="new-officer-pwd" placeholder="留空則不修改">
+      <label style="font-size:12px; color:#aaa; margin-top:5px;">管理員密碼</label>
+      <input type="text" id="new-admin-pwd" placeholder="留空則不修改">
+      <div class="modal-btns" style="margin-top:10px;">
+        <button class="btn-cancel" onclick="closePwdModal()">取消</button>
+        <button class="btn-submit" onclick="savePasswords()">儲存</button>
       </div>
     </div>
   </div>
@@ -599,9 +664,13 @@
     const db = firebase.firestore();
 
     let isOfficer = false;
+    let isAdmin = false;
     let qaData = [];
+    let reportsData = [];
     let isShowingLogo = false;
-    let currentAnnouncement = "目前無新公告。"; 
+    
+    let adminPwdB64 = btoa('thomas0212');
+    let officerPwdB64 = btoa('ckshbbox2026');
 
     window.onload = function() {
       const activeItem = document.querySelector('.nav-item.active');
@@ -615,12 +684,31 @@
         renderQA();
       });
 
+      db.collection("reports").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        reportsData = [];
+        snapshot.forEach((doc) => {
+          reportsData.push({ id: doc.id, ...doc.data() });
+        });
+        if (isAdmin) renderReports();
+      });
+
       db.collection("config").doc("announcement").onSnapshot((doc) => {
+        let content = doc.exists ? doc.data().content : "目前無新公告。";
+        document.getElementById('announcement-display').innerText = content;
+        document.getElementById('edit-announcement-textarea').value = content;
+      });
+
+      db.collection("config").doc("maintenance").onSnapshot((doc) => {
+        let content = doc.exists ? doc.data().content : "維修紀錄：\n- 2026/08/23";
+        document.getElementById('maintenance-display').innerText = content;
+        document.getElementById('edit-maintenance-textarea').value = content;
+      });
+
+      db.collection("config").doc("passwords").onSnapshot((doc) => {
         if (doc.exists) {
-          currentAnnouncement = doc.data().content;
+          if(doc.data().admin) adminPwdB64 = doc.data().admin;
+          if(doc.data().officer) officerPwdB64 = doc.data().officer;
         }
-        document.getElementById('announcement-display').innerText = currentAnnouncement;
-        document.getElementById('edit-announcement-textarea').value = currentAnnouncement;
       });
     };
 
@@ -643,7 +731,6 @@
     function handleToggleClick(event) {
       event.stopPropagation(); 
       switchTab(3, document.getElementById('nav-tab-3')); 
-      
       const toggle = document.getElementById('design-toggle');
       isShowingLogo = !isShowingLogo;
       
@@ -669,42 +756,75 @@
     function triggerWindEffect() {
       const overlay = document.getElementById('wind-overlay');
       overlay.innerHTML = '';
-      
       for (let i = 0; i < 30; i++) {
         const line = document.createElement('div');
         line.className = 'wind-line';
         line.style.top = Math.random() * 100 + 'vh';
         line.style.height = (Math.random() * 3 + 1) + 'px';
         line.style.width = (Math.random() * 100 + 50) + 'vw';
-        
         const duration = (Math.random() * 0.4 + 0.2); 
         const delay = (Math.random() * 0.15); 
-        
         line.style.animation = `windBlow ${duration}s ${delay}s cubic-bezier(0.1, 0.8, 0.3, 1) forwards`;
         overlay.appendChild(line);
       }
     }
 
-    function openModal() {
+    function openAuthModal() {
       document.getElementById('auth-modal').style.display = 'flex';
       document.getElementById('auth-password').value = '';
     }
-
-    function closeModal() {
+    function closeAuthModal() {
       document.getElementById('auth-modal').style.display = 'none';
+    }
+
+    function openReportModal() {
+      document.getElementById('report-modal').style.display = 'flex';
+      document.getElementById('report-input').value = '';
+    }
+    function closeReportModal() {
+      document.getElementById('report-modal').style.display = 'none';
+    }
+
+    function openPwdModal() {
+      document.getElementById('pwd-modal').style.display = 'flex';
+      document.getElementById('new-officer-pwd').value = '';
+      document.getElementById('new-admin-pwd').value = '';
+    }
+    function closePwdModal() {
+      document.getElementById('pwd-modal').style.display = 'none';
     }
 
     function verifyOfficer() {
       const pwd = document.getElementById('auth-password').value;
-      if (btoa(pwd) === 'Y2tzaGJib3gyMDI2') { 
+      const b64Pwd = btoa(pwd);
+
+      if (b64Pwd === adminPwdB64) {
         isOfficer = true;
+        isAdmin = true;
+        
+        const btn = document.getElementById('auth-btn-float');
+        btn.innerText = '管理員';
+        btn.disabled = true;
+        
+        document.getElementById('edit-announcement-btn').style.display = 'inline-block';
+        document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
+        document.getElementById('admin-settings-container').style.display = 'block';
+        document.getElementById('admin-reports-section').style.display = 'block';
+        
+        closeAuthModal();
+        renderQA();
+        renderReports();
+      } else if (b64Pwd === officerPwdB64) { 
+        isOfficer = true;
+        isAdmin = false;
+        
         const btn = document.getElementById('auth-btn-float');
         btn.innerText = '已認證';
         btn.disabled = true;
         
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
-
-        closeModal();
+        
+        closeAuthModal();
         renderQA();
       } else {
         alert('密碼錯誤。');
@@ -751,13 +871,105 @@
 
     function saveAnnouncement() {
       const newContent = document.getElementById('edit-announcement-textarea').value.trim();
-      
-      db.collection("config").doc("announcement").set({
-        content: newContent
-      }).then(() => {
+      db.collection("config").doc("announcement").set({ content: newContent }, { merge: true }).then(() => {
         toggleEditAnnouncement();
       }).catch((error) => {
         alert('儲存失敗: ' + error.message);
+      });
+    }
+
+    function toggleEditMaintenance() {
+        const content = document.getElementById('maintenance-display');
+        const textarea = document.getElementById('edit-maintenance-textarea');
+        const saveBtn = document.getElementById('save-maintenance-btn');
+
+        if (textarea.style.display === 'block') {
+            textarea.style.display = 'none';
+            saveBtn.style.display = 'none';
+            content.style.display = 'block';
+        } else {
+            content.style.display = 'none';
+            textarea.style.display = 'block';
+            saveBtn.style.display = 'block';
+        }
+    }
+
+    function saveMaintenance() {
+      const newContent = document.getElementById('edit-maintenance-textarea').value.trim();
+      db.collection("config").doc("maintenance").set({ content: newContent }, { merge: true }).then(() => {
+        toggleEditMaintenance();
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
+    }
+
+    function savePasswords() {
+      const newAdmin = document.getElementById('new-admin-pwd').value.trim();
+      const newOfficer = document.getElementById('new-officer-pwd').value.trim();
+      let updates = {};
+      
+      if (newAdmin) updates.admin = btoa(newAdmin);
+      if (newOfficer) updates.officer = btoa(newOfficer);
+
+      if (Object.keys(updates).length > 0) {
+        db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => {
+          alert('密碼已更新。');
+          closePwdModal();
+        }).catch((error) => {
+          alert('更新失敗: ' + error.message);
+        });
+      } else {
+        closePwdModal();
+      }
+    }
+
+    function submitReport() {
+      const text = document.getElementById('report-input').value.trim();
+      if (text !== '') {
+        const role = isOfficer ? 'officer' : 'user';
+        db.collection("reports").add({
+          text: text,
+          role: role,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert('回報已送出，感謝。');
+          document.getElementById('report-input').value = '';
+          if (!isAdmin) closeReportModal(); 
+        }).catch((error) => {
+          alert('送出失敗: ' + error.message);
+        });
+      } else {
+        alert('請輸入內容。');
+      }
+    }
+
+    function deleteReport(docId) {
+      if (confirm('確認刪除此回報？')) {
+        db.collection("reports").doc(docId).delete().catch(error => {
+          alert('刪除失敗: ' + error.message);
+        });
+      }
+    }
+
+    function renderReports() {
+      const container = document.getElementById('report-list');
+      container.innerHTML = '';
+      if (reportsData.length === 0) {
+        container.innerHTML = '<div style="color:#888; font-size:12px;">目前無回報紀錄。</div>';
+        return;
+      }
+      reportsData.forEach(item => {
+         const div = document.createElement('div');
+         div.className = 'report-item ' + (item.role === 'officer' ? 'red-border' : 'yellow-border');
+         
+         const timeString = item.timestamp ? new Date(item.timestamp.toDate()).toLocaleString() : '剛剛';
+         
+         div.innerHTML = `
+           <div style="font-size:11px; color:#aaa; margin-bottom:4px;">${timeString}</div>
+           <div style="font-size:13px; color:#fff; word-break: break-all;">${item.text}</div>
+           <button class="delete-btn" style="margin-top:8px; padding: 3px 8px; font-size:11px;" onclick="deleteReport('${item.id}')">刪除</button>
+         `;
+         container.appendChild(div);
       });
     }
 
@@ -776,7 +988,6 @@
           input.value = '';
           return;
         }
-
         db.collection("qa").add({
           q: text,
           a: null,
@@ -822,7 +1033,7 @@
         let html = `<div class="qa-header">
                       <div class="qa-q-text">Q: ${item.q}</div>`;
         
-        if (isOfficer) {
+        if (isOfficer || isAdmin) {
           html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         }
         
@@ -832,7 +1043,7 @@
           html += `<div class="qa-a">A: ${item.a}</div>`;
         } else {
           html += `<div class="qa-pending">（等待回覆中）</div>`;
-          if (isOfficer) {
+          if (isOfficer || isAdmin) {
             html += `
               <div class="reply-box">
                 <input type="text" id="reply-${item.id}" placeholder="輸入回覆內容...">
