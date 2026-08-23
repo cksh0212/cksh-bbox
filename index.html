@@ -16,7 +16,6 @@
       color: #ffffff;
       overflow-x: hidden;
     }
-
     .nav-container {
       display: flex;
       justify-content: center;
@@ -35,7 +34,6 @@
       background: #3a3a3a;
       border-radius: 30px;
     }
-
     .nav-item {
       position: relative;
       z-index: 2;
@@ -50,7 +48,6 @@
     .nav-item.active {
       color: #ffffff;
     }
-
     .bubble {
       position: absolute;
       top: 5px;
@@ -61,18 +58,16 @@
       z-index: 1;
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    /* 🎨 修改後的右下角圓形按鈕 */
     #auth-btn-float {
       position: fixed;
       right: 30px;
       bottom: 30px;
       width: 60px;
       height: 60px;
-      background-color: #00c3e3; /* 湖水藍 */
-      color: #000000; /* 黑色字體搭配藍色 */
+      background-color: #00c3e3;
+      color: #000000;
       border: none;
-      border-radius: 50%; /* 變成正圓形 */
+      border-radius: 50%;
       cursor: pointer;
       font-weight: bold;
       font-size: 14px;
@@ -86,7 +81,7 @@
       text-align: center;
     }
     #auth-btn-float:hover {
-      transform: scale(1.1); /* 滑鼠游標移過去會稍微放大 */
+      transform: scale(1.1);
       box-shadow: 0 6px 20px rgba(0, 195, 227, 0.6);
     }
     #auth-btn-float:disabled {
@@ -96,7 +91,6 @@
       cursor: not-allowed;
       transform: none;
     }
-
     #auth-modal {
       display: none;
       position: fixed;
@@ -121,7 +115,7 @@
     }
     .modal-content h3 {
       text-align: center;
-      color: #00c3e3; /* 配合按鈕顏色 */
+      color: #00c3e3;
     }
     .modal-content input {
       padding: 10px;
@@ -152,7 +146,6 @@
       background: #00c3e3;
       color: #000;
     }
-
     .content-wrapper {
       width: 100%;
       overflow: hidden;
@@ -170,7 +163,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     h1 {
       font-size: 2.5rem;
       margin-bottom: 20px;
@@ -185,11 +177,10 @@
       border-radius: 15px;
       margin-bottom: 15px;
     }
-
     .qa-container {
       width: 100%;
       max-width: 600px;
-      padding-bottom: 80px; /* 留出空間給右下角按鈕，避免擋住文字 */
+      padding-bottom: 80px;
     }
     .ask-box {
       display: flex;
@@ -217,7 +208,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     .qa-list {
       display: flex;
       flex-direction: column;
@@ -228,11 +218,28 @@
       padding: 20px;
       border-radius: 15px;
     }
-    .qa-q {
+    .qa-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .qa-q-text {
       font-weight: bold;
       color: #ff4b2b;
       font-size: 1.1rem;
-      margin-bottom: 10px;
+    }
+    .delete-btn {
+      background: #ff416c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .delete-btn:hover {
+      background: #ff4b2b;
     }
     .qa-a {
       color: #dddddd;
@@ -267,7 +274,6 @@
     .reply-box button:hover {
       background: #777;
     }
-
     .placeholder-box {
       width: 100%;
       max-width: 500px;
@@ -296,7 +302,6 @@
     </div>
   </div>
 
-  <!-- 移到右下角的懸浮按鈕 -->
   <button id="auth-btn-float" onclick="openModal()">社幹<br>認證</button>
 
   <div id="auth-modal">
@@ -312,30 +317,25 @@
 
   <div class="content-wrapper">
     <div class="content-track" id="slider-track">
-      
       <div class="section-page">
         <h1>🎤 基本介紹</h1>
         <p>歡迎來到建功口技社！這裡是一群熱愛 Beatbox 的聚集地。我們透過嘴巴、喉嚨和麥克風，創造出不可思議的節奏與音樂。無論你是入門新手還是資深成員。這裡都有你的舞台！</p>
       </div>
-
       <div class="section-page">
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物！這裡將介紹現任社長、副社長、總務等重要幹部。他們不僅擁有一定的 Beatbox實力（應該） ，更是帶領社團前進的核心動力。</p>
-        <div class="placeholder-box">（這裡之後可以放幹部們的照片）</div>
+        <div class="placeholder-box">（這裡之後可以放幹部們的帥氣/美麗照片）</div>
       </div>
-
       <div class="section-page">
         <h1>📸 各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下最熱血的瞬間。</p>
-        <div class="placeholder-box">（合照）</div>
+        <div class="placeholder-box">（歷屆大合照）</div>
       </div>
-
       <div class="section-page">
         <h1>👕 社服圖案介紹</h1>
         <p>（這段未定）</p>
         <div class="placeholder-box">（這裡可以放社服的正反面設計圖與理念說明）</div>
       </div>
-
       <div class="section-page">
         <h1>❓ Q&A 互動區</h1>
         <div class="qa-container">
@@ -347,7 +347,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -408,10 +407,8 @@
       document.getElementById('auth-modal').style.display = 'none';
     }
 
-    // 🛡️ 使用 Base64 編碼進行驗證 (防護升級)
     function verifyOfficer() {
       const pwd = document.getElementById('auth-password').value;
-      // 將使用者輸入的密碼轉為 Base64，並與預設的 Base64 亂碼比對
       if (btoa(pwd) === 'Y2tzaGJib3gyMDI2') { 
         isOfficer = true;
         const btn = document.getElementById('auth-btn-float');
@@ -427,7 +424,19 @@
     function postQuestion() {
       const input = document.getElementById('new-question');
       const text = input.value.trim();
+      
       if (text !== '') {
+        const existing = qaData.find(item => item.q === text);
+        if (existing) {
+          if (existing.a) {
+            alert('這個問題已經有解答囉！\n\n答案是：' + existing.a);
+          } else {
+            alert('這個問題已經有人問過，正在等待社幹回覆中喔！');
+          }
+          input.value = '';
+          return;
+        }
+
         db.collection("qa").add({
           q: text,
           a: null,
@@ -454,6 +463,14 @@
       }
     }
 
+    function deleteQuestion(docId) {
+      if (confirm('確定要刪除這個問題嗎？')) {
+        db.collection("qa").doc(docId).delete().catch(error => {
+          alert('刪除失敗: ' + error.message);
+        });
+      }
+    }
+
     function renderQA() {
       const listContainer = document.getElementById('qa-list');
       listContainer.innerHTML = '';
@@ -462,7 +479,14 @@
         const qaItem = document.createElement('div');
         qaItem.className = 'qa-item';
         
-        let html = `<div class="qa-q">Q: ${item.q}</div>`;
+        let html = `<div class="qa-header">
+                      <div class="qa-q-text">Q: ${item.q}</div>`;
+        
+        if (isOfficer) {
+          html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
+        }
+        
+        html += `</div>`;
         
         if (item.a) {
           html += `<div class="qa-a">A: ${item.a}</div>`;
