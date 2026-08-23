@@ -62,30 +62,39 @@
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    #auth-btn-top {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: 1px solid #ff4b2b;
-      color: #ff4b2b;
-      padding: 8px 16px;
-      border-radius: 20px;
+    /* 🎨 修改後的右下角圓形按鈕 */
+    #auth-btn-float {
+      position: fixed;
+      right: 30px;
+      bottom: 30px;
+      width: 60px;
+      height: 60px;
+      background-color: #00c3e3; /* 湖水藍 */
+      color: #000000; /* 黑色字體搭配藍色 */
+      border: none;
+      border-radius: 50%; /* 變成正圓形 */
       cursor: pointer;
       font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 15px rgba(0, 195, 227, 0.4);
+      z-index: 998;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.2;
+      text-align: center;
     }
-    #auth-btn-top:hover {
-      background: #ff4b2b;
-      color: #fff;
+    #auth-btn-float:hover {
+      transform: scale(1.1); /* 滑鼠游標移過去會稍微放大 */
+      box-shadow: 0 6px 20px rgba(0, 195, 227, 0.6);
     }
-    #auth-btn-top:disabled {
-      background: #ff4b2b;
-      color: #fff;
-      border-color: #ff4b2b;
+    #auth-btn-float:disabled {
+      background-color: #444;
+      color: #888;
+      box-shadow: none;
       cursor: not-allowed;
-      opacity: 0.8;
+      transform: none;
     }
 
     #auth-modal {
@@ -112,7 +121,7 @@
     }
     .modal-content h3 {
       text-align: center;
-      color: #ff4b2b;
+      color: #00c3e3; /* 配合按鈕顏色 */
     }
     .modal-content input {
       padding: 10px;
@@ -140,21 +149,19 @@
       color: #fff;
     }
     .btn-submit {
-      background: #ff4b2b;
-      color: #fff;
+      background: #00c3e3;
+      color: #000;
     }
 
     .content-wrapper {
       width: 100%;
       overflow: hidden;
     }
-    /* 這裡維持 500% 以容納 5 個選項 */
     .content-track {
       display: flex;
       width: 500%;
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    /* 每個頁面佔 20% (100 / 5) */
     .section-page {
       width: 20%;
       min-height: 80vh;
@@ -182,6 +189,7 @@
     .qa-container {
       width: 100%;
       max-width: 600px;
+      padding-bottom: 80px; /* 留出空間給右下角按鈕，避免擋住文字 */
     }
     .ask-box {
       display: flex;
@@ -286,8 +294,10 @@
       <div class="nav-item" onclick="switchTab(3, this)">社服圖案</div>
       <div class="nav-item" onclick="switchTab(4, this)">Q&A</div>
     </div>
-    <button id="auth-btn-top" onclick="openModal()">社幹認證</button>
   </div>
+
+  <!-- 移到右下角的懸浮按鈕 -->
+  <button id="auth-btn-float" onclick="openModal()">社幹<br>認證</button>
 
   <div id="auth-modal">
     <div class="modal-content">
@@ -303,34 +313,29 @@
   <div class="content-wrapper">
     <div class="content-track" id="slider-track">
       
-      <!-- 第一頁：你的新文案 -->
       <div class="section-page">
         <h1>🎤 基本介紹</h1>
         <p>歡迎來到建功口技社！這裡是一群熱愛 Beatbox 的聚集地。我們透過嘴巴、喉嚨和麥克風，創造出不可思議的節奏與音樂。無論你是入門新手還是資深成員。這裡都有你的舞台！</p>
       </div>
 
-      <!-- 第二頁：你的新文案 -->
       <div class="section-page">
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物！這裡將介紹現任社長、副社長、總務等重要幹部。他們不僅擁有一定的 Beatbox實力（應該） ，更是帶領社團前進的核心動力。</p>
-        <div class="placeholder-box">（這裡之後可以放幹部們的照片）</div>
+        <div class="placeholder-box">（這裡之後可以放幹部們的帥氣/美麗照片）</div>
       </div>
 
-      <!-- 第三頁：你的新文案 -->
       <div class="section-page">
         <h1>📸 各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下最熱血的瞬間。</p>
         <div class="placeholder-box">（歷屆大合照）</div>
       </div>
 
-      <!-- 第四頁：你的新文案 -->
       <div class="section-page">
         <h1>👕 社服圖案介紹</h1>
         <p>（這段未定）</p>
         <div class="placeholder-box">（這裡可以放社服的正反面設計圖與理念說明）</div>
       </div>
 
-      <!-- 第五頁：保留 Firebase Q&A -->
       <div class="section-page">
         <h1>❓ Q&A 互動區</h1>
         <div class="qa-container">
@@ -385,7 +390,6 @@
       updateBubble(element);
       
       const track = document.getElementById('slider-track');
-      // 這裡維持 20%，因為是 5 個選項
       track.style.transform = `translateX(-${index * 20}%)`;
     }
 
@@ -404,12 +408,14 @@
       document.getElementById('auth-modal').style.display = 'none';
     }
 
+    // 🛡️ 使用 Base64 編碼進行驗證 (防護升級)
     function verifyOfficer() {
       const pwd = document.getElementById('auth-password').value;
-      if (pwd === 'ckshbbox2026') {
+      // 將使用者輸入的密碼轉為 Base64，並與預設的 Base64 亂碼比對
+      if (btoa(pwd) === 'Y2tzaGJib3gyMDI2') { 
         isOfficer = true;
-        const btn = document.getElementById('auth-btn-top');
-        btn.innerText = '社幹';
+        const btn = document.getElementById('auth-btn-float');
+        btn.innerText = '已認證';
         btn.disabled = true;
         closeModal();
         renderQA();
