@@ -18,6 +18,7 @@
       position: relative;
     }
     
+    /* 物理氣泡系統樣式 */
     #bubble-container {
       position: fixed;
       top: 0;
@@ -40,7 +41,6 @@
       cursor: pointer;
       transform: translate(-50%, -50%);
       will-change: transform;
-      transition: width 0.3s ease, height 0.3s ease; /* 讓合併有平滑過渡 */
     }
     .game-bubble.unclickable {
       pointer-events: none;
@@ -52,6 +52,7 @@
       border-color: rgba(255, 75, 43, 0.6);
     }
 
+    /* 原有 UI 樣式 */
     .nav-container {
       display: flex;
       justify-content: center;
@@ -483,6 +484,66 @@
     .reply-box button:hover {
       background: #777;
     }
+
+    /* --- 社幹卡片區塊樣式 --- */
+    .officer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+      margin-top: 20px;
+    }
+    .officer-card {
+      background: #1e1e1e;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .officer-photo {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #2a2a2a;
+    }
+    .officer-info {
+      padding: 15px;
+      text-align: center;
+      width: 100%;
+    }
+    .officer-name {
+      font-weight: bold;
+      color: #00c3e3;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    .admin-controls {
+      margin-top: 10px;
+    }
+    .admin-add-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 15px;
+      border: 1px dashed #00c3e3;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      margin-top: 30px;
+    }
+    .admin-add-box input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #121212;
+      color: #fff;
+    }
+
     .placeholder-box {
       width: 100%;
       max-width: 550px;
@@ -623,7 +684,17 @@
       <div class="section-page">
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
-        <div class="placeholder-box">（此處將放置幹部照片）</div>
+        
+        <!-- 社幹卡片展示區 -->
+        <div class="officer-grid" id="officer-list"></div>
+
+        <!-- 管理員新增社幹區塊 -->
+        <div class="admin-add-box" id="admin-officer-box" style="display: none;">
+          <h4 style="color: #00c3e3; text-align: center;">[管理員] 新增社幹卡片</h4>
+          <input type="text" id="new-officer-name" placeholder="輸入幹部職稱與名稱 (例: 社長 小明)">
+          <input type="text" id="new-officer-photo" placeholder="貼上照片網址 (URL)">
+          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addOfficer()">新增幹部</button>
+        </div>
       </div>
       
       <div class="section-page">
@@ -682,6 +753,7 @@
     let isBubbleMode = false;
     let qaData = [];
     let reportsData = [];
+    let officersData = [];
     let isShowingLogo = false;
     
     const adminPwdB64 = btoa('thomas0212');
@@ -691,8 +763,6 @@
     let bubbleInterval;
     let activeBubble = null;
     let dragStartX = 0, dragStartY = 0, dragStartTime = 0;
-
-    // 儲存氣泡接觸幀數 (ID1_ID2 -> frames)
     let collisionFrames = {};
 
     window.onload = function() {
@@ -713,6 +783,15 @@
           reportsData.push({ id: doc.id, ...doc.data() });
         });
         if (isAdmin) renderReports();
+      });
+
+      // 載入社幹卡片資料
+      db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
+        officersData = [];
+        snapshot.forEach((doc) => {
+          officersData.push({ id: doc.id, ...doc.data() });
+        });
+        renderOfficers();
       });
 
       db.collection("config").doc("announcement").onSnapshot((doc) => {
@@ -736,6 +815,69 @@
       requestAnimationFrame(physicsLoop);
     };
 
+    /* --- 社幹卡片功能 --- */
+    function renderOfficers() {
+      const container = document.getElementById('officer-list');
+      container.innerHTML = '';
+      
+      if (officersData.length === 0 && !isAdmin) {
+         container.innerHTML = '<div style="color:#888; text-align:center; width:100%;">目前尚未新增幹部資料。</div>';
+         return;
+      }
+
+      officersData.forEach(officer => {
+        const card = document.createElement('div');
+        card.className = 'officer-card';
+        
+        let html = `
+          <img class="officer-photo" src="${officer.photoUrl || 'https://via.placeholder.com/200x200?text=No+Image'}" alt="社幹照片">
+          <div class="officer-info">
+            <div class="officer-name">${officer.name}</div>
+        `;
+        
+        if (isAdmin) {
+          html += `
+            <div class="admin-controls">
+              <button class="delete-btn" onclick="deleteOfficer('${officer.id}')">刪除</button>
+            </div>
+          `;
+        }
+        
+        html += `</div>`;
+        card.innerHTML = html;
+        container.appendChild(card);
+      });
+    }
+
+    function addOfficer() {
+      const name = document.getElementById('new-officer-name').value.trim();
+      const photoUrl = document.getElementById('new-officer-photo').value.trim();
+      
+      if (!name) {
+        alert("請輸入幹部名稱！");
+        return;
+      }
+
+      db.collection("officers").add({
+        name: name,
+        photoUrl: photoUrl,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('new-officer-name').value = '';
+        document.getElementById('new-officer-photo').value = '';
+      }).catch((error) => {
+        alert('新增失敗: ' + error.message);
+      });
+    }
+
+    function deleteOfficer(docId) {
+      if (confirm('確定要刪除這張社幹卡片嗎？')) {
+        db.collection("officers").doc(docId).delete().catch(error => {
+          alert('刪除失敗: ' + error.message);
+        });
+      }
+    }
+
     function physicsLoop() {
       const qaBox = document.getElementById('qa-target-box');
       let qaRect = null;
@@ -747,10 +889,8 @@
 
       for (let i = 0; i < bubbles.length; i++) {
          let b = bubbles[i];
-         
          if (b.cooldown > 0) b.cooldown--; 
          
-         // 自我繁殖機制：每幀 1/600 機率分裂 (不可點擊的小粉塵不會自我繁殖)
          if (!b.isUnclickable && Math.random() < (1 / 600)) {
              triggerSplit(b);
              i--; 
@@ -796,7 +936,6 @@
          }
       }
 
-      // 接觸與合併判定
       for (let i = 0; i < bubbles.length; i++) {
          for (let j = i + 1; j < bubbles.length; j++) {
             let b1 = bubbles[i];
@@ -808,8 +947,6 @@
                let dist = Math.hypot(dx, dy);
                
                if (dist < (b1.size + b2.size) / 2) {
-                   
-                   // 如果任何一方在出生冷卻期，只排斥不計算合併
                    if (b1.cooldown > 0 || b2.cooldown > 0) {
                        let pushForce = 0.8;
                        if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
@@ -820,7 +957,7 @@
                    let pairId = b1.id < b2.id ? b1.id + "_" + b2.id : b2.id + "_" + b1.id;
                    currentCollisions[pairId] = (collisionFrames[pairId] || 0) + 1;
                    
-                   if (currentCollisions[pairId] >= 180) { // 接觸滿 3 秒
+                   if (currentCollisions[pairId] >= 180) { 
                        let maxSize = isBubbleMode ? 800 : 150; 
                        let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
                        b1.size = newSize;
@@ -836,7 +973,6 @@
                        
                        delete currentCollisions[pairId];
                    } else {
-                       // 接觸但未滿 3 秒，產生輕微排斥力避免完全重疊
                        let pushForce = 0.5;
                        if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
                        else { b1.vx += pushForce; b2.vx -= pushForce; }
@@ -845,7 +981,6 @@
             }
          }
       }
-      
       collisionFrames = currentCollisions;
 
       let limit = isBubbleMode ? 500 : 200; 
@@ -961,7 +1096,6 @@
              createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180);
           }
         }
-        
         b.el.remove();
         bubbles = bubbles.filter(item => item !== b);
     }
@@ -980,7 +1114,7 @@
       
       if (isBubbleMode) {
         bubbleInterval = setInterval(() => {
-          let count = (Math.floor(Math.random() * 5) + 2) * 6; // 數量超大
+          let count = (Math.floor(Math.random() * 5) + 2) * 6; 
           for(let i=0; i<count; i++) {
             let size = Math.random() * 80 + 20; 
             let vy = Math.random() * 0.4 + 0.1; 
@@ -1027,7 +1161,6 @@
 
     function triggerBubbleTransition() {
       if (!isOfficer && !isAdmin && !isBubbleMode) return;
-
       let cx = window.innerWidth / 2;
       let cy = window.innerHeight / 2;
       for (let i = 0; i < 35; i++) {
@@ -1112,10 +1245,12 @@
         document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
         document.getElementById('admin-settings-container').style.display = 'block';
         document.getElementById('admin-reports-section').style.display = 'block';
+        document.getElementById('admin-officer-box').style.display = 'flex'; // 顯示社幹新增區塊
         
         closeAuthModal();
         renderQA();
         renderReports();
+        renderOfficers();
         startBubbleSystem(); 
       } else if (b64Pwd === officerPwdB64) { 
         isBubbleMode = false;
