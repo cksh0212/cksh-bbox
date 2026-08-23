@@ -41,6 +41,7 @@
       cursor: pointer;
       transform: translate(-50%, -50%);
       will-change: transform;
+      transition: width 0.3s ease, height 0.3s ease;
     }
     .game-bubble.unclickable {
       pointer-events: none;
@@ -259,6 +260,8 @@
       margin-top: 5px;
       font-weight: bold;
     }
+    
+    /* 彈出視窗相關 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -336,6 +339,8 @@
     .yellow-border {
       border: 2px solid #ffd700;
     }
+
+    /* 內容區塊 */
     .content-wrapper {
       width: 100%;
       overflow: hidden;
@@ -374,6 +379,8 @@
       border: 1px solid rgba(255,255,255,0.03);
       font-size: 1.05rem;
     }
+
+    /* Q&A 區塊 */
     .qa-container {
       width: 100%;
       max-width: 650px;
@@ -485,16 +492,21 @@
       background: #777;
     }
 
-    /* --- 社幹卡片區塊樣式 --- */
-    .officer-grid {
+    /* --- 照片網格顯示系統 (共用邏輯) --- */
+    .photo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       margin-top: 20px;
+      padding-bottom: 50px;
     }
-    .officer-card {
+    .large-grid {
+      max-width: 700px; /* 社服社徽需要大一點的展示 */
+      grid-template-columns: 1fr; /* 單行大圖展示 */
+    }
+    .photo-card {
       background: #1e1e1e;
       border-radius: 15px;
       overflow: hidden;
@@ -505,21 +517,33 @@
       align-items: center;
       position: relative;
     }
-    .officer-photo {
+    .photo-img {
       width: 100%;
-      height: 200px;
+      height: 220px;
       object-fit: cover;
       background: #2a2a2a;
+      cursor: pointer; 
+      transition: transform 0.3s ease;
     }
-    .officer-info {
+    .large-photo-img {
+      height: 350px; /* 大尺寸展示 */
+      object-fit: contain; /* 保留完整不裁切 */
+      background: #1a1a1a;
+    }
+    .photo-img:hover {
+      transform: scale(1.05);
+    }
+    .photo-info {
       padding: 15px;
       text-align: center;
       width: 100%;
+      background: #1e1e1e; 
+      z-index: 2;
     }
-    .officer-name {
+    .photo-title {
       font-weight: bold;
       color: #00c3e3;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 5px;
     }
     .admin-controls {
@@ -533,8 +557,10 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      width: 100%;
       max-width: 400px;
       margin-top: 30px;
+      z-index: 20;
     }
     .admin-add-box input {
       padding: 10px;
@@ -544,23 +570,29 @@
       color: #fff;
     }
 
-    .placeholder-box {
-      width: 100%;
-      max-width: 550px;
-      height: 300px;
-      background: #1a1a1a;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
+    /* --- 點擊看大圖 (Lightbox) 系統 --- */
+    #lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
       justify-content: center;
-      margin-top: 10px;
-      color: #666;
-      border: 2px dashed #444;
-      box-shadow: inset 0 4px 10px rgba(0,0,0,0.2);
+      align-items: center;
+      cursor: zoom-out; 
     }
-    .empty-box {
-      color: transparent;
+    #lightbox-img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      object-fit: contain;
     }
+
+    /* 雙視圖設計區塊 */
     .design-view {
       position: absolute;
       top: 50px;
@@ -571,16 +603,27 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
+      height: 70vh;
+      overflow-y: auto;
     }
     .design-view.active-view {
       opacity: 1;
       pointer-events: auto;
+    }
+    
+    /* 隱藏卷軸 */
+    .design-view::-webkit-scrollbar {
+      display: none;
     }
   </style>
 </head>
 <body>
 
   <div id="bubble-container"></div>
+  
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="放大照片">
+  </div>
 
   <div class="nav-container">
     <div class="nav-menu">
@@ -676,51 +719,79 @@
 
   <div class="content-wrapper">
     <div class="content-track" id="slider-track">
+      <!-- Page 0 -->
       <div class="section-page">
         <h1>🎤 基本介紹</h1>
         <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
       </div>
       
+      <!-- Page 1 -->
       <div class="section-page">
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
-        <!-- 社幹卡片展示區 -->
-        <div class="officer-grid" id="officer-list"></div>
+        <div class="photo-grid" id="officer-list"></div>
 
-        <!-- 管理員新增社幹區塊 -->
         <div class="admin-add-box" id="admin-officer-box" style="display: none;">
-          <h4 style="color: #00c3e3; text-align: center;">[管理員] 新增社幹卡片</h4>
-          <input type="text" id="new-officer-name" placeholder="輸入幹部職稱與名稱 (例: 社長 小明)">
-          <input type="text" id="new-officer-photo" placeholder="貼上照片網址 (URL)">
-          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addOfficer()">新增幹部</button>
+          <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社幹</h4>
+          <input type="text" id="new-officer-name" placeholder="職稱與名稱 (例: 社長 小明)">
+          <input type="text" id="new-officer-photo" placeholder="照片檔名或網址 (例: boss.jpg)">
+          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('officers')">新增幹部</button>
         </div>
       </div>
       
+      <!-- Page 2 -->
       <div class="section-page">
         <h1>📸 各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下來。</p>
-        <div class="placeholder-box">（歷屆大合照）</div>
+        
+        <div class="photo-grid" id="group-photo-list"></div>
+
+        <div class="admin-add-box" id="admin-group-photo-box" style="display: none;">
+          <h4 style="color: #ff4b2b; text-align: center;">[圖庫管理] 新增合照</h4>
+          <input type="text" id="new-group-title" placeholder="合照標題 (例: 第一屆迎新合照)">
+          <input type="text" id="new-group-photo" placeholder="照片檔名或網址 (例: group1.jpg)">
+          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('groups')">新增合照</button>
+        </div>
       </div>
       
+      <!-- Page 3 -->
       <div class="section-page" style="position: relative;">
+        <!-- 社服區塊 -->
         <div id="view-shirt" class="design-view active-view">
           <h1>👕 社服設計</h1>
-          <p>待定</p>
-          <div class="placeholder-box empty-box"></div>
+          
+          <div class="photo-grid large-grid" id="shirt-list"></div>
+          
+          <div class="admin-add-box" id="admin-shirt-box" style="display: none; margin-bottom: 50px;">
+            <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社服</h4>
+            <input type="text" id="new-shirt-title" placeholder="版本標題 (例: 2026年社服)">
+            <input type="text" id="new-shirt-photo" placeholder="照片檔名或網址 (例: shirt.jpg)">
+            <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('shirts')">新增社服</button>
+          </div>
         </div>
         
+        <!-- 社徽區塊 -->
         <div id="view-logo" class="design-view">
           <h1>🏅 社徽圖案</h1>
-          <p>社徽是由第一屆美宣所繪製出，簡約的線條加上俐落的文字縮寫，是我們第一屆建功口技社的象徵。</p>
-          <div class="placeholder-box empty-box"></div>
+          <p style="margin-bottom:0;">社徽是由第一屆美宣所繪製出，簡約的線條加上俐落的文字縮寫，是我們第一屆建功口技社的象徵。</p>
+          
+          <div class="photo-grid large-grid" id="logo-list"></div>
+          
+          <div class="admin-add-box" id="admin-logo-box" style="display: none; margin-bottom: 50px;">
+            <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社徽</h4>
+            <input type="text" id="new-logo-title" placeholder="版本標題 (例: 第一屆社徽)">
+            <input type="text" id="new-logo-photo" placeholder="照片檔名或網址 (例: logo.jpg)">
+            <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('logos')">新增社徽</button>
+          </div>
         </div>
       </div>
       
+      <!-- Page 4 -->
       <div class="section-page">
         <h1>❓ Q&A 互動區</h1>
         <div class="qa-container" id="qa-target-box">
-          <div class="ask-box">
+          <div class="ask-box" id="ask-box">
             <input type="text" id="new-question" placeholder="對建功口技社有疑問嗎？請在此發問。">
             <button onclick="postQuestion()">發布</button>
           </div>
@@ -751,9 +822,14 @@
     let isOfficer = false;
     let isAdmin = false;
     let isBubbleMode = false;
+    let isPhotoEditor = false; // 新增修圖員變數
+    
     let qaData = [];
     let reportsData = [];
     let officersData = [];
+    let groupPhotosData = [];
+    let shirtsData = []; // 新增社服資料
+    let logosData = [];  // 新增社徽資料
     let isShowingLogo = false;
     
     const adminPwdB64 = btoa('thomas0212');
@@ -770,28 +846,31 @@
       updateBubble(activeItem);
       
       db.collection("qa").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        qaData = [];
-        snapshot.forEach((doc) => {
-          qaData.push({ id: doc.id, ...doc.data() });
-        });
+        qaData = []; snapshot.forEach(doc => qaData.push({ id: doc.id, ...doc.data() }));
         renderQA();
       });
 
       db.collection("reports").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        reportsData = [];
-        snapshot.forEach((doc) => {
-          reportsData.push({ id: doc.id, ...doc.data() });
-        });
+        reportsData = []; snapshot.forEach(doc => reportsData.push({ id: doc.id, ...doc.data() }));
         if (isAdmin) renderReports();
       });
 
-      // 載入社幹卡片資料
+      // 監聽照片資料庫
       db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-        officersData = [];
-        snapshot.forEach((doc) => {
-          officersData.push({ id: doc.id, ...doc.data() });
-        });
-        renderOfficers();
+        officersData = []; snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
+        renderGridList('officers');
+      });
+      db.collection("group_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
+        groupPhotosData = []; snapshot.forEach(doc => groupPhotosData.push({ id: doc.id, ...doc.data() }));
+        renderGridList('groups');
+      });
+      db.collection("shirts").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
+        shirtsData = []; snapshot.forEach(doc => shirtsData.push({ id: doc.id, ...doc.data() }));
+        renderGridList('shirts');
+      });
+      db.collection("logos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
+        logosData = []; snapshot.forEach(doc => logosData.push({ id: doc.id, ...doc.data() }));
+        renderGridList('logos');
       });
 
       db.collection("config").doc("announcement").onSnapshot((doc) => {
@@ -807,77 +886,108 @@
       });
 
       db.collection("config").doc("passwords").onSnapshot((doc) => {
-        if (doc.exists) {
-          if(doc.data().officer) officerPwdB64 = doc.data().officer;
-        }
+        if (doc.exists && doc.data().officer) officerPwdB64 = doc.data().officer;
       });
       
       requestAnimationFrame(physicsLoop);
     };
 
-    /* --- 社幹卡片功能 --- */
-    function renderOfficers() {
-      const container = document.getElementById('officer-list');
+    /* --- 點擊看大圖 (Lightbox) --- */
+    function openLightbox(imgUrl) {
+      document.getElementById('lightbox-img').src = imgUrl;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+      document.getElementById('lightbox-img').src = '';
+    }
+
+    /* --- 網格卡片渲染與管理系統 --- */
+    function renderGridList(type) {
+      let containerId, dataArray, emptyText;
+      if (type === 'officers') { containerId = 'officer-list'; dataArray = officersData; emptyText = '目前尚未新增幹部。'; }
+      else if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
+      else if (type === 'shirts') { containerId = 'shirt-list'; dataArray = shirtsData; emptyText = '目前尚未新增社服照片。'; }
+      else if (type === 'logos') { containerId = 'logo-list'; dataArray = logosData; emptyText = '目前尚未新增社徽照片。'; }
+      
+      const container = document.getElementById(containerId);
       container.innerHTML = '';
       
-      if (officersData.length === 0 && !isAdmin) {
-         container.innerHTML = '<div style="color:#888; text-align:center; width:100%;">目前尚未新增幹部資料。</div>';
+      if (dataArray.length === 0 && !isAdmin && !isPhotoEditor) {
+         container.innerHTML = `<div style="color:#888; text-align:center; width:100%; margin-top: 20px;">${emptyText}</div>`;
          return;
       }
 
-      officersData.forEach(officer => {
+      // 社服和社徽使用大圖片樣式
+      const imgClass = (type === 'shirts' || type === 'logos') ? 'photo-img large-photo-img' : 'photo-img';
+
+      dataArray.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'officer-card';
+        card.className = 'photo-card';
+        const displayUrl = item.photoUrl || 'https://via.placeholder.com/300x200?text=No+Image';
         
         let html = `
-          <img class="officer-photo" src="${officer.photoUrl || 'https://via.placeholder.com/200x200?text=No+Image'}" alt="社幹照片">
-          <div class="officer-info">
-            <div class="officer-name">${officer.name}</div>
+          <img class="${imgClass}" src="${displayUrl}" alt="照片" onclick="openLightbox('${displayUrl}')">
+          <div class="photo-info">
+            <div class="photo-title">${item.title}</div>
         `;
         
-        if (isAdmin) {
+        // 管理員與修圖員可見刪除按鈕
+        if (isAdmin || isPhotoEditor) {
           html += `
             <div class="admin-controls">
-              <button class="delete-btn" onclick="deleteOfficer('${officer.id}')">刪除</button>
+              <button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button>
             </div>
           `;
         }
-        
         html += `</div>`;
         card.innerHTML = html;
         container.appendChild(card);
       });
     }
 
-    function addOfficer() {
-      const name = document.getElementById('new-officer-name').value.trim();
-      const photoUrl = document.getElementById('new-officer-photo').value.trim();
+    function addGridItem(type) {
+      let titleInputId, photoInputId, collectionName;
+      if (type === 'officers') { titleInputId = 'new-officer-name'; photoInputId = 'new-officer-photo'; collectionName = 'officers'; }
+      else if (type === 'groups') { titleInputId = 'new-group-title'; photoInputId = 'new-group-photo'; collectionName = 'group_photos'; }
+      else if (type === 'shirts') { titleInputId = 'new-shirt-title'; photoInputId = 'new-shirt-photo'; collectionName = 'shirts'; }
+      else if (type === 'logos') { titleInputId = 'new-logo-title'; photoInputId = 'new-logo-photo'; collectionName = 'logos'; }
       
-      if (!name) {
-        alert("請輸入幹部名稱！");
+      const title = document.getElementById(titleInputId).value.trim();
+      const photoUrl = document.getElementById(photoInputId).value.trim();
+      
+      if (!title) {
+        alert("請輸入名稱/標題！");
         return;
       }
 
-      db.collection("officers").add({
-        name: name,
+      db.collection(collectionName).add({
+        title: title,
         photoUrl: photoUrl,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        document.getElementById('new-officer-name').value = '';
-        document.getElementById('new-officer-photo').value = '';
+        document.getElementById(titleInputId).value = '';
+        document.getElementById(photoInputId).value = '';
       }).catch((error) => {
         alert('新增失敗: ' + error.message);
       });
     }
 
-    function deleteOfficer(docId) {
-      if (confirm('確定要刪除這張社幹卡片嗎？')) {
-        db.collection("officers").doc(docId).delete().catch(error => {
+    function deleteGridItem(type, docId) {
+      let collectionName;
+      if (type === 'officers') collectionName = 'officers';
+      else if (type === 'groups') collectionName = 'group_photos';
+      else if (type === 'shirts') collectionName = 'shirts';
+      else if (type === 'logos') collectionName = 'logos';
+      
+      if (confirm('確定要刪除這張照片嗎？')) {
+        db.collection(collectionName).doc(docId).delete().catch(error => {
           alert('刪除失敗: ' + error.message);
         });
       }
     }
 
+    /* --- 物理引擎系統 --- */
     function physicsLoop() {
       const qaBox = document.getElementById('qa-target-box');
       let qaRect = null;
@@ -901,7 +1011,7 @@
             b.y -= b.vy;
             b.x += b.vx;
 
-            if (currentTabIndex === 1) {
+            if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) {
                 let edgeLimit = window.innerWidth * 0.15;
                 if (b.x > edgeLimit && b.x < window.innerWidth - edgeLimit) {
                     if (b.x < window.innerWidth / 2) b.vx -= 0.5; 
@@ -922,7 +1032,6 @@
                     else b.vx += 1.5;
                 }
             }
-
             b.vx *= 0.98;
          }
 
@@ -947,6 +1056,7 @@
                let dist = Math.hypot(dx, dy);
                
                if (dist < (b1.size + b2.size) / 2) {
+                   
                    if (b1.cooldown > 0 || b2.cooldown > 0) {
                        let pushForce = 0.8;
                        if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
@@ -993,7 +1103,6 @@
     }
 
     let globalBubbleId = 0;
-
     function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0) {
       const container = document.getElementById('bubble-container');
       const el = document.createElement('div');
@@ -1027,18 +1136,13 @@
     }
 
     window.addEventListener('mousemove', (e) => {
-        if(activeBubble) {
-            activeBubble.x = e.clientX;
-            activeBubble.y = e.clientY;
-        }
+        if(activeBubble) { activeBubble.x = e.clientX; activeBubble.y = e.clientY; }
     });
     window.addEventListener('mouseup', (e) => {
         if(activeBubble) {
             let dt = Date.now() - dragStartTime;
             let dist = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
-            if(dt < 250 && dist < 15) {
-                triggerSplit(activeBubble);
-            }
+            if(dt < 250 && dist < 15) triggerSplit(activeBubble);
             activeBubble = null;
         }
     });
@@ -1055,9 +1159,7 @@
             let dt = Date.now() - dragStartTime;
             let touch = e.changedTouches[0];
             let dist = Math.hypot(touch.clientX - dragStartX, touch.clientY - dragStartY);
-            if(dt < 250 && dist < 15) {
-                triggerSplit(activeBubble);
-            }
+            if(dt < 250 && dist < 15) triggerSplit(activeBubble);
             activeBubble = null;
         }
     });
@@ -1102,7 +1204,7 @@
 
     function getSpawnX() {
         let w = window.innerWidth;
-        if (currentTabIndex === 1) {
+        if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) {
             return Math.random() < 0.5 ? Math.random() * (w * 0.15) : w - (Math.random() * (w * 0.15));
         }
         return Math.random() * w;
@@ -1122,7 +1224,7 @@
             createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180); 
           }
         }, 800); 
-      } else if (isAdmin) {
+      } else if (isAdmin || isPhotoEditor) {
         bubbleInterval = setInterval(() => {
           let size = Math.random() * 20 + 30;
           let vy = Math.random() * 0.8 + 0.5;
@@ -1160,7 +1262,7 @@
     }
 
     function triggerBubbleTransition() {
-      if (!isOfficer && !isAdmin && !isBubbleMode) return;
+      if (!isOfficer && !isAdmin && !isBubbleMode && !isPhotoEditor) return;
       let cx = window.innerWidth / 2;
       let cy = window.innerHeight / 2;
       for (let i = 0; i < 35; i++) {
@@ -1195,6 +1297,7 @@
       }, 200); 
     }
 
+    /* --- Auth & UI 控制 --- */
     function openAuthModal() {
       document.getElementById('auth-modal').style.display = 'flex';
       document.getElementById('auth-password').value = '';
@@ -1202,7 +1305,6 @@
     function closeAuthModal() {
       document.getElementById('auth-modal').style.display = 'none';
     }
-
     function openReportModal() {
       document.getElementById('report-modal').style.display = 'flex';
       document.getElementById('report-input').value = '';
@@ -1210,7 +1312,6 @@
     function closeReportModal() {
       document.getElementById('report-modal').style.display = 'none';
     }
-
     function openPwdModal() {
       document.getElementById('pwd-modal').style.display = 'flex';
       document.getElementById('new-officer-pwd').value = '';
@@ -1224,41 +1325,61 @@
       const b64Pwd = btoa(pwd);
 
       if (pwd === 'bubble') {
-        isBubbleMode = true;
-        isOfficer = false;
-        isAdmin = false;
+        isBubbleMode = true; isPhotoEditor = false; isOfficer = false; isAdmin = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '泡泡模式';
-        btn.disabled = true;
+        btn.innerText = '泡泡模式'; btn.disabled = true;
         closeAuthModal();
         renderQA();
         startBubbleSystem(); 
-      } else if (b64Pwd === adminPwdB64) {
-        isBubbleMode = false;
-        isOfficer = true;
-        isAdmin = true;
+      } else if (pwd === 'photoeditor') {
+        // 修圖員模式：專屬圖庫權限，禁用文字與發言功能
+        isPhotoEditor = true; isBubbleMode = false; isOfficer = false; isAdmin = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '管理員';
-        btn.disabled = true;
+        btn.innerText = '修圖員'; btn.disabled = true;
+        
+        // 隱藏 Q&A 輸入框
+        document.getElementById('ask-box').style.display = 'none';
+        
+        // 顯示圖庫管理區塊
+        document.getElementById('admin-officer-box').style.display = 'flex';
+        document.getElementById('admin-group-photo-box').style.display = 'flex';
+        document.getElementById('admin-shirt-box').style.display = 'flex';
+        document.getElementById('admin-logo-box').style.display = 'flex';
+        
+        closeAuthModal();
+        renderQA();
+        renderGridList('officers');
+        renderGridList('groups');
+        renderGridList('shirts');
+        renderGridList('logos');
+        startBubbleSystem(); 
+      } else if (b64Pwd === adminPwdB64) {
+        isAdmin = true; isOfficer = true; isBubbleMode = false; isPhotoEditor = false;
+        const btn = document.getElementById('auth-btn-float');
+        btn.innerText = '管理員'; btn.disabled = true;
         
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
         document.getElementById('admin-settings-container').style.display = 'block';
         document.getElementById('admin-reports-section').style.display = 'block';
-        document.getElementById('admin-officer-box').style.display = 'flex'; // 顯示社幹新增區塊
+        
+        document.getElementById('admin-officer-box').style.display = 'flex';
+        document.getElementById('admin-group-photo-box').style.display = 'flex';
+        document.getElementById('admin-shirt-box').style.display = 'flex';
+        document.getElementById('admin-logo-box').style.display = 'flex';
         
         closeAuthModal();
         renderQA();
         renderReports();
-        renderOfficers();
+        renderGridList('officers');
+        renderGridList('groups');
+        renderGridList('shirts');
+        renderGridList('logos');
         startBubbleSystem(); 
       } else if (b64Pwd === officerPwdB64) { 
-        isBubbleMode = false;
-        isOfficer = true;
-        isAdmin = false;
+        isOfficer = true; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '已認證';
-        btn.disabled = true;
+        btn.innerText = '已認證'; btn.disabled = true;
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         
         closeAuthModal();
@@ -1275,18 +1396,9 @@
       const textarea = document.getElementById('edit-announcement-textarea');
       const saveBtn = document.getElementById('save-announcement-btn');
 
-      if (textarea.style.display === 'block') {
-         textarea.style.display = 'none';
-         saveBtn.style.display = 'none';
-      }
-
-      if (content.style.display === 'block') {
-        content.style.display = 'none';
-        toggleText.innerText = '[點擊查看]';
-      } else {
-        content.style.display = 'block';
-        toggleText.innerText = '[收起]';
-      }
+      if (textarea.style.display === 'block') { textarea.style.display = 'none'; saveBtn.style.display = 'none'; }
+      if (content.style.display === 'block') { content.style.display = 'none'; toggleText.innerText = '[點擊查看]'; } 
+      else { content.style.display = 'block'; toggleText.innerText = '[收起]'; }
     }
 
     function toggleEditAnnouncement() {
@@ -1296,14 +1408,9 @@
         const toggleText = document.getElementById('toggle-announcement-text');
 
         if (textarea.style.display === 'block') {
-            textarea.style.display = 'none';
-            saveBtn.style.display = 'none';
-            content.style.display = 'block';
+            textarea.style.display = 'none'; saveBtn.style.display = 'none'; content.style.display = 'block';
         } else {
-            content.style.display = 'none';
-            textarea.style.display = 'block';
-            saveBtn.style.display = 'block';
-            toggleText.innerText = '[收起]';
+            content.style.display = 'none'; textarea.style.display = 'block'; saveBtn.style.display = 'block'; toggleText.innerText = '[收起]';
         }
     }
 
@@ -1322,13 +1429,9 @@
         const saveBtn = document.getElementById('save-maintenance-btn');
 
         if (textarea.style.display === 'block') {
-            textarea.style.display = 'none';
-            saveBtn.style.display = 'none';
-            content.style.display = 'block';
+            textarea.style.display = 'none'; saveBtn.style.display = 'none'; content.style.display = 'block';
         } else {
-            content.style.display = 'none';
-            textarea.style.display = 'block';
-            saveBtn.style.display = 'block';
+            content.style.display = 'none'; textarea.style.display = 'block'; saveBtn.style.display = 'block';
         }
     }
 
@@ -1407,17 +1510,16 @@
     }
 
     function postQuestion() {
+      if (isPhotoEditor) return; // 防呆機制
+      
       const input = document.getElementById('new-question');
       const text = input.value.trim();
       
       if (text !== '') {
         const existing = qaData.find(item => item.q === text);
         if (existing) {
-          if (existing.a) {
-            alert('此問題已有解答。\n\n答覆：' + existing.a);
-          } else {
-            alert('此問題已存在，等待回覆中。');
-          }
+          if (existing.a) alert('此問題已有解答。\n\n答覆：' + existing.a);
+          else alert('此問題已存在，等待回覆中。');
           input.value = '';
           return;
         }
@@ -1439,9 +1541,7 @@
       const replyInput = document.getElementById(`reply-${docId}`);
       const replyText = replyInput.value.trim();
       if (replyText !== '') {
-        db.collection("qa").doc(docId).update({
-          a: replyText
-        });
+        db.collection("qa").doc(docId).update({ a: replyText });
       } else {
         alert('請輸入回覆內容。');
       }
@@ -1462,13 +1562,13 @@
         const qaItem = document.createElement('div');
         qaItem.className = 'qa-item';
         let html = `<div class="qa-header"><div class="qa-q-text">Q: ${item.q}</div>`;
-        if (isOfficer || isAdmin) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
+        if (isAdmin || isOfficer) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         html += `</div>`;
         if (item.a) {
           html += `<div class="qa-a">A: ${item.a}</div>`;
         } else {
           html += `<div class="qa-pending">（等待回覆中）</div>`;
-          if (isOfficer || isAdmin) {
+          if (isAdmin || isOfficer) {
             html += `
               <div class="reply-box">
                 <input type="text" id="reply-${item.id}" placeholder="輸入回覆內容...">
