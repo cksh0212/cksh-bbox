@@ -134,6 +134,7 @@
       background: #ff4b2b;
       box-shadow: 0 2px 5px rgba(255, 75, 43, 0.5);
     }
+    
     #auth-btn-float {
       position: fixed;
       right: 30px;
@@ -160,13 +161,7 @@
       transform: scale(1.1);
       box-shadow: 0 6px 20px rgba(0, 195, 227, 0.6);
     }
-    #auth-btn-float:disabled {
-      background-color: #333;
-      color: #777;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-    }
+
     #left-info-panel {
       position: fixed;
       left: 20px;
@@ -492,7 +487,7 @@
       background: #777;
     }
 
-    /* --- 照片網格顯示系統 (共用邏輯) --- */
+    /* --- 照片網格顯示系統 (合照、社服、社徽使用) --- */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -503,9 +498,39 @@
       padding-bottom: 50px;
     }
     .large-grid {
-      max-width: 700px; /* 社服社徽需要大一點的展示 */
-      grid-template-columns: 1fr; /* 單行大圖展示 */
+      max-width: 700px; 
+      grid-template-columns: 1fr; 
     }
+    
+    /* --- 社幹專用垂直滾動列表 --- */
+    .officer-scroll-list {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      width: 100%;
+      max-width: 350px; /* 限制卡片寬度使其像手機版動態牆 */
+      max-height: 60vh; /* 限制高度，啟用內部滾動 */
+      overflow-y: auto;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 15px;
+      /* 加點內陰影看起來更像一個容器 */
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+      background: rgba(20,20,20,0.5);
+    }
+    /* 自訂社幹區塊滾動條 */
+    .officer-scroll-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .officer-scroll-list::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    .officer-scroll-list::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
     .photo-card {
       background: #1e1e1e;
       border-radius: 15px;
@@ -516,6 +541,7 @@
       flex-direction: column;
       align-items: center;
       position: relative;
+      width: 100%;
     }
     .photo-img {
       width: 100%;
@@ -526,8 +552,8 @@
       transition: transform 0.3s ease;
     }
     .large-photo-img {
-      height: 350px; /* 大尺寸展示 */
-      object-fit: contain; /* 保留完整不裁切 */
+      height: 350px; 
+      object-fit: contain; 
       background: #1a1a1a;
     }
     .photo-img:hover {
@@ -610,8 +636,6 @@
       opacity: 1;
       pointer-events: auto;
     }
-    
-    /* 隱藏卷軸 */
     .design-view::-webkit-scrollbar {
       display: none;
     }
@@ -676,7 +700,7 @@
     </div>
   </div>
 
-  <button id="auth-btn-float" onclick="openAuthModal()">社幹<br>認證</button>
+  <button id="auth-btn-float" onclick="handleAuthBtnClick()">社幹<br>認證</button>
 
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
@@ -730,7 +754,8 @@
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
-        <div class="photo-grid" id="officer-list"></div>
+        <!-- 改為垂直滾動列表 -->
+        <div class="officer-scroll-list" id="officer-list"></div>
 
         <div class="admin-add-box" id="admin-officer-box" style="display: none;">
           <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社幹</h4>
@@ -757,7 +782,6 @@
       
       <!-- Page 3 -->
       <div class="section-page" style="position: relative;">
-        <!-- 社服區塊 -->
         <div id="view-shirt" class="design-view active-view">
           <h1>👕 社服設計</h1>
           
@@ -771,7 +795,6 @@
           </div>
         </div>
         
-        <!-- 社徽區塊 -->
         <div id="view-logo" class="design-view">
           <h1>🏅 社徽圖案</h1>
           <p style="margin-bottom:0;">社徽是由第一屆美宣所繪製出，簡約的線條加上俐落的文字縮寫，是我們第一屆建功口技社的象徵。</p>
@@ -822,14 +845,14 @@
     let isOfficer = false;
     let isAdmin = false;
     let isBubbleMode = false;
-    let isPhotoEditor = false; // 新增修圖員變數
+    let isPhotoEditor = false; 
     
     let qaData = [];
     let reportsData = [];
     let officersData = [];
     let groupPhotosData = [];
-    let shirtsData = []; // 新增社服資料
-    let logosData = [];  // 新增社徽資料
+    let shirtsData = []; 
+    let logosData = [];  
     let isShowingLogo = false;
     
     const adminPwdB64 = btoa('thomas0212');
@@ -855,7 +878,6 @@
         if (isAdmin) renderReports();
       });
 
-      // 監聽照片資料庫
       db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         officersData = []; snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
         renderGridList('officers');
@@ -918,7 +940,6 @@
          return;
       }
 
-      // 社服和社徽使用大圖片樣式
       const imgClass = (type === 'shirts' || type === 'logos') ? 'photo-img large-photo-img' : 'photo-img';
 
       dataArray.forEach(item => {
@@ -932,7 +953,6 @@
             <div class="photo-title">${item.title}</div>
         `;
         
-        // 管理員與修圖員可見刪除按鈕
         if (isAdmin || isPhotoEditor) {
           html += `
             <div class="admin-controls">
@@ -1080,7 +1100,6 @@
                        b2.el.remove();
                        bubbles.splice(j, 1);
                        j--;
-                       
                        delete currentCollisions[pairId];
                    } else {
                        let pushForce = 0.5;
@@ -1297,7 +1316,49 @@
       }, 200); 
     }
 
-    /* --- Auth & UI 控制 --- */
+    /* --- Auth & 登出控制 --- */
+    function handleAuthBtnClick() {
+      // 判斷是否已經登入
+      if (isOfficer || isAdmin || isBubbleMode || isPhotoEditor) {
+        if (confirm("要登出當前帳號嗎？")) {
+          // 清除所有權限狀態
+          isOfficer = false;
+          isAdmin = false;
+          isBubbleMode = false;
+          isPhotoEditor = false;
+          
+          const btn = document.getElementById('auth-btn-float');
+          btn.innerHTML = '社幹<br>認證';
+          
+          // 隱藏所有管理員專屬區塊
+          document.getElementById('edit-announcement-btn').style.display = 'none';
+          document.getElementById('edit-maintenance-btn').style.display = 'none';
+          document.getElementById('admin-settings-container').style.display = 'none';
+          document.getElementById('admin-reports-section').style.display = 'none';
+          
+          document.getElementById('admin-officer-box').style.display = 'none';
+          document.getElementById('admin-group-photo-box').style.display = 'none';
+          document.getElementById('admin-shirt-box').style.display = 'none';
+          document.getElementById('admin-logo-box').style.display = 'none';
+          
+          // 恢復顯示被修圖員隱藏的發問框
+          document.getElementById('ask-box').style.display = 'flex';
+          
+          // 重新渲染畫面 (清除刪除按鈕)
+          renderQA();
+          renderGridList('officers');
+          renderGridList('groups');
+          renderGridList('shirts');
+          renderGridList('logos');
+          
+          // 氣泡系統切回未登入模式
+          startBubbleSystem(); 
+        }
+      } else {
+        openAuthModal();
+      }
+    }
+
     function openAuthModal() {
       document.getElementById('auth-modal').style.display = 'flex';
       document.getElementById('auth-password').value = '';
@@ -1305,6 +1366,7 @@
     function closeAuthModal() {
       document.getElementById('auth-modal').style.display = 'none';
     }
+
     function openReportModal() {
       document.getElementById('report-modal').style.display = 'flex';
       document.getElementById('report-input').value = '';
@@ -1312,6 +1374,7 @@
     function closeReportModal() {
       document.getElementById('report-modal').style.display = 'none';
     }
+
     function openPwdModal() {
       document.getElementById('pwd-modal').style.display = 'flex';
       document.getElementById('new-officer-pwd').value = '';
@@ -1327,20 +1390,17 @@
       if (pwd === 'bubble') {
         isBubbleMode = true; isPhotoEditor = false; isOfficer = false; isAdmin = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '泡泡模式'; btn.disabled = true;
+        btn.innerText = '泡泡模式'; 
         closeAuthModal();
         renderQA();
         startBubbleSystem(); 
       } else if (pwd === 'photoeditor') {
-        // 修圖員模式：專屬圖庫權限，禁用文字與發言功能
         isPhotoEditor = true; isBubbleMode = false; isOfficer = false; isAdmin = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '修圖員'; btn.disabled = true;
+        btn.innerText = '修圖員'; 
         
-        // 隱藏 Q&A 輸入框
         document.getElementById('ask-box').style.display = 'none';
         
-        // 顯示圖庫管理區塊
         document.getElementById('admin-officer-box').style.display = 'flex';
         document.getElementById('admin-group-photo-box').style.display = 'flex';
         document.getElementById('admin-shirt-box').style.display = 'flex';
@@ -1356,7 +1416,7 @@
       } else if (b64Pwd === adminPwdB64) {
         isAdmin = true; isOfficer = true; isBubbleMode = false; isPhotoEditor = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '管理員'; btn.disabled = true;
+        btn.innerText = '管理員'; 
         
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
@@ -1379,7 +1439,7 @@
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
         const btn = document.getElementById('auth-btn-float');
-        btn.innerText = '已認證'; btn.disabled = true;
+        btn.innerText = '已認證'; 
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         
         closeAuthModal();
@@ -1510,7 +1570,7 @@
     }
 
     function postQuestion() {
-      if (isPhotoEditor) return; // 防呆機制
+      if (isPhotoEditor) return; 
       
       const input = document.getElementById('new-question');
       const text = input.value.trim();
