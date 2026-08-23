@@ -730,11 +730,11 @@
         }
       });
       
-      startBubbleSystem();
+      // 確保一開始未登入時不要產生氣泡，等待登入再啟動
+      // startBubbleSystem(); <-- 移除這行
       requestAnimationFrame(physicsLoop);
     };
 
-    /* --- 物理引擎與無敵冷卻時間 --- */
     function physicsLoop() {
       const qaBox = document.getElementById('qa-target-box');
       let qaRect = null;
@@ -745,7 +745,7 @@
       for (let i = 0; i < bubbles.length; i++) {
          let b = bubbles[i];
          
-         if (b.cooldown > 0) b.cooldown--; // 減少無敵冷卻時間
+         if (b.cooldown > 0) b.cooldown--; 
          
          if (b !== activeBubble) {
             b.y -= b.vy;
@@ -786,7 +786,6 @@
          }
       }
 
-      // 碰撞合併判定 (加入冷卻時間檢查)
       for (let i = 0; i < bubbles.length; i++) {
          for (let j = i + 1; j < bubbles.length; j++) {
             let b1 = bubbles[i];
@@ -829,7 +828,6 @@
       el.style.width = size + 'px';
       el.style.height = size + 'px';
       
-      // 新增 cooldown 屬性
       let bubbleObj = { el, x, y, vx, vy, size, splits, isUnclickable, cooldown };
       
       if (!isUnclickable) {
@@ -895,15 +893,11 @@
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 21) + 10; 
             for(let i=0; i<count; i++) {
-               // 加大散開的隨機位移
                let startOffsetX = (Math.random() * 40 - 20);
                let startOffsetY = (Math.random() * 40 - 20);
-               
                let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
                let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
-               
                let newSize = Math.random() * 8 + 12;
-               // 賦予 30 幀的無敵冷卻時間 (約 0.5 秒)
                createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 30);
             }
           } else {
@@ -932,6 +926,7 @@
         return Math.random() * w;
     }
 
+    // 只有在已登入(社幹/管理員)的情況下才會呼叫此功能
     function startBubbleSystem() {
       clearInterval(bubbleInterval);
       let h = window.innerHeight + 100; 
@@ -953,27 +948,8 @@
             createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 0, true);
           }
         }, 1000);
-      } else {
-        bubbleInterval = setInterval(() => {
-          let leftCount = Math.floor(Math.random() * 4) + 2;
-          for(let i=0; i<leftCount; i++) {
-            let size = Math.random() * 30 + 15;
-            let vy = Math.random() * 0.8 + 0.5; 
-            let vx = Math.random() * 1 - 0.5;
-            let spawnX = (currentTabIndex === 1) ? Math.random() * (window.innerWidth*0.15) : Math.random() * (window.innerWidth*0.2);
-            createBubble(size, spawnX, h + (Math.random()*100), vx, vy, 0, false);
-          }
-          let rightCount = Math.floor(Math.random() * 4) + 2;
-          for(let i=0; i<rightCount; i++) {
-            let size = Math.random() * 30 + 15;
-            let vy = Math.random() * 0.8 + 0.5;
-            let vx = Math.random() * 1 - 0.5;
-            let w = window.innerWidth;
-            let spawnX = (currentTabIndex === 1) ? w - Math.random()*(w*0.15) : w - Math.random()*(w*0.2);
-            createBubble(size, spawnX, h + (Math.random()*100), vx, vy, 0, false);
-          }
-        }, 3000);
       }
+      // 未登入則什麼都不做，不會有氣泡產生
     }
 
     function switchTab(index, element) {
@@ -994,6 +970,9 @@
     }
 
     function triggerBubbleTransition() {
+      // 避免未登入訪客看到彩蛋特效
+      if (!isOfficer && !isAdmin) return;
+
       let cx = window.innerWidth / 2;
       let cy = window.innerHeight / 2;
       for (let i = 0; i < 35; i++) {
@@ -1071,7 +1050,7 @@
         closeAuthModal();
         renderQA();
         renderReports();
-        startBubbleSystem(); 
+        startBubbleSystem(); // 登入成功後開始產生氣泡
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true;
         isAdmin = false;
@@ -1082,7 +1061,7 @@
         
         closeAuthModal();
         renderQA();
-        startBubbleSystem();
+        startBubbleSystem(); // 登入成功後開始產生氣泡
       } else {
         alert('密碼錯誤。');
       }
