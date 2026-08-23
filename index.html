@@ -691,6 +691,9 @@
     let activeBubble = null;
     let dragStartX = 0, dragStartY = 0, dragStartTime = 0;
 
+    // 儲存正在碰撞的氣泡對 (格式: id1_id2 -> 接觸幀數)
+    let collisionFrames = {}; 
+
     window.onload = function() {
       const activeItem = document.querySelector('.nav-item.active');
       updateBubble(activeItem);
@@ -739,11 +742,21 @@
          qaRect = qaBox.getBoundingClientRect();
       }
 
+      // 用來記錄這一幀有發生物理碰撞的氣泡對，未發生的就會被重置
+      let currentCollisions = {};
+
       for (let i = 0; i < bubbles.length; i++) {
          let b = bubbles[i];
          
          if (b.cooldown > 0) b.cooldown--; 
          
+         // --- 隨機自我繁殖機制 (每幀 1/600 機率，相當於每秒 1/10) ---
+         if (!b.isUnclickable && Math.random() < (1 / 600)) {
+             triggerSplit(b);
+             i--; // 因為 b 被移除了，退回一格
+             continue;
+         }
+
          if (b !== activeBubble) {
             b.y -= b.vy;
             b.x += b.vx;
@@ -783,6 +796,7 @@
          }
       }
 
+      // 碰撞合併與接觸時間判定
       for (let i = 0; i < bubbles.length; i++) {
          for (let j = i + 1; j < bubbles.length; j++) {
             let b1 = bubbles[i];
@@ -794,24 +808,43 @@
                let dist = Math.hypot(dx, dy);
                
                if (dist < (b1.size + b2.size) / 2) {
-                   let maxSize = isBubbleMode ? 800 : 150; 
-                   let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
-                   b1.size = newSize;
-                   b1.el.style.width = newSize + 'px';
-                   b1.el.style.height = newSize + 'px';
-                   b1.splits = Math.max(b1.splits, b2.splits);
+                   // 產生一個唯一 ID 來記錄這對氣泡
+                   let pairId = b1.id < b2.id ? b1.id + "_" + b2.id : b2.id + "_" + b1.id;
                    
-                   if (b2 === activeBubble) activeBubble = b1;
+                   // 若之前已經接觸，增加幀數；否則從 1 開始
+                   currentCollisions[pairId] = (collisionFrames[pairId] || 0) + 1;
                    
-                   b2.el.remove();
-                   bubbles.splice(j, 1);
-                   j--;
+                   // 如果接觸超過 180 幀 (約 3 秒)，則執行合併
+                   if (currentCollisions[pairId] >= 180) {
+                       let maxSize = isBubbleMode ? 800 : 150; 
+                       let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
+                       b1.size = newSize;
+                       b1.el.style.width = newSize + 'px';
+                       b1.el.style.height = newSize + 'px';
+                       b1.splits = Math.max(b1.splits, b2.splits);
+                       
+                       if (b2 === activeBubble) activeBubble = b1;
+                       
+                       b2.el.remove();
+                       bubbles.splice(j, 1);
+                       j--;
+                       
+                       // 合併後重置這對的紀錄
+                       delete currentCollisions[pairId];
+                   } else {
+                       // 尚未到達 3 秒，讓氣泡互相產生輕微排斥力，避免完全重疊
+                       let pushForce = 0.5;
+                       if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
+                       else { b1.vx += pushForce; b2.vx -= pushForce; }
+                   }
                }
             }
          }
       }
+      // 更新全域碰撞紀錄，如果沒接觸了就會自然消失 (歸零)
+      collisionFrames = currentCollisions;
 
-      let limit = isBubbleMode ? 300 : 200;
+      let limit = isBubbleMode ? 500 : 200; // 泡泡模式允許更多氣泡共存
       if (bubbles.length > limit) {
          let oldest = bubbles.shift();
          oldest.el.remove();
@@ -820,6 +853,9 @@
       requestAnimationFrame(physicsLoop);
     }
 
+    // 全域 ID 用於記錄碰撞配對
+    let globalBubbleId = 0;
+
     function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0) {
       const container = document.getElementById('bubble-container');
       const el = document.createElement('div');
@@ -827,7 +863,8 @@
       el.style.width = size + 'px';
       el.style.height = size + 'px';
       
-      let bubbleObj = { el, x, y, vx, vy, size, splits, isUnclickable, cooldown };
+      globalBubbleId++;
+      let bubbleObj = { id: globalBubbleId, el, x, y, vx, vy, size, splits, isUnclickable, cooldown };
       
       if (!isUnclickable) {
          const startInteraction = function(e) {
@@ -894,8 +931,7 @@
                let startOffsetX = (Math.random() * 40 - 20);
                let sprayVx = (startOffsetX / 3);
                let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
-               let newSize = Math.random() * b.size + 10; 
-               // 加入 180 幀 (約 3 秒) 的無敵冷卻時間
+               let newSize = Math.max(Math.random() * b.size, 10); // 確保不會太小
                createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180);
           }
         } else if (isAdmin) {
@@ -907,7 +943,6 @@
                let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
                let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
                let newSize = Math.random() * 8 + 12;
-               // 加入 180 幀 (約 3 秒) 的無敵冷卻時間
                createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180);
             }
           } else {
@@ -920,7 +955,6 @@
           for(let i=0; i<count; i++) {
              let startOffsetX = (Math.random() * 20 - 10);
              let sprayVx = (startOffsetX / 2);
-             // 加入 180 幀 (約 3 秒) 的無敵冷卻時間
              createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180);
           }
         }
@@ -943,15 +977,14 @@
       
       if (isBubbleMode) {
         bubbleInterval = setInterval(() => {
-          let count = (Math.floor(Math.random() * 5) + 2) * 3; 
+          let count = (Math.floor(Math.random() * 5) + 2) * 6; // 泡泡模式生成數量超級加倍
           for(let i=0; i<count; i++) {
             let size = Math.random() * 80 + 20; 
             let vy = Math.random() * 0.4 + 0.1; 
             let vx = Math.random() * 2 - 1;
-            // 產生的新氣泡也給予 180 幀的無敵時間
             createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180); 
           }
-        }, 1000);
+        }, 800); // 縮短生成間隔
       } else if (isAdmin) {
         bubbleInterval = setInterval(() => {
           let size = Math.random() * 20 + 30;
