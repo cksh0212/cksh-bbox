@@ -18,7 +18,6 @@
       position: relative;
     }
     
-    /* 物理氣泡系統樣式 */
     #bubble-container {
       position: fixed;
       top: 0;
@@ -52,7 +51,6 @@
       border-color: rgba(255, 75, 43, 0.6);
     }
 
-    /* 原有 UI 樣式 */
     .nav-container {
       display: flex;
       justify-content: center;
@@ -516,11 +514,35 @@
       opacity: 1;
       pointer-events: auto;
     }
+    #wind-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    .wind-line {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, #00c3e3, #ffffff, transparent);
+      border-radius: 5px;
+      transform: translateX(-150vw);
+      opacity: 0;
+    }
+    @keyframes windBlow {
+      0% { transform: translateX(-150vw); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateX(150vw); opacity: 0; }
+    }
   </style>
 </head>
 <body>
 
   <div id="bubble-container"></div>
+  <div id="wind-overlay"></div>
 
   <div class="nav-container">
     <div class="nav-menu">
@@ -680,6 +702,7 @@
     let currentTabIndex = 0;
     let isOfficer = false;
     let isAdmin = false;
+    let isBubbleMode = false;
     let qaData = [];
     let reportsData = [];
     let isShowingLogo = false;
@@ -730,8 +753,6 @@
         }
       });
       
-      // 確保一開始未登入時不要產生氣泡，等待登入再啟動
-      // startBubbleSystem(); <-- 移除這行
       requestAnimationFrame(physicsLoop);
     };
 
@@ -797,7 +818,8 @@
                let dist = Math.hypot(dx, dy);
                
                if (dist < (b1.size + b2.size) / 2) {
-                   let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), 150);
+                   let maxSize = isBubbleMode ? 800 : 150; // 彩蛋模式可無限變大
+                   let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
                    b1.size = newSize;
                    b1.el.style.width = newSize + 'px';
                    b1.el.style.height = newSize + 'px';
@@ -813,7 +835,8 @@
          }
       }
 
-      if (bubbles.length > 200) {
+      let limit = isBubbleMode ? 300 : 200;
+      if (bubbles.length > limit) {
          let oldest = bubbles.shift();
          oldest.el.remove();
       }
@@ -889,7 +912,16 @@
     });
 
     function triggerSplit(b) {
-        if (isAdmin) {
+        if (isBubbleMode) {
+          let count = Math.floor(Math.random() * 3) + 2; 
+          for(let i=0; i<count; i++) {
+               let startOffsetX = (Math.random() * 40 - 20);
+               let sprayVx = (startOffsetX / 3);
+               let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
+               let newSize = Math.random() * b.size + 10; 
+               createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 15);
+          }
+        } else if (isAdmin) {
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 21) + 10; 
             for(let i=0; i<count; i++) {
@@ -926,12 +958,21 @@
         return Math.random() * w;
     }
 
-    // 只有在已登入(社幹/管理員)的情況下才會呼叫此功能
     function startBubbleSystem() {
       clearInterval(bubbleInterval);
       let h = window.innerHeight + 100; 
       
-      if (isAdmin) {
+      if (isBubbleMode) {
+        bubbleInterval = setInterval(() => {
+          let count = (Math.floor(Math.random() * 5) + 2) * 3; // 數量3倍
+          for(let i=0; i<count; i++) {
+            let size = Math.random() * 80 + 20; // 初始大小隨機
+            let vy = Math.random() * 0.4 + 0.1; // 上升極緩慢
+            let vx = Math.random() * 2 - 1;
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false); // 無限分裂
+          }
+        }, 1000);
+      } else if (isAdmin) {
         bubbleInterval = setInterval(() => {
           let size = Math.random() * 20 + 30;
           let vy = Math.random() * 0.8 + 0.5;
@@ -949,7 +990,6 @@
           }
         }, 1000);
       }
-      // 未登入則什麼都不做，不會有氣泡產生
     }
 
     function switchTab(index, element) {
@@ -970,8 +1010,7 @@
     }
 
     function triggerBubbleTransition() {
-      // 避免未登入訪客看到彩蛋特效
-      if (!isOfficer && !isAdmin) return;
+      if (!isOfficer && !isAdmin && !isBubbleMode) return;
 
       let cx = window.innerWidth / 2;
       let cy = window.innerHeight / 2;
@@ -1035,7 +1074,18 @@
       const pwd = document.getElementById('auth-password').value;
       const b64Pwd = btoa(pwd);
 
-      if (b64Pwd === adminPwdB64) {
+      if (pwd === 'bubble') {
+        isBubbleMode = true;
+        isOfficer = false;
+        isAdmin = false;
+        const btn = document.getElementById('auth-btn-float');
+        btn.innerText = '泡泡模式';
+        btn.disabled = true;
+        closeAuthModal();
+        renderQA();
+        startBubbleSystem(); 
+      } else if (b64Pwd === adminPwdB64) {
+        isBubbleMode = false;
         isOfficer = true;
         isAdmin = true;
         const btn = document.getElementById('auth-btn-float');
@@ -1050,8 +1100,9 @@
         closeAuthModal();
         renderQA();
         renderReports();
-        startBubbleSystem(); // 登入成功後開始產生氣泡
+        startBubbleSystem(); 
       } else if (b64Pwd === officerPwdB64) { 
+        isBubbleMode = false;
         isOfficer = true;
         isAdmin = false;
         const btn = document.getElementById('auth-btn-float');
@@ -1061,7 +1112,7 @@
         
         closeAuthModal();
         renderQA();
-        startBubbleSystem(); // 登入成功後開始產生氣泡
+        startBubbleSystem();
       } else {
         alert('密碼錯誤。');
       }
