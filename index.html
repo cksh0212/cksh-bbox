@@ -129,6 +129,89 @@
       cursor: not-allowed;
       transform: none;
     }
+    #left-info-panel {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 997;
+    }
+    .info-box {
+      background: rgba(30, 30, 30, 0.6);
+      padding: 10px 15px;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      color: #ccc;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      max-width: 250px;
+    }
+    .announcement-header {
+      font-weight: bold;
+      color: #00c3e3;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .announcement-content {
+      display: none;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .toggle-text {
+      font-size: 11px;
+      color: #888;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .edit-btn {
+      display: none;
+      background: none;
+      border: 1px solid #00c3e3;
+      color: #00c3e3;
+      border-radius: 3px;
+      padding: 2px 5px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .edit-btn:hover {
+      background: #00c3e3;
+      color: #000;
+    }
+    #edit-announcement-textarea {
+      width: 100%;
+      background: #121212;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 60px;
+      display: none;
+      margin-top: 5px;
+    }
+    .save-btn {
+      display: none;
+      background: #00c3e3;
+      color: #000;
+      border: none;
+      border-radius: 3px;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+    .maintenance-log {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.5;
+    }
     #auth-modal {
       display: none;
       position: fixed;
@@ -310,7 +393,6 @@
     }
     .qa-pending {
       color: #777;
-      font-style: italic;
     }
     .reply-box {
       margin-top: 15px;
@@ -355,8 +437,6 @@
     .empty-box {
       color: transparent;
     }
-
-    /* 雙視圖切換區塊 */
     .design-view {
       position: absolute;
       top: 50px;
@@ -372,8 +452,6 @@
       opacity: 1;
       pointer-events: auto;
     }
-
-    /* 快速風切動畫 */
     #wind-overlay {
       position: fixed;
       top: 0;
@@ -424,6 +502,26 @@
     </div>
   </div>
 
+  <div id="left-info-panel">
+    <div class="info-box">
+      <div class="announcement-header">
+        社團公告
+        <button class="edit-btn" id="edit-announcement-btn" onclick="toggleEditAnnouncement()">編輯</button>
+      </div>
+      <div class="toggle-text" id="toggle-announcement-text" onclick="toggleAnnouncement()">[點擊查看]</div>
+      <div class="announcement-content" id="announcement-display">
+        讀取中...
+      </div>
+      <textarea id="edit-announcement-textarea"></textarea>
+      <button class="save-btn" id="save-announcement-btn" onclick="saveAnnouncement()">儲存</button>
+    </div>
+    
+    <div class="info-box maintenance-log">
+      維修紀錄：<br>
+      - 2026/08/23
+    </div>
+  </div>
+
   <button id="auth-btn-float" onclick="openModal()">社幹<br>認證</button>
 
   <div id="auth-modal">
@@ -431,8 +529,8 @@
       <h3>社幹認證</h3>
       <input type="password" id="auth-password" placeholder="請輸入密碼">
       <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal()">返回</button>
-        <button class="btn-submit" onclick="verifyOfficer()">認證</button>
+        <button class="btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn-submit" onclick="verifyOfficer()">確認</button>
       </div>
     </div>
   </div>
@@ -441,25 +539,25 @@
     <div class="content-track" id="slider-track">
       <div class="section-page">
         <h1>🎤 基本介紹</h1>
-        <p>歡迎來到建功口技社！這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出不可思議的節奏與音樂。無論你是入門新手還是資深玩家。這裡都有你的舞台！</p>
+        <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
       </div>
       
       <div class="section-page">
         <h1>👑 介紹社幹</h1>
-        <p>口技社的靈魂人物！這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
-        <div class="placeholder-box">（這裡之後可以放幹部們的照片）</div>
+        <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
+        <div class="placeholder-box">（此處將放置幹部照片）</div>
       </div>
       
       <div class="section-page">
         <h1>📸 各年合照</h1>
-        <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下最熱血的瞬間。</p>
+        <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下來。</p>
         <div class="placeholder-box">（歷屆大合照）</div>
       </div>
       
       <div class="section-page" style="position: relative;">
         <div id="view-shirt" class="design-view active-view">
           <h1>👕 社服設計</h1>
-          <p>代訂</p>
+          <p>待定</p>
           <div class="placeholder-box empty-box"></div>
         </div>
         
@@ -474,7 +572,7 @@
         <h1>❓ Q&A 互動區</h1>
         <div class="qa-container">
           <div class="ask-box">
-            <input type="text" id="new-question" placeholder="對建功口技社有什麼疑問嗎？在這裡發問！">
+            <input type="text" id="new-question" placeholder="對建功口技社有疑問嗎？請在此發問。">
             <button onclick="postQuestion()">發布</button>
           </div>
           <div class="qa-list" id="qa-list">
@@ -502,7 +600,8 @@
 
     let isOfficer = false;
     let qaData = [];
-    let isShowingLogo = false; 
+    let isShowingLogo = false;
+    let currentAnnouncement = "目前無新公告。"; 
 
     window.onload = function() {
       const activeItem = document.querySelector('.nav-item.active');
@@ -514,6 +613,14 @@
           qaData.push({ id: doc.id, ...doc.data() });
         });
         renderQA();
+      });
+
+      db.collection("config").doc("announcement").onSnapshot((doc) => {
+        if (doc.exists) {
+          currentAnnouncement = doc.data().content;
+        }
+        document.getElementById('announcement-display').innerText = currentAnnouncement;
+        document.getElementById('edit-announcement-textarea').value = currentAnnouncement;
       });
     };
 
@@ -594,11 +701,64 @@
         const btn = document.getElementById('auth-btn-float');
         btn.innerText = '已認證';
         btn.disabled = true;
+        
+        document.getElementById('edit-announcement-btn').style.display = 'inline-block';
+
         closeModal();
         renderQA();
       } else {
-        alert('密碼錯誤！');
+        alert('密碼錯誤。');
       }
+    }
+
+    function toggleAnnouncement() {
+      const content = document.getElementById('announcement-display');
+      const toggleText = document.getElementById('toggle-announcement-text');
+      const textarea = document.getElementById('edit-announcement-textarea');
+      const saveBtn = document.getElementById('save-announcement-btn');
+
+      if (textarea.style.display === 'block') {
+         textarea.style.display = 'none';
+         saveBtn.style.display = 'none';
+      }
+
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+        toggleText.innerText = '[點擊查看]';
+      } else {
+        content.style.display = 'block';
+        toggleText.innerText = '[收起]';
+      }
+    }
+
+    function toggleEditAnnouncement() {
+        const content = document.getElementById('announcement-display');
+        const textarea = document.getElementById('edit-announcement-textarea');
+        const saveBtn = document.getElementById('save-announcement-btn');
+        const toggleText = document.getElementById('toggle-announcement-text');
+
+        if (textarea.style.display === 'block') {
+            textarea.style.display = 'none';
+            saveBtn.style.display = 'none';
+            content.style.display = 'block';
+        } else {
+            content.style.display = 'none';
+            textarea.style.display = 'block';
+            saveBtn.style.display = 'block';
+            toggleText.innerText = '[收起]';
+        }
+    }
+
+    function saveAnnouncement() {
+      const newContent = document.getElementById('edit-announcement-textarea').value.trim();
+      
+      db.collection("config").doc("announcement").set({
+        content: newContent
+      }).then(() => {
+        toggleEditAnnouncement();
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
     }
 
     function postQuestion() {
@@ -609,9 +769,9 @@
         const existing = qaData.find(item => item.q === text);
         if (existing) {
           if (existing.a) {
-            alert('這個問題已經有解答囉！\n\n答案是：' + existing.a);
+            alert('此問題已有解答。\n\n答覆：' + existing.a);
           } else {
-            alert('這個問題已經有人問過，正在等待社幹回覆中喔！');
+            alert('此問題已存在，等待回覆中。');
           }
           input.value = '';
           return;
@@ -627,7 +787,7 @@
           alert('發布失敗: ' + error.message);
         });
       } else {
-        alert('請輸入問題內容！');
+        alert('請輸入內容。');
       }
     }
 
@@ -639,12 +799,12 @@
           a: replyText
         });
       } else {
-        alert('請輸入回覆內容！');
+        alert('請輸入回覆內容。');
       }
     }
 
     function deleteQuestion(docId) {
-      if (confirm('確定要刪除這個問題嗎？')) {
+      if (confirm('確認刪除此問題？')) {
         db.collection("qa").doc(docId).delete().catch(error => {
           alert('刪除失敗: ' + error.message);
         });
@@ -671,12 +831,12 @@
         if (item.a) {
           html += `<div class="qa-a">A: ${item.a}</div>`;
         } else {
-          html += `<div class="qa-pending">（等待社幹回覆中...）</div>`;
+          html += `<div class="qa-pending">（等待回覆中）</div>`;
           if (isOfficer) {
             html += `
               <div class="reply-box">
-                <input type="text" id="reply-${item.id}" placeholder="身為社幹，來回答這個問題吧...">
-                <button onclick="submitReply('${item.id}')">回覆</button>
+                <input type="text" id="reply-${item.id}" placeholder="輸入回覆內容...">
+                <button onclick="submitReply('${item.id}')">送出</button>
               </div>
             `;
           }
