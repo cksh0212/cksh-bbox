@@ -18,15 +18,15 @@
       position: relative;
     }
     
-    /* 氣泡系統樣式修正 */
+    /* 氣泡系統樣式 */
     #bubble-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      pointer-events: none; /* 讓圖層不阻擋網頁操作 */
-      z-index: 995; /* 移至最上層，但在選單與彈出視窗之下 */
+      pointer-events: none;
+      z-index: 995;
       overflow: hidden;
     }
     .game-bubble {
@@ -36,7 +36,7 @@
       border: 1px solid rgba(0, 195, 227, 0.4);
       box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
       bottom: -100px;
-      pointer-events: auto; /* 恢復氣泡本身的點擊能力 */
+      pointer-events: auto;
       cursor: pointer;
       transition: transform 0.1s;
     }
@@ -757,7 +757,7 @@
       startBubbleSystem();
     };
 
-    /* --- 氣泡遊戲系統修正版 --- */
+    /* --- 氣泡遊戲系統完美噴發版 --- */
     function createBubble(size, speed, left, drift, splits, isUnclickable = false, startTop = null) {
       const container = document.getElementById('bubble-container');
       const bubble = document.createElement('div');
@@ -766,7 +766,6 @@
       bubble.style.height = size + 'px';
       bubble.style.left = left + 'vw';
       
-      // 若為分裂出的氣泡，從當前高度繼續飄
       if (startTop !== null) {
         bubble.style.bottom = 'auto';
         bubble.style.top = startTop + 'px';
@@ -775,7 +774,6 @@
       bubble.style.setProperty('--drift', drift + 'vw');
       bubble.style.animation = `floatUp ${speed}s linear forwards`;
       
-      // 使用 onmousedown 與 ontouchstart 提升移動物件點擊的精準度
       const popBubble = function(e) {
         if (isUnclickable) return;
         e.preventDefault(); 
@@ -783,22 +781,26 @@
         
         const rect = bubble.getBoundingClientRect();
         const currentLeft = (rect.left / window.innerWidth) * 100;
-        const currentTop = rect.top; // 精準鎖定炸開高度
+        const currentTop = rect.top; 
         
-        if (isAdmin) {
-          if (splits > 0) {
-            for(let i=0; i<4; i++) {
-               createBubble(size * 0.6, speed * 0.8, currentLeft + (Math.random()*10 - 5), drift + (Math.random()*20 - 10), splits - 1, false, currentTop);
-            }
-          } else {
-            // 管理員氣泡最後一次分裂成不可點擊的小粉塵
-            for(let i=0; i<2; i++) {
-               createBubble(10, speed * 0.6, currentLeft + (Math.random()*4 - 2), drift + (Math.random()*10 - 5), 0, true, currentTop);
-            }
+        if (isAdmin && splits > 0) {
+          // 管理員分裂成 10-30 個中氣泡，並製造噴射偏移
+          const splitCount = Math.floor(Math.random() * 21) + 10;
+          for(let i = 0; i < splitCount; i++) {
+             const sprayDrift = (Math.random() * 60 - 30); // 往外擴散 30vw 範圍
+             const startOffsetX = (Math.random() * 4 - 2);
+             const startOffsetY = (Math.random() * 20 - 10);
+             const newSize = Math.random() * 8 + 12; // 12-20px
+             createBubble(newSize, speed * 0.8, currentLeft + startOffsetX, drift + sprayDrift, splits - 1, false, currentTop + startOffsetY);
           }
         } else {
-          for(let i=0; i<2; i++) {
-             createBubble(10, speed * 0.6, currentLeft + (Math.random()*4 - 2), drift + (Math.random()*10 - 5), 0, true, currentTop);
+          // 一般氣泡 (或管理員最後一次分裂) 分裂成 2-3 個，並產生往外噴射感
+          const splitCount = Math.floor(Math.random() * 2) + 2; 
+          for(let i = 0; i < splitCount; i++) {
+             const sprayDrift = (Math.random() * 60 - 30);
+             const startOffsetX = (Math.random() * 4 - 2);
+             const startOffsetY = (Math.random() * 20 - 10);
+             createBubble(10, speed * 0.6, currentLeft + startOffsetX, drift + sprayDrift, 0, true, currentTop + startOffsetY);
           }
         }
         
@@ -820,14 +822,16 @@
       clearInterval(bubbleInterval);
       
       if (isAdmin) {
+        // 管理員：每 5 秒一顆，只能分裂 2 次
         bubbleInterval = setInterval(() => {
           const size = Math.random() * 20 + 30;
           const speed = Math.random() * 5 + 15;
           const left = Math.random() * 80 + 10;
           const drift = Math.random() * 40 - 20;
-          createBubble(size, speed, left, drift, 4);
+          createBubble(size, speed, left, drift, 2);
         }, 5000);
       } else if (isOfficer) {
+        // 一般社幹
         bubbleInterval = setInterval(() => {
           const count = Math.floor(Math.random() * 5) + 2;
           for(let i=0; i<count; i++) {
@@ -839,6 +843,7 @@
           }
         }, 1000);
       } else {
+        // 未登入訪客
         bubbleInterval = setInterval(() => {
           const leftCount = Math.floor(Math.random() * 4) + 2;
           for(let i=0; i<leftCount; i++) {
@@ -846,7 +851,7 @@
             const speed = Math.random() * 6 + 10;
             const left = Math.random() * 20; 
             const drift = Math.random() * 10 - 5;
-            createBubble(size, speed, left, drift, 0);
+            createBubble(size, speed, left, drift, 0); // splits 為 0
           }
           const rightCount = Math.floor(Math.random() * 4) + 2;
           for(let i=0; i<rightCount; i++) {
@@ -854,7 +859,7 @@
             const speed = Math.random() * 6 + 10;
             const left = Math.random() * 20 + 80; 
             const drift = Math.random() * 10 - 5;
-            createBubble(size, speed, left, drift, 0);
+            createBubble(size, speed, left, drift, 0); // splits 為 0
           }
         }, 3000);
       }
