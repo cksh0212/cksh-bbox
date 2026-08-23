@@ -15,7 +15,47 @@
       background-color: #121212;
       color: #e0e0e0;
       overflow-x: hidden;
+      position: relative;
     }
+    
+    /* 氣泡系統樣式 */
+    #bubble-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .game-bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0, 195, 227, 0.15);
+      border: 1px solid rgba(0, 195, 227, 0.4);
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+      bottom: -100px; /* 從畫面下方開始 */
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .game-bubble.unclickable {
+      pointer-events: none;
+    }
+    .game-bubble:hover:not(.unclickable) {
+      background: rgba(255, 75, 43, 0.3);
+      border-color: rgba(255, 75, 43, 0.6);
+      transform: scale(1.05);
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-120vh) translateX(var(--drift)); opacity: 0; }
+    }
+
+    /* 原有 UI 樣式，並提升 z-index 確保在氣泡之上 */
     .nav-container {
       display: flex;
       justify-content: center;
@@ -302,6 +342,8 @@
     .content-wrapper {
       width: 100%;
       overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
     .content-track {
       display: flex;
@@ -504,6 +546,7 @@
 </head>
 <body>
 
+  <div id="bubble-container"></div>
   <div id="wind-overlay"></div>
 
   <div class="nav-container">
@@ -552,7 +595,7 @@
       <button class="save-btn" id="save-maintenance-btn" onclick="saveMaintenance()">儲存</button>
       
       <div id="admin-settings-container" style="display:none; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
-        <button class="action-btn" style="width:100%; margin:0;" onclick="openPwdModal()">修改系統密碼</button>
+        <button class="action-btn" style="width:100%; margin:0;" onclick="openPwdModal()">修改社幹密碼</button>
       </div>
     </div>
   </div>
@@ -588,11 +631,9 @@
 
   <div id="pwd-modal" class="modal-overlay">
     <div class="modal-content">
-      <h3>修改系統密碼</h3>
+      <h3>修改社幹密碼</h3>
       <label style="font-size:12px; color:#aaa;">一般社幹密碼</label>
       <input type="text" id="new-officer-pwd" placeholder="留空則不修改">
-      <label style="font-size:12px; color:#aaa; margin-top:5px;">管理員密碼</label>
-      <input type="text" id="new-admin-pwd" placeholder="留空則不修改">
       <div class="modal-btns" style="margin-top:10px;">
         <button class="btn-cancel" onclick="closePwdModal()">取消</button>
         <button class="btn-submit" onclick="savePasswords()">儲存</button>
@@ -669,8 +710,11 @@
     let reportsData = [];
     let isShowingLogo = false;
     
-    let adminPwdB64 = btoa('thomas0212');
+    // 管理員密碼固定不可改
+    const adminPwdB64 = btoa('thomas0212');
     let officerPwdB64 = btoa('ckshbbox2026');
+    
+    let bubbleInterval;
 
     window.onload = function() {
       const activeItem = document.querySelector('.nav-item.active');
@@ -706,12 +750,99 @@
 
       db.collection("config").doc("passwords").onSnapshot((doc) => {
         if (doc.exists) {
-          if(doc.data().admin) adminPwdB64 = doc.data().admin;
           if(doc.data().officer) officerPwdB64 = doc.data().officer;
         }
       });
+      
+      startBubbleSystem();
     };
 
+    /* --- 氣泡遊戲系統 --- */
+    function createBubble(size, speed, left, drift, splits, isUnclickable = false) {
+      const container = document.getElementById('bubble-container');
+      const bubble = document.createElement('div');
+      bubble.className = 'game-bubble' + (isUnclickable ? ' unclickable' : '');
+      bubble.style.width = size + 'px';
+      bubble.style.height = size + 'px';
+      bubble.style.left = left + 'vw';
+      bubble.style.setProperty('--drift', drift + 'vw');
+      bubble.style.animation = `floatUp ${speed}s linear forwards`;
+      
+      bubble.onclick = function(e) {
+        if (isUnclickable) return;
+        e.stopPropagation();
+        
+        const rect = bubble.getBoundingClientRect();
+        const currentLeft = (rect.left / window.innerWidth) * 100;
+        
+        if (isAdmin && splits > 0) {
+          // 管理員可分裂氣泡
+          for(let i=0; i<4; i++) {
+             createBubble(size * 0.6, speed * 0.8, currentLeft + (Math.random()*10 - 5), drift + (Math.random()*20 - 10), splits - 1);
+          }
+        } else if (!isAdmin) {
+          // 非管理員戳破變成兩個小氣泡 (無法再戳)
+          for(let i=0; i<2; i++) {
+             createBubble(10, speed * 0.6, currentLeft + (Math.random()*4 - 2), drift + (Math.random()*10 - 5), 0, true);
+          }
+        }
+        bubble.remove();
+      };
+      
+      bubble.addEventListener('animationend', () => bubble.remove());
+      container.appendChild(bubble);
+    }
+
+    function startBubbleSystem() {
+      clearInterval(bubbleInterval);
+      
+      if (isAdmin) {
+        // 管理員：每 5 秒一顆中型可分裂氣泡
+        bubbleInterval = setInterval(() => {
+          const size = Math.random() * 20 + 30; // 30-50px
+          const speed = Math.random() * 5 + 15; // 較慢
+          const left = Math.random() * 80 + 10;
+          const drift = Math.random() * 40 - 20;
+          createBubble(size, speed, left, drift, 4);
+        }, 5000);
+      } else if (isOfficer) {
+        // 社幹：每秒 2-6 顆小氣泡
+        bubbleInterval = setInterval(() => {
+          const count = Math.floor(Math.random() * 5) + 2;
+          for(let i=0; i<count; i++) {
+            const size = Math.random() * 10 + 10; // 10-20px
+            const speed = Math.random() * 5 + 8; // 較快
+            const left = Math.random() * 90 + 5;
+            const drift = Math.random() * 20 - 10;
+            createBubble(size, speed, left, drift, 0, true);
+          }
+        }, 1000);
+      } else {
+        // 未登入：每 3 秒兩側 2-5 顆大小不一氣泡
+        bubbleInterval = setInterval(() => {
+          // 左側
+          const leftCount = Math.floor(Math.random() * 4) + 2;
+          for(let i=0; i<leftCount; i++) {
+            const size = Math.random() * 30 + 15;
+            const speed = Math.random() * 6 + 10;
+            const left = Math.random() * 20; // 0-20vw
+            const drift = Math.random() * 10 - 5;
+            createBubble(size, speed, left, drift, 0);
+          }
+          // 右側
+          const rightCount = Math.floor(Math.random() * 4) + 2;
+          for(let i=0; i<rightCount; i++) {
+            const size = Math.random() * 30 + 15;
+            const speed = Math.random() * 6 + 10;
+            const left = Math.random() * 20 + 80; // 80-100vw
+            const drift = Math.random() * 10 - 5;
+            createBubble(size, speed, left, drift, 0);
+          }
+        }, 3000);
+      }
+    }
+
+    /* --- 原有功能 --- */
     function switchTab(index, element) {
       const items = document.querySelectorAll('.nav-item');
       items.forEach(item => item.classList.remove('active'));
@@ -788,7 +919,6 @@
     function openPwdModal() {
       document.getElementById('pwd-modal').style.display = 'flex';
       document.getElementById('new-officer-pwd').value = '';
-      document.getElementById('new-admin-pwd').value = '';
     }
     function closePwdModal() {
       document.getElementById('pwd-modal').style.display = 'none';
@@ -814,6 +944,7 @@
         closeAuthModal();
         renderQA();
         renderReports();
+        startBubbleSystem(); 
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true;
         isAdmin = false;
@@ -826,6 +957,7 @@
         
         closeAuthModal();
         renderQA();
+        startBubbleSystem();
       } else {
         alert('密碼錯誤。');
       }
@@ -904,16 +1036,14 @@
     }
 
     function savePasswords() {
-      const newAdmin = document.getElementById('new-admin-pwd').value.trim();
       const newOfficer = document.getElementById('new-officer-pwd').value.trim();
       let updates = {};
       
-      if (newAdmin) updates.admin = btoa(newAdmin);
       if (newOfficer) updates.officer = btoa(newOfficer);
 
       if (Object.keys(updates).length > 0) {
         db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => {
-          alert('密碼已更新。');
+          alert('社幹密碼已更新。');
           closePwdModal();
         }).catch((error) => {
           alert('更新失敗: ' + error.message);
