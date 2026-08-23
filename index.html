@@ -514,35 +514,11 @@
       opacity: 1;
       pointer-events: auto;
     }
-    #wind-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
-      overflow: hidden;
-    }
-    .wind-line {
-      position: absolute;
-      background: linear-gradient(90deg, transparent, #00c3e3, #ffffff, transparent);
-      border-radius: 5px;
-      transform: translateX(-150vw);
-      opacity: 0;
-    }
-    @keyframes windBlow {
-      0% { transform: translateX(-150vw); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateX(150vw); opacity: 0; }
-    }
   </style>
 </head>
 <body>
 
   <div id="bubble-container"></div>
-  <div id="wind-overlay"></div>
 
   <div class="nav-container">
     <div class="nav-menu">
@@ -818,7 +794,7 @@
                let dist = Math.hypot(dx, dy);
                
                if (dist < (b1.size + b2.size) / 2) {
-                   let maxSize = isBubbleMode ? 800 : 150; // 彩蛋模式可無限變大
+                   let maxSize = isBubbleMode ? 800 : 150; 
                    let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
                    b1.size = newSize;
                    b1.el.style.width = newSize + 'px';
@@ -919,7 +895,8 @@
                let sprayVx = (startOffsetX / 3);
                let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
                let newSize = Math.random() * b.size + 10; 
-               createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 15);
+               // 加入 180 幀 (約 3 秒) 的無敵冷卻時間
+               createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180);
           }
         } else if (isAdmin) {
           if (b.splits > 0) {
@@ -930,7 +907,8 @@
                let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
                let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
                let newSize = Math.random() * 8 + 12;
-               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 30);
+               // 加入 180 幀 (約 3 秒) 的無敵冷卻時間
+               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180);
             }
           } else {
             for(let i=0; i<2; i++) {
@@ -942,7 +920,8 @@
           for(let i=0; i<count; i++) {
              let startOffsetX = (Math.random() * 20 - 10);
              let sprayVx = (startOffsetX / 2);
-             createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true);
+             // 加入 180 幀 (約 3 秒) 的無敵冷卻時間
+             createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180);
           }
         }
         
@@ -964,12 +943,13 @@
       
       if (isBubbleMode) {
         bubbleInterval = setInterval(() => {
-          let count = (Math.floor(Math.random() * 5) + 2) * 3; // 數量3倍
+          let count = (Math.floor(Math.random() * 5) + 2) * 3; 
           for(let i=0; i<count; i++) {
-            let size = Math.random() * 80 + 20; // 初始大小隨機
-            let vy = Math.random() * 0.4 + 0.1; // 上升極緩慢
+            let size = Math.random() * 80 + 20; 
+            let vy = Math.random() * 0.4 + 0.1; 
             let vx = Math.random() * 2 - 1;
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false); // 無限分裂
+            // 產生的新氣泡也給予 180 幀的無敵時間
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180); 
           }
         }, 1000);
       } else if (isAdmin) {
@@ -977,7 +957,7 @@
           let size = Math.random() * 20 + 30;
           let vy = Math.random() * 0.8 + 0.5;
           let vx = Math.random() * 2 - 1;
-          createBubble(size, getSpawnX(), h, vx, vy, 2, false);
+          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180);
         }, 5000);
       } else if (isOfficer) {
         bubbleInterval = setInterval(() => {
@@ -986,7 +966,7 @@
             let size = Math.random() * 10 + 10;
             let vy = Math.random() * 1.5 + 1;
             let vx = Math.random() * 2 - 1;
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 0, true);
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 0, true, 180);
           }
         }, 1000);
       }
