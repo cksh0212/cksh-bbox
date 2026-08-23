@@ -18,7 +18,7 @@
       position: relative;
     }
     
-    /* 氣泡系統樣式 */
+    /* 物理氣泡系統樣式 */
     #bubble-container {
       position: fixed;
       top: 0;
@@ -35,24 +35,21 @@
       background: rgba(0, 195, 227, 0.15);
       border: 1px solid rgba(0, 195, 227, 0.4);
       box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
-      bottom: -100px;
+      top: 0; 
+      left: 0;
       pointer-events: auto;
       cursor: pointer;
-      transition: transform 0.1s;
+      transform: translate(-50%, -50%);
+      will-change: transform;
     }
     .game-bubble.unclickable {
       pointer-events: none;
+      background: rgba(100, 100, 100, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
     }
     .game-bubble:hover:not(.unclickable) {
       background: rgba(255, 75, 43, 0.3);
       border-color: rgba(255, 75, 43, 0.6);
-      transform: scale(1.05);
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(0) translateX(0); opacity: 0; }
-      5% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-120vh) translateX(var(--drift)); opacity: 0; }
     }
 
     /* 原有 UI 樣式 */
@@ -519,35 +516,11 @@
       opacity: 1;
       pointer-events: auto;
     }
-    #wind-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
-      overflow: hidden;
-    }
-    .wind-line {
-      position: absolute;
-      background: linear-gradient(90deg, transparent, #00c3e3, #ffffff, transparent);
-      border-radius: 5px;
-      transform: translateX(-150vw);
-      opacity: 0;
-    }
-    @keyframes windBlow {
-      0% { transform: translateX(-150vw); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateX(150vw); opacity: 0; }
-    }
   </style>
 </head>
 <body>
 
   <div id="bubble-container"></div>
-  <div id="wind-overlay"></div>
 
   <div class="nav-container">
     <div class="nav-menu">
@@ -676,7 +649,7 @@
       
       <div class="section-page">
         <h1>❓ Q&A 互動區</h1>
-        <div class="qa-container">
+        <div class="qa-container" id="qa-target-box">
           <div class="ask-box">
             <input type="text" id="new-question" placeholder="對建功口技社有疑問嗎？請在此發問。">
             <button onclick="postQuestion()">發布</button>
@@ -704,17 +677,20 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    let currentTabIndex = 0;
     let isOfficer = false;
     let isAdmin = false;
     let qaData = [];
     let reportsData = [];
     let isShowingLogo = false;
     
-    // 管理員密碼固定不可改
     const adminPwdB64 = btoa('thomas0212');
     let officerPwdB64 = btoa('ckshbbox2026');
     
+    let bubbles = [];
     let bubbleInterval;
+    let activeBubble = null;
+    let dragStartX = 0, dragStartY = 0, dragStartTime = 0;
 
     window.onload = function() {
       const activeItem = document.querySelector('.nav-item.active');
@@ -755,118 +731,253 @@
       });
       
       startBubbleSystem();
+      requestAnimationFrame(physicsLoop);
     };
 
-    /* --- 氣泡遊戲系統完美噴發版 --- */
-    function createBubble(size, speed, left, drift, splits, isUnclickable = false, startTop = null) {
+    /* --- 物理引擎與無敵冷卻時間 --- */
+    function physicsLoop() {
+      const qaBox = document.getElementById('qa-target-box');
+      let qaRect = null;
+      if (currentTabIndex === 4 && qaBox) {
+         qaRect = qaBox.getBoundingClientRect();
+      }
+
+      for (let i = 0; i < bubbles.length; i++) {
+         let b = bubbles[i];
+         
+         if (b.cooldown > 0) b.cooldown--; // 減少無敵冷卻時間
+         
+         if (b !== activeBubble) {
+            b.y -= b.vy;
+            b.x += b.vx;
+
+            if (currentTabIndex === 1) {
+                let edgeLimit = window.innerWidth * 0.15;
+                if (b.x > edgeLimit && b.x < window.innerWidth - edgeLimit) {
+                    if (b.x < window.innerWidth / 2) b.vx -= 0.5; 
+                    else b.vx += 0.5; 
+                }
+            }
+
+            if (currentTabIndex === 4 && qaRect) {
+                let padding = b.size / 2 + 10;
+                let leftBound = qaRect.left - padding;
+                let rightBound = qaRect.right + padding;
+                let topBound = qaRect.top - padding;
+                let bottomBound = qaRect.bottom + padding;
+                
+                if (b.x > leftBound && b.x < rightBound && b.y > topBound && b.y < bottomBound) {
+                    let centerX = qaRect.left + qaRect.width / 2;
+                    if (b.x < centerX) b.vx -= 1.5; 
+                    else b.vx += 1.5;
+                }
+            }
+
+            b.vx *= 0.98;
+         }
+
+         b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+
+         if (b.y < -100) {
+            b.el.remove();
+            bubbles.splice(i, 1);
+            i--;
+            continue;
+         }
+      }
+
+      // 碰撞合併判定 (加入冷卻時間檢查)
+      for (let i = 0; i < bubbles.length; i++) {
+         for (let j = i + 1; j < bubbles.length; j++) {
+            let b1 = bubbles[i];
+            let b2 = bubbles[j];
+            
+            if (!b1.isUnclickable && !b2.isUnclickable && b1.cooldown === 0 && b2.cooldown === 0) {
+               let dx = b1.x - b2.x;
+               let dy = b1.y - b2.y;
+               let dist = Math.hypot(dx, dy);
+               
+               if (dist < (b1.size + b2.size) / 2) {
+                   let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), 150);
+                   b1.size = newSize;
+                   b1.el.style.width = newSize + 'px';
+                   b1.el.style.height = newSize + 'px';
+                   b1.splits = Math.max(b1.splits, b2.splits);
+                   
+                   if (b2 === activeBubble) activeBubble = b1;
+                   
+                   b2.el.remove();
+                   bubbles.splice(j, 1);
+                   j--;
+               }
+            }
+         }
+      }
+
+      if (bubbles.length > 200) {
+         let oldest = bubbles.shift();
+         oldest.el.remove();
+      }
+
+      requestAnimationFrame(physicsLoop);
+    }
+
+    function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0) {
       const container = document.getElementById('bubble-container');
-      const bubble = document.createElement('div');
-      bubble.className = 'game-bubble' + (isUnclickable ? ' unclickable' : '');
-      bubble.style.width = size + 'px';
-      bubble.style.height = size + 'px';
-      bubble.style.left = left + 'vw';
+      const el = document.createElement('div');
+      el.className = 'game-bubble' + (isUnclickable ? ' unclickable' : '');
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
       
-      if (startTop !== null) {
-        bubble.style.bottom = 'auto';
-        bubble.style.top = startTop + 'px';
+      // 新增 cooldown 屬性
+      let bubbleObj = { el, x, y, vx, vy, size, splits, isUnclickable, cooldown };
+      
+      if (!isUnclickable) {
+         const startInteraction = function(e) {
+            e.preventDefault();
+            activeBubble = bubbleObj;
+            dragStartTime = Date.now();
+            if (e.touches) {
+               dragStartX = e.touches[0].clientX;
+               dragStartY = e.touches[0].clientY;
+            } else {
+               dragStartX = e.clientX;
+               dragStartY = e.clientY;
+            }
+         };
+         el.onmousedown = startInteraction;
+         el.ontouchstart = startInteraction;
       }
       
-      bubble.style.setProperty('--drift', drift + 'vw');
-      bubble.style.animation = `floatUp ${speed}s linear forwards`;
-      
-      const popBubble = function(e) {
-        if (isUnclickable) return;
-        e.preventDefault(); 
-        e.stopPropagation();
-        
-        const rect = bubble.getBoundingClientRect();
-        const currentLeft = (rect.left / window.innerWidth) * 100;
-        const currentTop = rect.top; 
-        
-        if (isAdmin && splits > 0) {
-          // 管理員分裂成 10-30 個中氣泡，並製造噴射偏移
-          const splitCount = Math.floor(Math.random() * 21) + 10;
-          for(let i = 0; i < splitCount; i++) {
-             const sprayDrift = (Math.random() * 60 - 30); // 往外擴散 30vw 範圍
-             const startOffsetX = (Math.random() * 4 - 2);
-             const startOffsetY = (Math.random() * 20 - 10);
-             const newSize = Math.random() * 8 + 12; // 12-20px
-             createBubble(newSize, speed * 0.8, currentLeft + startOffsetX, drift + sprayDrift, splits - 1, false, currentTop + startOffsetY);
+      container.appendChild(el);
+      bubbles.push(bubbleObj);
+      return bubbleObj;
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        if(activeBubble) {
+            activeBubble.x = e.clientX;
+            activeBubble.y = e.clientY;
+        }
+    });
+    window.addEventListener('mouseup', (e) => {
+        if(activeBubble) {
+            let dt = Date.now() - dragStartTime;
+            let dist = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+            if(dt < 250 && dist < 15) {
+                triggerSplit(activeBubble);
+            }
+            activeBubble = null;
+        }
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if(activeBubble) {
+            activeBubble.x = e.touches[0].clientX;
+            activeBubble.y = e.touches[0].clientY;
+            e.preventDefault(); 
+        }
+    }, {passive: false});
+    window.addEventListener('touchend', (e) => {
+        if(activeBubble) {
+            let dt = Date.now() - dragStartTime;
+            let touch = e.changedTouches[0];
+            let dist = Math.hypot(touch.clientX - dragStartX, touch.clientY - dragStartY);
+            if(dt < 250 && dist < 15) {
+                triggerSplit(activeBubble);
+            }
+            activeBubble = null;
+        }
+    });
+
+    function triggerSplit(b) {
+        if (isAdmin) {
+          if (b.splits > 0) {
+            let count = Math.floor(Math.random() * 21) + 10; 
+            for(let i=0; i<count; i++) {
+               // 加大散開的隨機位移
+               let startOffsetX = (Math.random() * 40 - 20);
+               let startOffsetY = (Math.random() * 40 - 20);
+               
+               let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
+               let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
+               
+               let newSize = Math.random() * 8 + 12;
+               // 賦予 30 幀的無敵冷卻時間 (約 0.5 秒)
+               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 30);
+            }
+          } else {
+            for(let i=0; i<2; i++) {
+               createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true);
+            }
           }
         } else {
-          // 一般氣泡 (或管理員最後一次分裂) 分裂成 2-3 個，並產生往外噴射感
-          const splitCount = Math.floor(Math.random() * 2) + 2; 
-          for(let i = 0; i < splitCount; i++) {
-             const sprayDrift = (Math.random() * 60 - 30);
-             const startOffsetX = (Math.random() * 4 - 2);
-             const startOffsetY = (Math.random() * 20 - 10);
-             createBubble(10, speed * 0.6, currentLeft + startOffsetX, drift + sprayDrift, 0, true, currentTop + startOffsetY);
+          let count = Math.floor(Math.random() * 2) + 2; 
+          for(let i=0; i<count; i++) {
+             let startOffsetX = (Math.random() * 20 - 10);
+             let sprayVx = (startOffsetX / 2);
+             createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true);
           }
         }
         
-        if(bubble.parentNode) {
-            bubble.parentNode.removeChild(bubble);
+        b.el.remove();
+        bubbles = bubbles.filter(item => item !== b);
+    }
+
+    function getSpawnX() {
+        let w = window.innerWidth;
+        if (currentTabIndex === 1) {
+            return Math.random() < 0.5 ? Math.random() * (w * 0.15) : w - (Math.random() * (w * 0.15));
         }
-      };
-      
-      bubble.onmousedown = popBubble;
-      bubble.ontouchstart = popBubble;
-      
-      bubble.addEventListener('animationend', () => {
-         if(bubble.parentNode) bubble.parentNode.removeChild(bubble);
-      });
-      container.appendChild(bubble);
+        return Math.random() * w;
     }
 
     function startBubbleSystem() {
       clearInterval(bubbleInterval);
+      let h = window.innerHeight + 100; 
       
       if (isAdmin) {
-        // 管理員：每 5 秒一顆，只能分裂 2 次
         bubbleInterval = setInterval(() => {
-          const size = Math.random() * 20 + 30;
-          const speed = Math.random() * 5 + 15;
-          const left = Math.random() * 80 + 10;
-          const drift = Math.random() * 40 - 20;
-          createBubble(size, speed, left, drift, 2);
+          let size = Math.random() * 20 + 30;
+          let vy = Math.random() * 0.8 + 0.5;
+          let vx = Math.random() * 2 - 1;
+          createBubble(size, getSpawnX(), h, vx, vy, 2, false);
         }, 5000);
       } else if (isOfficer) {
-        // 一般社幹
         bubbleInterval = setInterval(() => {
-          const count = Math.floor(Math.random() * 5) + 2;
+          let count = Math.floor(Math.random() * 5) + 2;
           for(let i=0; i<count; i++) {
-            const size = Math.random() * 10 + 10;
-            const speed = Math.random() * 5 + 8;
-            const left = Math.random() * 90 + 5;
-            const drift = Math.random() * 20 - 10;
-            createBubble(size, speed, left, drift, 0, true);
+            let size = Math.random() * 10 + 10;
+            let vy = Math.random() * 1.5 + 1;
+            let vx = Math.random() * 2 - 1;
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 0, true);
           }
         }, 1000);
       } else {
-        // 未登入訪客
         bubbleInterval = setInterval(() => {
-          const leftCount = Math.floor(Math.random() * 4) + 2;
+          let leftCount = Math.floor(Math.random() * 4) + 2;
           for(let i=0; i<leftCount; i++) {
-            const size = Math.random() * 30 + 15;
-            const speed = Math.random() * 6 + 10;
-            const left = Math.random() * 20; 
-            const drift = Math.random() * 10 - 5;
-            createBubble(size, speed, left, drift, 0); // splits 為 0
+            let size = Math.random() * 30 + 15;
+            let vy = Math.random() * 0.8 + 0.5; 
+            let vx = Math.random() * 1 - 0.5;
+            let spawnX = (currentTabIndex === 1) ? Math.random() * (window.innerWidth*0.15) : Math.random() * (window.innerWidth*0.2);
+            createBubble(size, spawnX, h + (Math.random()*100), vx, vy, 0, false);
           }
-          const rightCount = Math.floor(Math.random() * 4) + 2;
+          let rightCount = Math.floor(Math.random() * 4) + 2;
           for(let i=0; i<rightCount; i++) {
-            const size = Math.random() * 30 + 15;
-            const speed = Math.random() * 6 + 10;
-            const left = Math.random() * 20 + 80; 
-            const drift = Math.random() * 10 - 5;
-            createBubble(size, speed, left, drift, 0); // splits 為 0
+            let size = Math.random() * 30 + 15;
+            let vy = Math.random() * 0.8 + 0.5;
+            let vx = Math.random() * 1 - 0.5;
+            let w = window.innerWidth;
+            let spawnX = (currentTabIndex === 1) ? w - Math.random()*(w*0.15) : w - Math.random()*(w*0.2);
+            createBubble(size, spawnX, h + (Math.random()*100), vx, vy, 0, false);
           }
         }, 3000);
       }
     }
 
-    /* --- 原有功能 --- */
     function switchTab(index, element) {
+      currentTabIndex = index; 
       const items = document.querySelectorAll('.nav-item');
       items.forEach(item => item.classList.remove('active'));
       element.classList.add('active');
@@ -882,19 +993,29 @@
       bubble.style.left = element.offsetLeft + 'px';
     }
 
+    function triggerBubbleTransition() {
+      let cx = window.innerWidth / 2;
+      let cy = window.innerHeight / 2;
+      for (let i = 0; i < 35; i++) {
+         let size = Math.random() * 20 + 10;
+         let startOffsetX = (Math.random() * 100 - 50);
+         let startOffsetY = (Math.random() * 100 - 50);
+         let vx = (startOffsetX / 3);
+         let vy = (startOffsetY / 3);
+         createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true);
+      }
+    }
+
     function handleToggleClick(event) {
       event.stopPropagation(); 
       switchTab(3, document.getElementById('nav-tab-3')); 
       const toggle = document.getElementById('design-toggle');
       isShowingLogo = !isShowingLogo;
       
-      if (isShowingLogo) {
-        toggle.classList.add('switched');
-      } else {
-        toggle.classList.remove('switched');
-      }
+      if (isShowingLogo) toggle.classList.add('switched');
+      else toggle.classList.remove('switched');
       
-      triggerWindEffect();
+      triggerBubbleTransition(); 
       
       setTimeout(() => {
         if (isShowingLogo) {
@@ -905,22 +1026,6 @@
           document.getElementById('view-shirt').classList.add('active-view');
         }
       }, 200); 
-    }
-
-    function triggerWindEffect() {
-      const overlay = document.getElementById('wind-overlay');
-      overlay.innerHTML = '';
-      for (let i = 0; i < 30; i++) {
-        const line = document.createElement('div');
-        line.className = 'wind-line';
-        line.style.top = Math.random() * 100 + 'vh';
-        line.style.height = (Math.random() * 3 + 1) + 'px';
-        line.style.width = (Math.random() * 100 + 50) + 'vw';
-        const duration = (Math.random() * 0.4 + 0.2); 
-        const delay = (Math.random() * 0.15); 
-        line.style.animation = `windBlow ${duration}s ${delay}s cubic-bezier(0.1, 0.8, 0.3, 1) forwards`;
-        overlay.appendChild(line);
-      }
     }
 
     function openAuthModal() {
@@ -954,7 +1059,6 @@
       if (b64Pwd === adminPwdB64) {
         isOfficer = true;
         isAdmin = true;
-        
         const btn = document.getElementById('auth-btn-float');
         btn.innerText = '管理員';
         btn.disabled = true;
@@ -971,11 +1075,9 @@
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true;
         isAdmin = false;
-        
         const btn = document.getElementById('auth-btn-float');
         btn.innerText = '已認證';
         btn.disabled = true;
-        
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         
         closeAuthModal();
@@ -1061,7 +1163,6 @@
     function savePasswords() {
       const newOfficer = document.getElementById('new-officer-pwd').value.trim();
       let updates = {};
-      
       if (newOfficer) updates.officer = btoa(newOfficer);
 
       if (Object.keys(updates).length > 0) {
@@ -1114,9 +1215,7 @@
       reportsData.forEach(item => {
          const div = document.createElement('div');
          div.className = 'report-item ' + (item.role === 'officer' ? 'red-border' : 'yellow-border');
-         
          const timeString = item.timestamp ? new Date(item.timestamp.toDate()).toLocaleString() : '剛剛';
-         
          div.innerHTML = `
            <div style="font-size:11px; color:#aaa; margin-bottom:4px;">${timeString}</div>
            <div style="font-size:13px; color:#fff; word-break: break-all;">${item.text}</div>
@@ -1178,20 +1277,12 @@
     function renderQA() {
       const listContainer = document.getElementById('qa-list');
       listContainer.innerHTML = '';
-
       qaData.forEach(item => {
         const qaItem = document.createElement('div');
         qaItem.className = 'qa-item';
-        
-        let html = `<div class="qa-header">
-                      <div class="qa-q-text">Q: ${item.q}</div>`;
-        
-        if (isOfficer || isAdmin) {
-          html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
-        }
-        
+        let html = `<div class="qa-header"><div class="qa-q-text">Q: ${item.q}</div>`;
+        if (isOfficer || isAdmin) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         html += `</div>`;
-        
         if (item.a) {
           html += `<div class="qa-a">A: ${item.a}</div>`;
         } else {
@@ -1205,7 +1296,6 @@
             `;
           }
         }
-        
         qaItem.innerHTML = html;
         listContainer.appendChild(qaItem);
       });
