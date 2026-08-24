@@ -53,6 +53,47 @@
       border-color: rgba(255, 75, 43, 0.6);
     }
 
+    /* 左右無限滾動相片牆 (訪客專屬) */
+    .side-marquee {
+      position: fixed;
+      top: 0;
+      width: 14vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 1; /* 位於背景之上，內容之下 */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1s ease, visibility 1s;
+      pointer-events: none; /* 不干擾點擊 */
+      filter: grayscale(40%) brightness(0.35) blur(1px); /* 質感背景化 */
+    }
+    .side-marquee.show-marquee {
+      opacity: 1;
+      visibility: visible;
+    }
+    #left-marquee { left: 2vw; }
+    #right-marquee { right: 2vw; }
+    
+    .marquee-track {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: scrollVertical 40s linear infinite;
+    }
+    #right-marquee .marquee-track {
+      animation-direction: reverse; /* 右側反向滾動 */
+    }
+    .marquee-track img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    @keyframes scrollVertical {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+
     /* 原有 UI 樣式 */
     .nav-container {
       display: flex;
@@ -134,7 +175,6 @@
       background: #ff4b2b;
       box-shadow: 0 2px 5px rgba(255, 75, 43, 0.5);
     }
-    
     #auth-btn-float {
       position: fixed;
       right: 30px;
@@ -198,7 +238,6 @@
       display: none;
     }
     
-    /* 左側面板滾動與展開樣式 */
     .scrollable-content {
       max-height: 80px;
       overflow-y: auto;
@@ -369,8 +408,9 @@
     .content-track {
       display: flex;
       width: 500%;
-      transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
+    /* 絲滑切換核心設定 */
     .section-page {
       width: 20%;
       min-height: 85vh;
@@ -379,7 +419,19 @@
       flex-direction: column;
       align-items: center;
       position: relative;
+      /* 預設隱藏並微縮小 */
+      opacity: 0;
+      transform: scale(0.92) translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
     }
+    /* 啟用狀態展開並顯示 */
+    .section-page.active-page {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+    
     h1 {
       font-size: 2.2rem;
       margin-bottom: 20px;
@@ -538,7 +590,7 @@
       background: #777;
     }
 
-    /* --- 照片網格顯示系統 (合照、社服、社徽) --- */
+    /* 照片網格 (合照、社服、社徽) */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -553,7 +605,7 @@
       grid-template-columns: 1fr; 
     }
     
-    /* --- 介紹社幹專用：二維行結構 --- */
+    /* 介紹社幹二維行結構 */
     .officer-rows-container {
       display: flex;
       flex-direction: column;
@@ -719,8 +771,12 @@
 
   <div id="bubble-container"></div>
   
+  <!-- 新增的雙側相片牆 (預設隱藏) -->
+  <div id="left-marquee" class="side-marquee"><div class="marquee-track" id="left-marquee-track"></div></div>
+  <div id="right-marquee" class="side-marquee"><div class="marquee-track" id="right-marquee-track"></div></div>
+
   <div id="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="放大照片">
+    <img id="lightbox-img" src="" alt="">
   </div>
 
   <div class="nav-container">
@@ -745,7 +801,6 @@
   </div>
 
   <div id="left-info-panel">
-    <!-- 活動日曆 (新增) -->
     <div class="info-box">
       <div class="panel-header">
         活動日曆
@@ -757,7 +812,6 @@
       <button class="save-btn" id="save-calendar-btn" onclick="saveCalendar()">儲存</button>
     </div>
 
-    <!-- 舊有：社團公告 -->
     <div class="info-box">
       <div class="panel-header">
         社團公告
@@ -769,7 +823,6 @@
       <button class="save-btn" id="save-announcement-btn" onclick="saveAnnouncement()">儲存</button>
     </div>
     
-    <!-- 舊有：維修紀錄 -->
     <div class="info-box">
       <div class="panel-header">
         維修紀錄
@@ -789,7 +842,7 @@
     </div>
   </div>
 
-  <button id="auth-btn-float" onclick="handleAuthBtnClick()">社幹<br>認證</button>
+  <button id="auth-btn-float" onclick="handleAuthBtnClick()">系統<br>認證</button>
 
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
@@ -830,7 +883,6 @@
     </div>
   </div>
 
-  <!-- 社幹行重新命名彈窗 -->
   <div id="row-name-modal" class="modal-overlay">
     <div class="modal-content">
       <h3>修改行數標題</h3>
@@ -866,7 +918,6 @@
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
-        <!-- 二維多行展示區 -->
         <div class="officer-rows-container" id="officer-list"></div>
 
         <div class="admin-add-box" id="admin-officer-box" style="display: none;">
@@ -968,7 +1019,7 @@
     let shirtsData = []; 
     let logosData = [];  
     let isShowingLogo = false;
-    let rowNamesData = {}; // 儲存社幹行數名稱
+    let rowNamesData = {}; 
     
     const adminPwdB64 = btoa('thomas0212');
     let officerPwdB64 = btoa('ckshbbox2026');
@@ -980,6 +1031,9 @@
     let collisionFrames = {};
 
     window.onload = function() {
+      // 確保第一頁載入時就有絲滑的 active 狀態
+      document.querySelectorAll('.section-page')[0].classList.add('active-page');
+      
       const activeItem = document.querySelector('.nav-item.active');
       updateBubble(activeItem);
       
@@ -996,6 +1050,7 @@
       db.collection("intro_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         introPhotosData = []; snapshot.forEach(doc => introPhotosData.push({ id: doc.id, ...doc.data() }));
         renderIntroPhotos();
+        updateSideMarquees(); // 更新側邊照片牆
       });
       db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         officersData = []; snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
@@ -1014,38 +1069,29 @@
         renderGridList('logos');
       });
 
-      // 監聽社幹行數名稱設定
       db.collection("config").doc("row_names").onSnapshot((doc) => {
-        if (doc.exists) {
-          rowNamesData = doc.data();
-          renderOfficers(); // 更新顯示名稱
-        }
+        if (doc.exists) { rowNamesData = doc.data(); renderOfficers(); }
       });
-
       db.collection("config").doc("announcement").onSnapshot((doc) => {
         let content = doc.exists ? doc.data().content : "目前無新公告。";
         document.getElementById('announcement-display').innerText = content;
         document.getElementById('edit-announcement-textarea').value = content;
       });
-
-      // 監聽維修紀錄
       db.collection("config").doc("maintenance").onSnapshot((doc) => {
         let content = doc.exists ? doc.data().content : "維修紀錄：\n- 2026/08/23";
         document.getElementById('maintenance-display').innerText = content;
         document.getElementById('edit-maintenance-textarea').value = content;
       });
-
-      // 監聽活動日曆
       db.collection("config").doc("calendar").onSnapshot((doc) => {
         let content = doc.exists ? doc.data().content : "尚未新增活動日程。";
         document.getElementById('calendar-display').innerText = content;
         document.getElementById('edit-calendar-textarea').value = content;
       });
-
       db.collection("config").doc("passwords").onSnapshot((doc) => {
         if (doc.exists && doc.data().officer) officerPwdB64 = doc.data().officer;
       });
       
+      checkSideMarquees();
       requestAnimationFrame(physicsLoop);
     };
 
@@ -1056,6 +1102,39 @@
     function closeLightbox() {
       document.getElementById('lightbox').style.display = 'none';
       document.getElementById('lightbox-img').src = '';
+    }
+
+    /* --- 側邊相片牆更新系統 --- */
+    function updateSideMarquees() {
+      const leftTrack = document.getElementById('left-marquee-track');
+      const rightTrack = document.getElementById('right-marquee-track');
+      if (!leftTrack || !rightTrack) return;
+
+      let html = '';
+      if (introPhotosData.length > 0) {
+        let baseHtml = '';
+        introPhotosData.forEach(item => {
+          const url = item.photoUrl || 'https://via.placeholder.com/240x180';
+          baseHtml += `<img src="${url}" alt="">`;
+        });
+        // 複製6次以確保畫面夠長可以完美循環
+        html = baseHtml.repeat(6);
+      }
+      leftTrack.innerHTML = html;
+      rightTrack.innerHTML = html;
+    }
+
+    function checkSideMarquees() {
+      const left = document.getElementById('left-marquee');
+      const right = document.getElementById('right-marquee');
+      // 只有在訪客狀態且在「社服社徽」(index=3)時顯示
+      if (currentTabIndex === 3 && !isOfficer && !isAdmin && !isBubbleMode && !isPhotoEditor) {
+          left.classList.add('show-marquee');
+          right.classList.add('show-marquee');
+      } else {
+          left.classList.remove('show-marquee');
+          right.classList.remove('show-marquee');
+      }
     }
 
     /* --- 基本介紹左右滑動照片渲染 --- */
@@ -1071,23 +1150,26 @@
         const card = document.createElement('div');
         card.className = 'photo-card intro-photo-card';
         const displayUrl = item.photoUrl || 'https://via.placeholder.com/240x180?text=Intro+Photo';
-        let html = `
-          <img class="photo-img" src="${displayUrl}" alt="介紹照片" onclick="openLightbox('${displayUrl}')">
-          <div class="photo-info">
-            <div class="photo-title">${item.title}</div>
-            ${(isAdmin || isPhotoEditor) ? `
+        
+        let html = `<img class="photo-img" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">`;
+        
+        // 只有管理員/修圖員才顯示標題與刪除按鈕，訪客只看見純圖片
+        if (isAdmin || isPhotoEditor) {
+          html += `
+            <div class="photo-info">
+              <div class="photo-title">${item.title}</div>
               <div class="admin-controls">
                 <button class="delete-btn" onclick="deleteGridItem('intro', '${item.id}')">刪除</button>
               </div>
-            ` : ''}
-          </div>
-        `;
+            </div>
+          `;
+        }
         card.innerHTML = html;
         container.appendChild(card);
       });
     }
 
-    /* --- 介紹社幹二維結構渲染與行數命名 --- */
+    /* --- 介紹社幹二維結構渲染 --- */
     function renderOfficers() {
       const container = document.getElementById('officer-list');
       container.innerHTML = '';
@@ -1110,7 +1192,6 @@
         const rowWrapper = document.createElement('div');
         rowWrapper.className = 'officer-row-wrapper';
         
-        // 取得自訂名稱或預設名稱
         const rowTitle = rowNamesData[`row_${rowKey}`] || `第 ${rowKey} 行幹部`;
         
         let rowHtml = `
@@ -1128,7 +1209,7 @@
           const displayUrl = officer.photoUrl || 'https://via.placeholder.com/200x200?text=No+Image';
           rowHtml += `
             <div class="photo-card officer-card-item">
-              <img class="photo-img" src="${displayUrl}" alt="社幹照片" onclick="openLightbox('${displayUrl}')">
+              <img class="photo-img" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
               <div class="photo-info">
                 <div class="photo-title">${officer.title || officer.name}</div>
                 ${(isAdmin || isPhotoEditor) ? `
@@ -1158,7 +1239,6 @@
       document.getElementById('edit-row-id').value = rowId;
       document.getElementById('edit-row-title').value = currentTitle;
     }
-    
     function closeRowNameModal() {
       document.getElementById('row-name-modal').style.display = 'none';
     }
@@ -1166,7 +1246,6 @@
     function saveRowName() {
       const rowId = document.getElementById('edit-row-id').value;
       const newTitle = document.getElementById('edit-row-title').value.trim();
-      
       let updates = {};
       updates[`row_${rowId}`] = newTitle;
       
@@ -1200,7 +1279,7 @@
         const displayUrl = item.photoUrl || 'https://via.placeholder.com/300x200?text=No+Image';
         
         let html = `
-          <img class="${imgClass}" src="${displayUrl}" alt="照片" onclick="openLightbox('${displayUrl}')">
+          <img class="${imgClass}" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
           <div class="photo-info">
             <div class="photo-title">${item.title}</div>
             ${(isAdmin || isPhotoEditor) ? `
@@ -1525,6 +1604,15 @@
       
       const track = document.getElementById('slider-track');
       track.style.transform = `translateX(-${index * 20}%)`;
+
+      // 絲滑過渡套用 active-page 類別
+      const pages = document.querySelectorAll('.section-page');
+      pages.forEach((page, i) => {
+          if (i === index) page.classList.add('active-page');
+          else page.classList.remove('active-page');
+      });
+
+      checkSideMarquees();
     }
 
     function updateBubble(element) {
@@ -1598,6 +1686,7 @@
           renderGridList('groups');
           renderGridList('shirts');
           renderGridList('logos');
+          checkSideMarquees();
           startBubbleSystem(); 
         }
       } else {
@@ -1637,6 +1726,7 @@
         btn.innerText = '泡泡模式'; 
         closeAuthModal();
         renderQA();
+        checkSideMarquees();
         startBubbleSystem(); 
       } else if (pwd === 'photoeditor') {
         isPhotoEditor = true; isBubbleMode = false; isOfficer = false; isAdmin = false;
@@ -1657,6 +1747,7 @@
         renderGridList('groups');
         renderGridList('shirts');
         renderGridList('logos');
+        checkSideMarquees();
         startBubbleSystem(); 
       } else if (b64Pwd === adminPwdB64) {
         isAdmin = true; isOfficer = true; isBubbleMode = false; isPhotoEditor = false;
@@ -1683,6 +1774,7 @@
         renderGridList('groups');
         renderGridList('shirts');
         renderGridList('logos');
+        checkSideMarquees();
         startBubbleSystem(); 
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
@@ -1694,6 +1786,7 @@
         
         closeAuthModal();
         renderQA();
+        checkSideMarquees();
         startBubbleSystem();
       } else {
         alert('密碼錯誤。');
@@ -1732,7 +1825,6 @@
       }).catch((error) => alert('儲存失敗: ' + error.message));
     }
 
-    // 維修紀錄展開/收起
     function toggleMaintenance() {
       const content = document.getElementById('maintenance-display');
       const toggleText = document.getElementById('toggle-maintenance-text');
@@ -1774,7 +1866,6 @@
       }).catch((error) => alert('儲存失敗: ' + error.message));
     }
 
-    // 活動日曆展開/收起與編輯
     function toggleCalendar() {
       const content = document.getElementById('calendar-display');
       const toggleText = document.getElementById('toggle-calendar-text');
