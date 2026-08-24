@@ -5,25 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>建功口技社 | cksh Beatbox</title>
   <style>
-    /* 定義 Apple 風格的高級絲滑過渡曲線 */
+    /* Apple 御用絲滑過渡曲線 */
     :root {
       --apple-ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --glass-bg: rgba(30, 30, 32, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --theme-red: #ff416c;
+      --theme-cyan: #00c3e3;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', '微軟正黑體', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", "微軟正黑體", sans-serif;
     }
     body {
-      background-color: #121212;
-      color: #e0e0e0;
+      background-color: #000000; /* Apple 深色模式純黑底 */
+      color: #f5f5f7;
       overflow-x: hidden;
       position: relative;
     }
     
-    /* 物理氣泡系統樣式 */
+    /* 物理氣泡系統樣式 (保留互動性但降低視覺干擾) */
     #bubble-container {
       position: fixed;
       top: 0;
@@ -37,28 +41,30 @@
     .game-bubble {
       position: absolute;
       border-radius: 50%;
-      background: rgba(0, 195, 227, 0.15);
-      border: 1px solid rgba(0, 195, 227, 0.4);
-      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+      background: rgba(0, 195, 227, 0.1);
+      border: 1px solid rgba(0, 195, 227, 0.2);
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
       top: 0; 
       left: 0;
       pointer-events: auto;
       cursor: pointer;
       transform: translate(-50%, -50%);
       will-change: transform;
-      transition: width 0.3s ease, height 0.3s ease;
+      transition: width 0.4s var(--apple-ease), height 0.4s var(--apple-ease);
     }
     .game-bubble.unclickable {
       pointer-events: none;
-      background: rgba(100, 100, 100, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(100, 100, 100, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
     }
     .game-bubble:hover:not(.unclickable) {
-      background: rgba(255, 75, 43, 0.3);
-      border-color: rgba(255, 75, 43, 0.6);
+      background: rgba(255, 65, 108, 0.2);
+      border-color: rgba(255, 65, 108, 0.4);
     }
 
-    /* 左右無限滾動相片牆 (訪客專屬) */
+    /* 左右無限滾動相片牆 (訪客專屬，極致柔和化) */
     .side-marquee {
       position: fixed;
       top: 0;
@@ -68,9 +74,9 @@
       z-index: 1; 
       opacity: 0;
       visibility: hidden;
-      transition: opacity 1s ease, visibility 1s;
+      transition: opacity 1.5s ease, visibility 1.5s;
       pointer-events: none; 
-      filter: grayscale(40%) brightness(0.35) blur(1px); 
+      filter: grayscale(20%) brightness(0.2) blur(3px); 
     }
     .side-marquee.show-marquee {
       opacity: 1;
@@ -83,7 +89,7 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
-      animation: scrollVertical 40s linear infinite;
+      animation: scrollVertical 50s linear infinite;
     }
     #right-marquee .marquee-track {
       animation-direction: reverse; 
@@ -92,49 +98,48 @@
       width: 100%;
       border-radius: 12px;
       object-fit: cover;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
     @keyframes scrollVertical {
       0% { transform: translateY(0); }
       100% { transform: translateY(-50%); }
     }
 
-    /* 原有 UI 樣式 */
+    /* Apple 懸浮動態島導覽列 */
     .nav-container {
       display: flex;
       justify-content: center;
-      padding: 20px 0;
-      background: rgba(30, 30, 30, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      padding: 15px 0;
       position: sticky;
       top: 0;
       z-index: 998;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: transparent;
     }
     .nav-menu {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       padding: 6px;
-      background: #252525;
-      border-radius: 30px;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+      background: rgba(30, 30, 32, 0.7);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 40px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .nav-item {
       position: relative;
       z-index: 2;
-      padding: 10px 20px;
+      padding: 10px 22px;
       cursor: pointer;
       font-size: 15px;
-      font-weight: bold;
-      color: #999;
+      font-weight: 600;
+      color: #98989d;
       transition: color 0.4s var(--apple-ease);
-      border-radius: 25px;
+      border-radius: 30px;
       display: flex;
       align-items: center;
+      letter-spacing: 0.5px;
     }
     .nav-item.active {
       color: #ffffff;
@@ -144,60 +149,61 @@
       top: 6px;
       left: 6px;
       height: calc(100% - 12px);
-      background: linear-gradient(135deg, #ff416c, #ff4b2b);
-      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
       z-index: 1;
-      transition: all 0.5s var(--apple-ease);
-      box-shadow: 0 4px 10px rgba(255, 65, 108, 0.3);
+      transition: all 0.6s var(--apple-ease);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
     .design-toggle-wrapper {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
     .toggle-track {
-      width: 44px;
-      height: 24px;
-      background: rgba(0, 0, 0, 0.5);
+      width: 40px;
+      height: 22px;
+      background: rgba(0, 0, 0, 0.6);
       border-radius: 12px;
       position: relative;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.4s var(--apple-ease);
       border: 1px solid rgba(255,255,255,0.1);
     }
     .toggle-thumb {
-      width: 18px;
-      height: 18px;
-      background: #00c3e3;
+      width: 16px;
+      height: 16px;
+      background: var(--theme-cyan);
       border-radius: 50%;
       position: absolute;
       top: 2px;
-      left: 3px;
-      transition: 0.4s var(--apple-ease);
-      box-shadow: 0 2px 5px rgba(0, 195, 227, 0.5);
+      left: 2px;
+      transition: 0.5s var(--apple-ease);
     }
     .toggle-track.switched .toggle-thumb {
-      left: 21px;
-      background: #ff4b2b;
-      box-shadow: 0 2px 5px rgba(255, 75, 43, 0.5);
+      left: 20px;
+      background: var(--theme-red);
     }
     
+    /* 懸浮按鈕 */
     #auth-btn-float {
       position: fixed;
       right: 30px;
       bottom: 30px;
       width: 60px;
       height: 60px;
-      background-color: #00c3e3;
-      color: #000000;
-      border: none;
+      background: rgba(28, 28, 30, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      color: #fff;
       border-radius: 50%;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      box-shadow: 0 4px 15px rgba(0, 195, 227, 0.4);
+      font-weight: 600;
+      font-size: 13px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       z-index: 998;
-      transition: all 0.3s ease;
+      transition: transform 0.4s var(--apple-ease), background 0.4s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -205,129 +211,111 @@
       text-align: center;
     }
     #auth-btn-float:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(0, 195, 227, 0.6);
+      transform: scale(1.08);
+      background: rgba(50, 50, 55, 0.9);
     }
 
+    /* 左下角面板 (毛玻璃卡片) */
     #left-info-panel {
       position: fixed;
       left: 20px;
       bottom: 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       z-index: 997;
     }
     .info-box {
-      background: rgba(30, 30, 30, 0.6);
-      padding: 10px 15px;
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--glass-bg);
+      padding: 15px;
+      border-radius: 18px;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
       font-size: 13px;
-      color: #ccc;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      color: #ebebf5;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       max-width: 280px;
     }
     .panel-header {
-      font-weight: bold;
-      color: #00c3e3;
-      margin-bottom: 5px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: 14px;
     }
     .panel-content {
       margin-top: 5px;
-      line-height: 1.5;
+      line-height: 1.6;
+      color: #a1a1a6;
     }
-    .announcement-content {
-      display: none;
-    }
+    .announcement-content { display: none; }
     
     .scrollable-content {
       max-height: 80px;
       overflow-y: auto;
-      font-size: 12px;
-      color: #888;
+      font-size: 13px;
+      color: #a1a1a6;
       white-space: pre-wrap;
-      line-height: 1.5;
+      line-height: 1.6;
       margin-top: 5px;
       padding-right: 4px;
-      transition: max-height 0.4s var(--apple-ease);
+      transition: max-height 0.6s var(--apple-ease);
     }
-    .scrollable-content.expanded {
-      max-height: 220px;
-    }
-    .scrollable-content::-webkit-scrollbar {
-      width: 4px;
-    }
-    .scrollable-content::-webkit-scrollbar-thumb {
-      background: #555;
-      border-radius: 2px;
-    }
+    .scrollable-content.expanded { max-height: 220px; }
+    .scrollable-content::-webkit-scrollbar { width: 4px; }
+    .scrollable-content::-webkit-scrollbar-thumb { background: #636366; border-radius: 4px; }
 
     .toggle-text {
-      font-size: 11px;
-      color: #888;
+      font-size: 12px;
+      color: #0a84ff; /* Apple iOS Blue */
       cursor: pointer;
-      text-decoration: underline;
     }
-    .small-btn {
-      background: none;
-      border: 1px solid #00c3e3;
-      color: #00c3e3;
-      border-radius: 3px;
-      padding: 2px 5px;
-      font-size: 11px;
-      cursor: pointer;
-      margin-left: 5px;
-    }
-    .small-btn:hover {
-      background: #00c3e3;
-      color: #000;
-    }
-    .action-btn {
-      background: #444;
+    .toggle-text:hover { opacity: 0.8; }
+    
+    .small-btn, .action-btn {
+      background: #0a84ff;
       color: #fff;
       border: none;
-      border-radius: 3px;
-      padding: 3px 6px;
-      font-size: 11px;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 12px;
       cursor: pointer;
-      margin-left: 5px;
+      font-weight: 600;
+      transition: background 0.3s ease;
     }
-    .action-btn:hover {
-      background: #666;
-    }
+    .small-btn:hover, .action-btn:hover { background: #0071e3; }
+    
     .edit-textarea {
       width: 100%;
-      background: #121212;
+      background: rgba(0,0,0,0.3);
       color: #fff;
-      border: 1px solid #444;
-      border-radius: 5px;
-      padding: 5px;
-      font-size: 12px;
+      border: 1px solid #3a3a3c;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
       resize: vertical;
       min-height: 60px;
       display: none;
-      margin-top: 5px;
+      margin-top: 10px;
+      outline: none;
     }
     .save-btn {
       display: none;
-      background: #00c3e3;
-      color: #000;
+      background: #34c759; /* Apple Green */
+      color: #fff;
       border: none;
-      border-radius: 3px;
-      padding: 4px 8px;
-      font-size: 11px;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 13px;
       cursor: pointer;
-      margin-top: 5px;
-      font-weight: bold;
+      margin-top: 10px;
+      font-weight: 600;
     }
     
-    /* 彈出視窗相關 */
+    /* 彈出視窗 (MacOS 風格) */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -335,90 +323,83 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       z-index: 999;
       justify-content: center;
       align-items: center;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.4s var(--apple-ease);
     }
     .modal-content {
-      background: #1e1e1e;
-      padding: 30px;
-      border-radius: 20px;
-      width: 320px;
+      background: rgba(30, 30, 32, 0.8);
+      padding: 35px 30px;
+      border-radius: 24px;
+      width: 340px;
       display: flex;
       flex-direction: column;
       gap: 15px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-      border: 1px solid rgba(255,255,255,0.08);
-      transform: scale(0.9);
-      transition: transform 0.3s var(--apple-ease);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.5s var(--apple-ease);
     }
-    .modal-overlay.show {
-      opacity: 1;
-    }
-    .modal-overlay.show .modal-content {
-      transform: scale(1);
-    }
+    .modal-overlay.show { opacity: 1; }
+    .modal-overlay.show .modal-content { transform: scale(1) translateY(0); }
     
     .modal-content h3 {
       text-align: center;
-      color: #00c3e3;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
     .modal-content input, .modal-content textarea {
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #444;
-      background: #121212;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid #3a3a3c;
+      background: rgba(0,0,0,0.2);
       color: #fff;
       outline: none;
       transition: 0.3s;
-      resize: vertical;
+      font-size: 14px;
     }
     .modal-content input:focus, .modal-content textarea:focus {
-      border-color: #00c3e3;
+      border-color: #0a84ff;
     }
     .modal-btns {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
+      margin-top: 10px;
     }
     .modal-btns button {
       flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .btn-cancel {
-      background: #444;
-      color: #fff;
-    }
-    .btn-submit {
-      background: #00c3e3;
-      color: #000;
-    }
-    .report-item {
-      background: #121212;
       padding: 12px;
-      border-radius: 8px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+    .modal-btns button:active { transform: scale(0.96); }
+    .btn-cancel { background: #3a3a3c; color: #fff; }
+    .btn-submit { background: #0a84ff; color: #fff; }
+
+    /* 錯誤回報列表 */
+    .report-item {
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 14px;
       margin-bottom: 10px;
       font-size: 13px;
       line-height: 1.5;
+      border-left: 3px solid #ff453a; /* Apple Red */
     }
-    .red-border {
-      border: 2px solid #ff416c;
-    }
-    .yellow-border {
-      border: 2px solid #ffd700;
-    }
+    .report-item.yellow-border { border-left-color: #ffd60a; }
 
-    /* 內容區塊 */
+    /* --- 內容區塊與 Apple 絲滑切換 --- */
     .content-wrapper {
       width: 100%;
       overflow: hidden;
@@ -428,10 +409,9 @@
     .content-track {
       display: flex;
       width: 500%;
-      transition: transform 0.9s var(--apple-ease);
+      transition: transform 0.8s var(--apple-ease);
     }
     
-    /* --- 絲滑切換與視角縮放特效 --- */
     .section-page {
       width: 20%;
       min-height: 85vh;
@@ -441,351 +421,130 @@
       align-items: center;
       position: relative;
       
-      /* Apple-style 預設隱藏並微縮小 */
+      /* Apple-style 極簡過渡：純淨的淡入與微上浮 */
       opacity: 0;
-      transform: scale(0.94) translateY(15px);
-      transition: opacity 0.8s ease, transform 0.9s var(--apple-ease);
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s var(--apple-ease);
       pointer-events: none;
     }
     .section-page.active-page {
       opacity: 1;
-      transform: scale(1) translateY(0);
+      transform: translateY(0);
       pointer-events: auto;
     }
 
-    /* 介紹社幹: 視覺從更小放大 */
-    #page-officers { transform: scale(0.85) translateY(20px); }
-    #page-officers.active-page { transform: scale(1) translateY(0); }
-
-    /* 各年合照: 視覺從微大縮小 */
-    #page-groups { transform: scale(1.1) translateY(0); }
-    #page-groups.active-page { transform: scale(1) translateY(0); }
-    
-    /* ---------------------------------------------------- */
-    /* 特效 1: 基本介紹 (主畫面) - Apple 毛玻璃斜角 45度滑入 */
-    /* ---------------------------------------------------- */
-    #page-intro { overflow: hidden; border-radius: 30px; }
-    .intro-corner {
-      position: absolute;
-      width: 200px;
-      height: 400px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      z-index: 25;
-      pointer-events: none;
-      opacity: 0;
-      transition: transform 1.2s var(--apple-ease) 0.1s, opacity 1s ease 0.1s;
-    }
-    .intro-corner.top-left {
-      top: -100px;
-      left: -100px;
-      transform: rotate(45deg) translateY(-250px) translateX(-250px);
-    }
-    .intro-corner.bottom-right {
-      bottom: -100px;
-      right: -100px;
-      transform: rotate(45deg) translateY(250px) translateX(250px);
-    }
-    #page-intro.active-page .intro-corner.top-left {
-      opacity: 1;
-      transform: rotate(45deg) translateY(0) translateX(0);
-    }
-    #page-intro.active-page .intro-corner.bottom-right {
-      opacity: 1;
-      transform: rotate(45deg) translateY(0) translateX(0);
-    }
-
-    /* ---------------------------------------------------- */
-    /* 特效 2: 介紹社幹 - Apple 級白色圓角長條 (延遲一秒跟上) */
-    /* ---------------------------------------------------- */
-    .officer-rect {
-      position: absolute;
-      width: 10px;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 10px;
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 0;
-      /* 延遲 1 秒的超絲滑滑入 */
-      transition: transform 1.8s var(--apple-ease) 1s, opacity 1.5s ease 1s;
-    }
-    .officer-rect.left {
-      left: 3%;
-      top: 15%;
-      height: 60%;
-      transform: translateY(-80px);
-    }
-    .officer-rect.right {
-      right: 3%;
-      top: 25%;
-      height: 50%;
-      transform: translateY(80px);
-    }
-    
-    #page-officers.active-page .officer-rect {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    /* 讓它有呼吸浮動感 (進場完畢後開始) */
-    @keyframes floatRect {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(12px); }
-    }
-    #page-officers.active-page .officer-rect.left {
-      animation: floatRect 7s ease-in-out infinite 2s; /* 延遲至進場後才開始 */
-    }
-    #page-officers.active-page .officer-rect.right {
-      animation: floatRect 8s ease-in-out infinite 2.5s;
-    }
-
-    /* ---------------------------------------------------- */
-    /* 特效 3: 各年合照 - 相機框滑入 (聚焦縮小感) */
-    /* ---------------------------------------------------- */
-    .photo-frame-corner {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      opacity: 0;
-      transition: opacity 0.6s ease 0.3s, top 1s var(--apple-ease) 0.2s, right 1s var(--apple-ease) 0.2s, bottom 1s var(--apple-ease) 0.2s, left 1s var(--apple-ease) 0.2s;
-      pointer-events: none;
-      z-index: 5;
-      border-radius: 8px; /* 微圓角更具質感 */
-    }
-    .photo-frame-corner.tr {
-      top: -50px; right: -50px;
-      border-top: 4px solid rgba(255,255,255,0.8); border-right: 4px solid rgba(255,255,255,0.8);
-    }
-    .photo-frame-corner.bl {
-      bottom: -50px; left: -50px;
-      border-bottom: 4px solid rgba(255,255,255,0.8); border-left: 4px solid rgba(255,255,255,0.8);
-    }
-
-    #page-groups.active-page .photo-frame-corner { opacity: 1; }
-    #page-groups.active-page .photo-frame-corner.tr { top: 6%; right: 6%; }
-    #page-groups.active-page .photo-frame-corner.bl { bottom: 6%; left: 6%; }
-    
     h1 {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       margin-bottom: 20px;
-      color: #ff4b2b;
+      color: #fff;
+      font-weight: 700;
       letter-spacing: 1px;
     }
     p {
-      line-height: 1.8;
+      line-height: 1.6;
       max-width: 650px;
       text-align: justify;
-      background: rgba(30, 30, 30, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 25px;
-      border-radius: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      border: 1px solid rgba(255,255,255,0.05);
-      font-size: 1.05rem;
-      position: relative;
-      z-index: 2; 
+      color: #a1a1a6;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      padding: 0 10px;
     }
 
-    /* 基本介紹專用左右滑動展示區 */
+    /* 統一卡片與照片網格 (Apple UI) */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 10px;
+      padding-bottom: 50px;
+    }
+    .large-grid { max-width: 750px; grid-template-columns: 1fr; }
+    
+    .photo-card, .officer-row-wrapper, .qa-item, .ask-box {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .photo-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.4s var(--apple-ease);
+    }
+    .photo-card:hover {
+      transform: scale(1.02);
+    }
+    .photo-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: rgba(0,0,0,0.3);
+      cursor: pointer; 
+    }
+    .large-photo-img {
+      height: auto; 
+      max-height: 400px;
+      object-fit: contain; 
+    }
+    .photo-info {
+      padding: 16px;
+      text-align: center;
+      width: 100%;
+    }
+    .photo-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    /* 基本介紹左右滑動 */
     .horizontal-photo-scroll {
       display: flex;
       gap: 15px;
       overflow-x: auto;
       width: 100%;
-      max-width: 650px;
-      padding: 10px 5px 15px 5px;
+      max-width: 680px;
+      padding: 10px 5px 20px 5px;
       margin-bottom: 20px;
       scroll-snap-type: x mandatory;
-      position: relative;
-      z-index: 2;
     }
-    .horizontal-photo-scroll::-webkit-scrollbar {
-      height: 6px;
-    }
-    .horizontal-photo-scroll::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.2);
-      border-radius: 4px;
-    }
-    .horizontal-photo-scroll::-webkit-scrollbar-thumb {
-      background: #444;
-      border-radius: 4px;
-    }
-    .intro-photo-card {
-      flex: 0 0 220px;
-      scroll-snap-align: start;
-    }
+    .horizontal-photo-scroll::-webkit-scrollbar { display: none; } /* 隱藏滾動條更像 iOS */
+    .intro-photo-card { flex: 0 0 260px; scroll-snap-align: center; }
 
-    /* Q&A 區塊 */
-    .qa-container {
-      width: 100%;
-      max-width: 650px;
-      padding-bottom: 90px;
-      position: relative;
-      z-index: 2;
-    }
-    .ask-box {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 35px;
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      border: 1px solid rgba(255,255,255,0.03);
-    }
-    .ask-box input {
-      flex: 1;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #333;
-      background: #121212;
-      color: #fff;
-      outline: none;
-      transition: 0.3s;
-    }
-    .ask-box input:focus {
-      border-color: #ff4b2b;
-    }
-    .ask-box button {
-      padding: 0 25px;
-      background: #ff4b2b;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .ask-box button:hover {
-      background: #ff6b52;
-    }
-    .qa-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .qa-item {
-      background: rgba(30, 30, 30, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .qa-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-    .qa-q-text {
-      font-weight: bold;
-      color: #ff4b2b;
-      font-size: 1.15rem;
-    }
-    .delete-btn {
-      background: #ff416c;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: 0.3s;
-    }
-    .delete-btn:hover {
-      background: #ff2a55;
-    }
-    .qa-a {
-      color: #cccccc;
-      line-height: 1.7;
-    }
-    .qa-pending {
-      color: #777;
-    }
-    .reply-box {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-    .reply-box input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #121212;
-      color: #fff;
-      outline: none;
-    }
-    .reply-box button {
-      padding: 0 15px;
-      background: #555;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .reply-box button:hover {
-      background: #777;
-    }
-
-    /* 照片網格 */
-    .photo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      width: 100%;
-      max-width: 900px;
-      margin-top: 20px;
-      padding-bottom: 50px;
-      position: relative;
-      z-index: 2;
-    }
-    .large-grid {
-      max-width: 700px; 
-      grid-template-columns: 1fr; 
-    }
-    
-    /* 介紹社幹二維行結構 */
+    /* 介紹社幹二維結構 */
     .officer-rows-container {
       display: flex;
       flex-direction: column;
-      gap: 25px;
+      gap: 30px;
       width: 100%;
-      max-width: 850px;
+      max-width: 900px;
       margin-top: 10px;
-      position: relative;
-      z-index: 2;
     }
     .officer-row-wrapper {
-      background: rgba(30, 30, 30, 0.4);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 15px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 15px;
     }
     .officer-row-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 5px;
+      padding: 0 10px;
     }
     .officer-row-title {
-      font-size: 14px;
-      font-weight: bold;
-      color: #00c3e3;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
     }
     .officer-row-track {
       display: flex;
@@ -794,122 +553,98 @@
       padding-bottom: 10px;
       scroll-snap-type: x mandatory;
     }
-    .officer-row-track::-webkit-scrollbar {
-      height: 6px;
-    }
-    .officer-row-track::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.2);
-      border-radius: 3px;
-    }
-    .officer-row-track::-webkit-scrollbar-thumb {
-      background: #444;
-      border-radius: 3px;
-    }
-    .officer-card-item {
-      flex: 0 0 200px;
-      scroll-snap-align: start;
-    }
+    .officer-row-track::-webkit-scrollbar { display: none; }
+    .officer-card-item { flex: 0 0 220px; scroll-snap-align: start; }
 
-    .photo-card {
-      background: #1e1e1e;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.05);
+    /* Q&A 區塊 */
+    .qa-container {
+      width: 100%;
+      max-width: 650px;
+      padding-bottom: 90px;
+    }
+    .ask-box {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      width: 100%;
-      transition: transform 0.3s var(--apple-ease);
-    }
-    .photo-card:hover {
-      transform: scale(1.02);
-    }
-    .photo-img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      background: #2a2a2a;
-      cursor: pointer; 
-    }
-    .large-photo-img {
-      height: 350px; 
-      object-fit: contain; 
-      background: #1a1a1a;
-    }
-    .photo-info {
-      padding: 12px;
-      text-align: center;
-      width: 100%;
-      background: #1e1e1e; 
-      z-index: 2;
-    }
-    .photo-title {
-      font-weight: bold;
-      color: #00c3e3;
-      font-size: 1.05rem;
-      margin-bottom: 4px;
-    }
-    .admin-controls {
-      margin-top: 8px;
-    }
-    .admin-add-box {
-      background: rgba(30,30,30,0.8);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      gap: 12px;
+      margin-bottom: 35px;
       padding: 20px;
-      border-radius: 15px;
-      border: 1px dashed #00c3e3;
+    }
+    .ask-box input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid #3a3a3c;
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+      font-size: 15px;
+    }
+    .ask-box input:focus { border-color: #0a84ff; }
+    .ask-box button {
+      padding: 0 25px;
+      background: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s ease;
+    }
+    .ask-box button:active { transform: scale(0.95); }
+    .qa-list { display: flex; flex-direction: column; gap: 20px; }
+    .qa-item { padding: 25px; }
+    .qa-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .qa-q-text { font-weight: 600; color: #fff; font-size: 1.15rem; line-height: 1.4; }
+    .delete-btn { background: #ff453a; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 12px; cursor: pointer; }
+    .qa-a { color: #a1a1a6; line-height: 1.6; font-size: 15px; }
+    .qa-pending { color: #636366; font-size: 14px; }
+    
+    .reply-box { margin-top: 15px; display: flex; gap: 10px; }
+    .reply-box input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.3); color: #fff; outline: none; }
+    .reply-box button { padding: 0 15px; background: #30d158; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+
+    /* 圖庫新增工具框 */
+    .admin-add-box {
+      background: rgba(20, 20, 22, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 25px;
+      border-radius: 20px;
+      border: 1px solid #3a3a3c;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
       max-width: 400px;
-      margin-top: 25px;
-      z-index: 20;
+      margin: 30px auto 0;
     }
-    .admin-add-box input {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #121212;
-      color: #fff;
-    }
+    .admin-add-box h4 { color: #fff; text-align: center; font-weight: 600; margin-bottom: 5px; }
+    .admin-add-box input { padding: 12px; border-radius: 12px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.3); color: #fff; }
 
-    /* 點擊看大圖 (Lightbox) 系統 */
+    /* Lightbox 系統 */
     #lightbox {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       z-index: 9999;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; align-items: center;
       cursor: zoom-out; 
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.4s var(--apple-ease);
     }
-    #lightbox.show {
-      opacity: 1;
-    }
+    #lightbox.show { opacity: 1; }
     #lightbox-img {
-      max-width: 90vw;
-      max-height: 90vh;
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      max-width: 90vw; max-height: 90vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
       object-fit: contain;
-      transform: scale(0.9);
-      transition: transform 0.3s var(--apple-ease);
+      transform: scale(0.95);
+      transition: transform 0.5s var(--apple-ease);
     }
-    #lightbox.show #lightbox-img {
-      transform: scale(1);
-    }
+    #lightbox.show #lightbox-img { transform: scale(1); }
 
     /* 雙視圖設計區塊 */
     .design-view {
@@ -921,17 +656,12 @@
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.5s ease;
-      height: 70vh;
+      transition: opacity 0.6s ease;
+      height: 75vh;
       overflow-y: auto;
     }
-    .design-view.active-view {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .design-view::-webkit-scrollbar {
-      display: none;
-    }
+    .design-view.active-view { opacity: 1; pointer-events: auto; }
+    .design-view::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
@@ -1003,7 +733,7 @@
       <textarea class="edit-textarea" id="edit-maintenance-textarea"></textarea>
       <button class="save-btn" id="save-maintenance-btn" onclick="saveMaintenance()">儲存</button>
       
-      <div id="admin-settings-container" style="display:none; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+      <div id="admin-settings-container" style="display:none; margin-top:10px; border-top:1px solid #3a3a3c; padding-top:10px;">
         <button class="action-btn" style="width:100%; margin:0;" onclick="openPwdModal()">修改社幹密碼</button>
       </div>
     </div>
@@ -1011,6 +741,7 @@
 
   <button id="auth-btn-float" onclick="handleAuthBtnClick()">系統<br>認證</button>
 
+  <!-- 所有 Modal 共用樣式處理 -->
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
       <h3>系統認證</h3>
@@ -1030,9 +761,9 @@
         <button class="btn-cancel" onclick="closeReportModal()">取消</button>
         <button class="btn-submit" onclick="submitReport()">送出</button>
       </div>
-      <div id="admin-reports-section" style="display:none; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">
-        <h4 style="color:#00c3e3; margin-bottom: 10px; font-size:14px;">回報列表 (管理員)</h4>
-        <div id="report-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+      <div id="admin-reports-section" style="display:none; margin-top: 15px; border-top: 1px solid #3a3a3c; padding-top: 15px;">
+        <h4 style="color:#00c3e3; margin-bottom: 10px; font-size:14px; text-align:center;">回報列表 (管理員)</h4>
+        <div id="report-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
         </div>
       </div>
     </div>
@@ -1041,7 +772,7 @@
   <div id="pwd-modal" class="modal-overlay">
     <div class="modal-content">
       <h3>修改社幹密碼</h3>
-      <label style="font-size:12px; color:#aaa;">一般社幹密碼</label>
+      <label style="font-size:12px; color:#a1a1a6;">一般社幹密碼</label>
       <input type="text" id="new-officer-pwd" placeholder="留空則不修改">
       <div class="modal-btns" style="margin-top:10px;">
         <button class="btn-cancel" onclick="closePwdModal()">取消</button>
@@ -1053,7 +784,7 @@
   <div id="row-name-modal" class="modal-overlay">
     <div class="modal-content">
       <h3>修改行數標題</h3>
-      <label style="font-size:12px; color:#aaa;">(例如將「第1行」改為「幹部核心」)</label>
+      <label style="font-size:12px; color:#a1a1a6;">(例如將「第1行」改為「幹部核心」)</label>
       <input type="hidden" id="edit-row-id">
       <input type="text" id="edit-row-title" placeholder="輸入新標題">
       <div class="modal-btns" style="margin-top:10px;">
@@ -1068,95 +799,83 @@
       
       <!-- Page 0: 基本介紹 -->
       <div class="section-page" id="page-intro">
-        <!-- 45度斜角毛玻璃特效 -->
-        <div class="intro-corner top-left"></div>
-        <div class="intro-corner bottom-right"></div>
-        
-        <h1>🎤 基本介紹</h1>
+        <h1>基本介紹</h1>
         <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
         
         <div class="horizontal-photo-scroll" id="intro-photo-list"></div>
 
         <div class="admin-add-box" id="admin-intro-box" style="display: none;">
-          <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增介紹照片</h4>
-          <input type="text" id="new-intro-title" placeholder="照片標題/說明 (例: 社課日常練習)">
-          <input type="text" id="new-intro-photo" placeholder="照片檔名或網址 (例: practice.jpg)">
-          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('intro')">新增介紹照片</button>
+          <h4>[圖庫管理] 新增介紹照片</h4>
+          <input type="text" id="new-intro-title" placeholder="照片標題/說明">
+          <input type="text" id="new-intro-photo" placeholder="照片檔名或網址 (例: img.jpg)">
+          <button class="action-btn" style="padding: 12px; font-size: 14px;" onclick="addGridItem('intro')">新增</button>
         </div>
       </div>
       
       <!-- Page 1: 介紹社幹 -->
       <div class="section-page" id="page-officers">
-        <!-- 替換藍邊為 Apple 風白色長條 (延遲滑入) -->
-        <div class="officer-rect left"></div>
-        <div class="officer-rect right"></div>
-        
-        <h1>👑 介紹社幹</h1>
+        <h1>介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
         <div class="officer-rows-container" id="officer-list"></div>
 
         <div class="admin-add-box" id="admin-officer-box" style="display: none;">
-          <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社幹</h4>
+          <h4>[圖庫管理] 新增社幹</h4>
           <input type="number" id="new-officer-row" placeholder="所屬行數 (預設: 1)" value="1" min="1">
-          <input type="text" id="new-officer-name" placeholder="職稱與名稱 (例: 社長 小明)">
-          <input type="text" id="new-officer-photo" placeholder="照片檔名或網址 (例: boss.jpg)">
-          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('officers')">新增幹部</button>
+          <input type="text" id="new-officer-name" placeholder="職稱與名稱">
+          <input type="text" id="new-officer-photo" placeholder="照片檔名或網址">
+          <button class="action-btn" style="padding: 12px; font-size: 14px;" onclick="addGridItem('officers')">新增</button>
         </div>
       </div>
       
       <!-- Page 2: 各年合照 -->
       <div class="section-page" id="page-groups">
-        <!-- 聚焦相機框特效 -->
-        <div class="photo-frame-corner tr"></div>
-        <div class="photo-frame-corner bl"></div>
-        
-        <h1>📸 各年合照</h1>
+        <h1>各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下來。</p>
         
         <div class="photo-grid" id="group-photo-list"></div>
 
         <div class="admin-add-box" id="admin-group-photo-box" style="display: none;">
-          <h4 style="color: #ff4b2b; text-align: center;">[圖庫管理] 新增合照</h4>
-          <input type="text" id="new-group-title" placeholder="合照標題 (例: 第一屆迎新合照)">
-          <input type="text" id="new-group-photo" placeholder="照片檔名或網址 (例: group1.jpg)">
-          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('groups')">新增合照</button>
+          <h4>[圖庫管理] 新增合照</h4>
+          <input type="text" id="new-group-title" placeholder="合照標題">
+          <input type="text" id="new-group-photo" placeholder="照片檔名或網址">
+          <button class="action-btn" style="padding: 12px; font-size: 14px;" onclick="addGridItem('groups')">新增</button>
         </div>
       </div>
       
       <!-- Page 3: 社服與社徽 -->
-      <div class="section-page" id="page-design" style="position: relative;">
+      <div class="section-page" id="page-design">
         <div id="view-shirt" class="design-view active-view">
-          <h1>👕 社服設計</h1>
+          <h1>社服設計</h1>
           
           <div class="photo-grid large-grid" id="shirt-list"></div>
           
           <div class="admin-add-box" id="admin-shirt-box" style="display: none; margin-bottom: 50px;">
-            <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社服</h4>
-            <input type="text" id="new-shirt-title" placeholder="版本標題 (例: 2026年社服)">
-            <input type="text" id="new-shirt-photo" placeholder="照片檔名或網址 (例: shirt.jpg)">
-            <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('shirts')">新增社服</button>
+            <h4>[圖庫管理] 新增社服</h4>
+            <input type="text" id="new-shirt-title" placeholder="版本標題">
+            <input type="text" id="new-shirt-photo" placeholder="照片檔名或網址">
+            <button class="action-btn" style="padding: 12px; font-size: 14px;" onclick="addGridItem('shirts')">新增</button>
           </div>
         </div>
         
         <div id="view-logo" class="design-view">
-          <h1>🏅 社徽圖案</h1>
+          <h1>社徽圖案</h1>
           <p style="margin-bottom:0;">社徽是由第一屆美宣所繪製出，簡約的線條加上俐落的文字縮寫，是我們第一屆建功口技社的象徵。</p>
           
           <div class="photo-grid large-grid" id="logo-list"></div>
           
           <div class="admin-add-box" id="admin-logo-box" style="display: none; margin-bottom: 50px;">
-            <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社徽</h4>
-            <input type="text" id="new-logo-title" placeholder="版本標題 (例: 第一屆社徽)">
-            <input type="text" id="new-logo-photo" placeholder="照片檔名或網址 (例: logo.jpg)">
-            <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('logos')">新增社徽</button>
+            <h4>[圖庫管理] 新增社徽</h4>
+            <input type="text" id="new-logo-title" placeholder="版本標題">
+            <input type="text" id="new-logo-photo" placeholder="照片檔名或網址">
+            <button class="action-btn" style="padding: 12px; font-size: 14px;" onclick="addGridItem('logos')">新增</button>
           </div>
         </div>
       </div>
       
       <!-- Page 4: Q&A -->
       <div class="section-page" id="page-qa">
-        <h1>❓ Q&A 互動區</h1>
+        <h1>Q&A 互動區</h1>
         <div class="qa-container" id="qa-target-box">
           <div class="ask-box" id="ask-box">
             <input type="text" id="new-question" placeholder="對建功口技社有疑問嗎？請在此發問。">
@@ -1271,7 +990,6 @@
         if (doc.exists && doc.data().officer) officerPwdB64 = doc.data().officer;
       });
       
-      // 修復手機版觸控防止卡死的全域解除綁定
       window.addEventListener('mouseup', () => { activeBubble = null; });
       window.addEventListener('touchend', () => { activeBubble = null; });
       window.addEventListener('touchcancel', () => { activeBubble = null; });
@@ -1280,19 +998,24 @@
       requestAnimationFrame(physicsLoop);
     };
 
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10);
+    }
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 400);
+    }
+
     function openLightbox(imgUrl) {
-      const lb = document.getElementById('lightbox');
       document.getElementById('lightbox-img').src = imgUrl;
-      lb.style.display = 'flex';
-      setTimeout(() => lb.classList.add('show'), 10);
+      openModal('lightbox');
     }
     function closeLightbox() {
-      const lb = document.getElementById('lightbox');
-      lb.classList.remove('show');
-      setTimeout(() => {
-          lb.style.display = 'none';
-          document.getElementById('lightbox-img').src = '';
-      }, 300);
+      closeModal('lightbox');
+      setTimeout(() => document.getElementById('lightbox-img').src = '', 400);
     }
 
     function updateSideMarquees() {
@@ -1304,7 +1027,6 @@
       if (introPhotosData.length > 0) {
         let baseHtml = '';
         introPhotosData.forEach(item => {
-          // 如果沒有照片網址，也不要顯示預設的代替文字
           const url = item.photoUrl || 'https://via.placeholder.com/240x180';
           baseHtml += `<img src="${url}" alt="">`;
         });
@@ -1361,7 +1083,7 @@
       container.innerHTML = '';
       
       if (officersData.length === 0 && !isAdmin && !isPhotoEditor) {
-         container.innerHTML = '<div style="color:#888; text-align:center; width:100%; margin-top:20px;">目前尚未新增幹部。</div>';
+         container.innerHTML = '<div style="color:#a1a1a6; text-align:center; width:100%; margin-top:20px;">目前尚未新增幹部。</div>';
          return;
       }
 
@@ -1384,8 +1106,8 @@
           <div class="officer-row-header">
             <span class="officer-row-title">${rowTitle}</span>
             <div>
-              ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="openRowNameModal('${rowKey}', '${rowTitle}')">[編輯標題]</button>` : ''}
-              ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="quickAddOfficerRow('${rowKey}')">+ 此行新增</button>` : ''}
+              ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="openRowNameModal('${rowKey}', '${rowTitle}')">編輯標題</button>` : ''}
+              ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="quickAddOfficerRow('${rowKey}')">+ 新增</button>` : ''}
             </div>
           </div>
           <div class="officer-row-track">
@@ -1421,12 +1143,12 @@
     }
 
     function openRowNameModal(rowId, currentTitle) {
-      document.getElementById('row-name-modal').style.display = 'flex';
       document.getElementById('edit-row-id').value = rowId;
       document.getElementById('edit-row-title').value = currentTitle;
+      openModal('row-name-modal');
     }
     function closeRowNameModal() {
-      document.getElementById('row-name-modal').style.display = 'none';
+      closeModal('row-name-modal');
     }
 
     function saveRowName() {
@@ -1452,7 +1174,7 @@
       container.innerHTML = '';
       
       if (dataArray.length === 0 && !isAdmin && !isPhotoEditor) {
-         container.innerHTML = `<div style="color:#888; text-align:center; width:100%; margin-top: 20px;">${emptyText}</div>`;
+         container.innerHTML = `<div style="color:#a1a1a6; text-align:center; width:100%; margin-top: 20px;">${emptyText}</div>`;
          return;
       }
 
@@ -1794,7 +1516,6 @@
       const track = document.getElementById('slider-track');
       track.style.transform = `translateX(-${index * 20}%)`;
 
-      // Apple Style 視角縮放觸發
       const pages = document.querySelectorAll('.section-page');
       pages.forEach((page, i) => {
           if (i === index) page.classList.add('active-page');
@@ -1879,31 +1600,21 @@
           startBubbleSystem(); 
         }
       } else {
-        openAuthModal();
+        openModal('auth-modal');
       }
     }
 
-    function openAuthModal() {
-      document.getElementById('auth-modal').style.display = 'flex';
-      document.getElementById('auth-password').value = '';
-    }
-    function closeAuthModal() {
-      document.getElementById('auth-modal').style.display = 'none';
-    }
+    function closeAuthModal() { closeModal('auth-modal'); }
     function openReportModal() {
-      document.getElementById('report-modal').style.display = 'flex';
       document.getElementById('report-input').value = '';
+      openModal('report-modal');
     }
-    function closeReportModal() {
-      document.getElementById('report-modal').style.display = 'none';
-    }
+    function closeReportModal() { closeModal('report-modal'); }
     function openPwdModal() {
-      document.getElementById('pwd-modal').style.display = 'flex';
       document.getElementById('new-officer-pwd').value = '';
+      openModal('pwd-modal');
     }
-    function closePwdModal() {
-      document.getElementById('pwd-modal').style.display = 'none';
-    }
+    function closePwdModal() { closeModal('pwd-modal'); }
 
     function verifyOfficer() {
       const pwd = document.getElementById('auth-password').value;
