@@ -16,6 +16,7 @@
       color: #e0e0e0;
       overflow-x: hidden;
       position: relative;
+      padding-top: 80px; /* 配合 fixed 導覽列預留頂部空間 */
     }
     
     /* 物理氣泡系統樣式 */
@@ -60,12 +61,12 @@
       width: 14vw;
       height: 100vh;
       overflow: hidden;
-      z-index: 1; /* 位於背景之上，內容之下 */
+      z-index: 1; 
       opacity: 0;
       visibility: hidden;
       transition: opacity 1s ease, visibility 1s;
-      pointer-events: none; /* 不干擾點擊 */
-      filter: grayscale(40%) brightness(0.35) blur(1px); /* 質感背景化 */
+      pointer-events: none; 
+      filter: grayscale(40%) brightness(0.35) blur(1px); 
     }
     .side-marquee.show-marquee {
       opacity: 1;
@@ -81,7 +82,7 @@
       animation: scrollVertical 40s linear infinite;
     }
     #right-marquee .marquee-track {
-      animation-direction: reverse; /* 右側反向滾動 */
+      animation-direction: reverse; 
     }
     .marquee-track img {
       width: 100%;
@@ -94,7 +95,7 @@
       100% { transform: translateY(-50%); }
     }
 
-    /* 原有 UI 樣式 */
+    /* 導覽列優化 (改為 Fixed 解決手機版誤觸與跑版問題) */
     .nav-container {
       display: flex;
       justify-content: center;
@@ -102,8 +103,10 @@
       background: rgba(30, 30, 30, 0.85);
       backdrop-filter: blur(12px);
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      position: sticky;
+      position: fixed;
+      width: 100vw;
       top: 0;
+      left: 0;
       z-index: 998;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
@@ -129,6 +132,8 @@
       border-radius: 25px;
       display: flex;
       align-items: center;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     .nav-item.active {
       color: #ffffff;
@@ -143,6 +148,7 @@
       z-index: 1;
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 10px rgba(255, 65, 108, 0.3);
+      pointer-events: none; /* 確保背景圓角不會擋住按鈕的點擊判定 */
     }
     .design-toggle-wrapper {
       display: flex;
@@ -175,6 +181,7 @@
       background: #ff4b2b;
       box-shadow: 0 2px 5px rgba(255, 75, 43, 0.5);
     }
+    
     #auth-btn-float {
       position: fixed;
       right: 30px;
@@ -196,6 +203,8 @@
       justify-content: center;
       line-height: 1.2;
       text-align: center;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     #auth-btn-float:hover {
       transform: scale(1.1);
@@ -410,7 +419,8 @@
       width: 500%;
       transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    /* 絲滑切換核心設定 */
+    
+    /* --- 絲滑切換與視角縮放特效 --- */
     .section-page {
       width: 20%;
       min-height: 85vh;
@@ -419,18 +429,66 @@
       flex-direction: column;
       align-items: center;
       position: relative;
-      /* 預設隱藏並微縮小 */
       opacity: 0;
       transform: scale(0.92) translateY(20px);
       transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
       pointer-events: none;
     }
-    /* 啟用狀態展開並顯示 */
     .section-page.active-page {
       opacity: 1;
       transform: scale(1) translateY(0);
       pointer-events: auto;
     }
+
+    #page-officers { transform: scale(0.85) translateY(20px); }
+    #page-officers.active-page { transform: scale(1) translateY(0); }
+
+    #page-groups { transform: scale(1.15) translateY(0); }
+    #page-groups.active-page { transform: scale(1) translateY(0); }
+    
+    /* 特效 1: 社幹藍邊滑出 (擴張放大感)  */
+    .officer-edge {
+      position: absolute;
+      top: 15%;
+      bottom: 15%;
+      width: 4px;
+      background: #00c3e3;
+      box-shadow: 0 0 15px #00c3e3, 0 0 5px #ffffff;
+      opacity: 0;
+      border-radius: 4px;
+      transition: opacity 0.4s ease 0.2s, left 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, right 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .officer-edge.left { left: 30%; }
+    .officer-edge.right { right: 30%; }
+    
+    #page-officers.active-page .officer-edge { opacity: 1; }
+    #page-officers.active-page .officer-edge.left { left: 3%; }
+    #page-officers.active-page .officer-edge.right { right: 3%; }
+
+    /* 特效 2: 合照相機框滑入 (聚焦縮小感) */
+    .photo-frame-corner {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.2s, top 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, right 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, bottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, left 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .photo-frame-corner.tr {
+      top: -50px; right: -50px;
+      border-top: 5px solid #fff; border-right: 5px solid #fff;
+    }
+    .photo-frame-corner.bl {
+      bottom: -50px; left: -50px;
+      border-bottom: 5px solid #fff; border-left: 5px solid #fff;
+    }
+
+    #page-groups.active-page .photo-frame-corner { opacity: 0.7; }
+    #page-groups.active-page .photo-frame-corner.tr { top: 5%; right: 5%; }
+    #page-groups.active-page .photo-frame-corner.bl { bottom: 5%; left: 5%; }
     
     h1 {
       font-size: 2.2rem;
@@ -449,6 +507,8 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       border: 1px solid rgba(255,255,255,0.03);
       font-size: 1.05rem;
+      position: relative;
+      z-index: 2; 
     }
 
     /* 基本介紹專用左右滑動展示區 */
@@ -461,6 +521,8 @@
       padding: 10px 5px 15px 5px;
       margin-bottom: 20px;
       scroll-snap-type: x mandatory;
+      position: relative;
+      z-index: 2;
     }
     .horizontal-photo-scroll::-webkit-scrollbar {
       height: 6px;
@@ -483,6 +545,8 @@
       width: 100%;
       max-width: 650px;
       padding-bottom: 90px;
+      position: relative;
+      z-index: 2;
     }
     .ask-box {
       display: flex;
@@ -590,7 +654,7 @@
       background: #777;
     }
 
-    /* 照片網格 (合照、社服、社徽) */
+    /* 照片網格 */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -599,6 +663,8 @@
       max-width: 900px;
       margin-top: 20px;
       padding-bottom: 50px;
+      position: relative;
+      z-index: 2;
     }
     .large-grid {
       max-width: 700px; 
@@ -613,6 +679,8 @@
       width: 100%;
       max-width: 850px;
       margin-top: 10px;
+      position: relative;
+      z-index: 2;
     }
     .officer-row-wrapper {
       background: rgba(30, 30, 30, 0.4);
@@ -722,7 +790,7 @@
       color: #fff;
     }
 
-    /* --- 點擊看大圖 (Lightbox) 系統 --- */
+    /* 點擊看大圖 (Lightbox) 系統 */
     #lightbox {
       display: none;
       position: fixed;
@@ -771,7 +839,7 @@
 
   <div id="bubble-container"></div>
   
-  <!-- 新增的雙側相片牆 (預設隱藏) -->
+  <!-- 雙側相片牆 (訪客專屬) -->
   <div id="left-marquee" class="side-marquee"><div class="marquee-track" id="left-marquee-track"></div></div>
   <div id="right-marquee" class="side-marquee"><div class="marquee-track" id="right-marquee-track"></div></div>
 
@@ -914,7 +982,10 @@
       </div>
       
       <!-- Page 1: 介紹社幹 -->
-      <div class="section-page">
+      <div class="section-page" id="page-officers">
+        <div class="officer-edge left"></div>
+        <div class="officer-edge right"></div>
+        
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
@@ -930,7 +1001,10 @@
       </div>
       
       <!-- Page 2: 各年合照 -->
-      <div class="section-page">
+      <div class="section-page" id="page-groups">
+        <div class="photo-frame-corner tr"></div>
+        <div class="photo-frame-corner bl"></div>
+        
         <h1>📸 各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下來。</p>
         
@@ -1050,7 +1124,7 @@
       db.collection("intro_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         introPhotosData = []; snapshot.forEach(doc => introPhotosData.push({ id: doc.id, ...doc.data() }));
         renderIntroPhotos();
-        updateSideMarquees(); // 更新側邊照片牆
+        updateSideMarquees(); 
       });
       db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         officersData = []; snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
@@ -1091,6 +1165,11 @@
         if (doc.exists && doc.data().officer) officerPwdB64 = doc.data().officer;
       });
       
+      // 修復手機版觸控防止卡死的全域解除綁定
+      window.addEventListener('mouseup', () => { activeBubble = null; });
+      window.addEventListener('touchend', () => { activeBubble = null; });
+      window.addEventListener('touchcancel', () => { activeBubble = null; });
+      
       checkSideMarquees();
       requestAnimationFrame(physicsLoop);
     };
@@ -1104,7 +1183,6 @@
       document.getElementById('lightbox-img').src = '';
     }
 
-    /* --- 側邊相片牆更新系統 --- */
     function updateSideMarquees() {
       const leftTrack = document.getElementById('left-marquee-track');
       const rightTrack = document.getElementById('right-marquee-track');
@@ -1117,7 +1195,6 @@
           const url = item.photoUrl || 'https://via.placeholder.com/240x180';
           baseHtml += `<img src="${url}" alt="">`;
         });
-        // 複製6次以確保畫面夠長可以完美循環
         html = baseHtml.repeat(6);
       }
       leftTrack.innerHTML = html;
@@ -1127,7 +1204,6 @@
     function checkSideMarquees() {
       const left = document.getElementById('left-marquee');
       const right = document.getElementById('right-marquee');
-      // 只有在訪客狀態且在「社服社徽」(index=3)時顯示
       if (currentTabIndex === 3 && !isOfficer && !isAdmin && !isBubbleMode && !isPhotoEditor) {
           left.classList.add('show-marquee');
           right.classList.add('show-marquee');
@@ -1137,7 +1213,6 @@
       }
     }
 
-    /* --- 基本介紹左右滑動照片渲染 --- */
     function renderIntroPhotos() {
       const container = document.getElementById('intro-photo-list');
       container.innerHTML = '';
@@ -1149,11 +1224,10 @@
       introPhotosData.forEach(item => {
         const card = document.createElement('div');
         card.className = 'photo-card intro-photo-card';
-        const displayUrl = item.photoUrl || 'https://via.placeholder.com/240x180?text=Intro+Photo';
+        const displayUrl = item.photoUrl || 'https://via.placeholder.com/240x180';
         
         let html = `<img class="photo-img" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">`;
         
-        // 只有管理員/修圖員才顯示標題與刪除按鈕，訪客只看見純圖片
         if (isAdmin || isPhotoEditor) {
           html += `
             <div class="photo-info">
@@ -1169,7 +1243,6 @@
       });
     }
 
-    /* --- 介紹社幹二維結構渲染 --- */
     function renderOfficers() {
       const container = document.getElementById('officer-list');
       container.innerHTML = '';
@@ -1206,7 +1279,7 @@
         `;
         
         rowsMap[rowKey].forEach(officer => {
-          const displayUrl = officer.photoUrl || 'https://via.placeholder.com/200x200?text=No+Image';
+          const displayUrl = officer.photoUrl || 'https://via.placeholder.com/200x200';
           rowHtml += `
             <div class="photo-card officer-card-item">
               <img class="photo-img" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
@@ -1256,7 +1329,6 @@
       });
     }
 
-    /* --- 標準網格列表渲染 --- */
     function renderGridList(type) {
       let containerId, dataArray, emptyText;
       if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
@@ -1276,7 +1348,7 @@
       dataArray.forEach(item => {
         const card = document.createElement('div');
         card.className = 'photo-card';
-        const displayUrl = item.photoUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+        const displayUrl = item.photoUrl || 'https://via.placeholder.com/300x200';
         
         let html = `
           <img class="${imgClass}" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
@@ -1464,8 +1536,10 @@
       
       if (!isUnclickable) {
          const startInteraction = function(e) {
-            e.preventDefault();
-            if (isDraggable) activeBubble = bubbleObj;
+            if (isDraggable) {
+                e.preventDefault(); // 只有可拖曳氣泡才阻止預設滾動，修復手機版頁面卡死問題
+                activeBubble = bubbleObj;
+            }
             bubbleObj.clickStartX = e.touches ? e.touches[0].clientX : e.clientX;
             bubbleObj.clickStartY = e.touches ? e.touches[0].clientY : e.clientY;
             bubbleObj.clickStartTime = Date.now();
@@ -1506,6 +1580,8 @@
     }, {passive: false});
 
     function triggerSplit(b) {
+        if (!bubbles.includes(b)) return; // 安全檢查
+        
         if (isBubbleMode) {
           let count = Math.floor(Math.random() * 3) + 2; 
           for(let i=0; i<count; i++) {
@@ -1605,7 +1681,6 @@
       const track = document.getElementById('slider-track');
       track.style.transform = `translateX(-${index * 20}%)`;
 
-      // 絲滑過渡套用 active-page 類別
       const pages = document.querySelectorAll('.section-page');
       pages.forEach((page, i) => {
           if (i === index) page.classList.add('active-page');
