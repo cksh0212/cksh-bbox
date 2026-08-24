@@ -910,6 +910,7 @@
       max-width: 680px;
       padding: 10px 5px 20px 5px;
       margin-bottom: 20px;
+      scroll-snap-type: x mandatory;
       position: relative;
       z-index: 2;
     }
@@ -919,6 +920,7 @@
       gap: 15px;
       overflow-x: auto;
       padding-bottom: 15px;
+      scroll-snap-type: x mandatory;
     }
 
     /* 恢復滾動條並美化 */
@@ -1900,6 +1902,7 @@
       let qaRect = null;
       if (currentTabIndex === 4 && qaBox) qaRect = qaBox.getBoundingClientRect();
       let currentCollisions = {};
+      
       for (let i = 0; i < bubbles.length; i++) {
          let b = bubbles[i];
          if (b.cooldown > 0) b.cooldown--; 
@@ -1938,14 +1941,14 @@
                let dx = b1.x - b2.x; let dy = b1.y - b2.y; let dist = Math.hypot(dx, dy);
                if (dist < (b1.size + b2.size) / 2) {
                    if (b1.cooldown > 0 || b2.cooldown > 0) {
-                       let pushForce = 0.8; 
+                       let pushForce = 0.4; 
                        if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; } 
                        else { b1.vx += pushForce; b2.vx -= pushForce; } 
                        continue;
                    }
                    let pairId = b1.id < b2.id ? b1.id + "_" + b2.id : b2.id + "_" + b1.id;
                    currentCollisions[pairId] = (collisionFrames[pairId] || 0) + 1;
-                   if (currentCollisions[pairId] >= 180) { 
+                   if (currentCollisions[pairId] >= 90) { 
                        let maxSize = isBubbleMode ? 800 : 150; 
                        let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
                        b1.size = newSize; b1.el.style.width = newSize + 'px'; b1.el.style.height = newSize + 'px'; b1.splits = Math.max(b1.splits, b2.splits);
@@ -1953,7 +1956,7 @@
                        b2.el.remove(); bubbles.splice(j, 1); j--; 
                        delete currentCollisions[pairId];
                    } else { 
-                       let pushForce = 0.5; 
+                       let pushForce = 0.1; 
                        if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; } 
                        else { b1.vx += pushForce; b2.vx -= pushForce; } 
                    }
@@ -2030,7 +2033,7 @@
             let sprayVx = (startOffsetX / 3); 
             let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
             let newSize = Math.max(Math.random() * b.size, 10); 
-            createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180, true); 
+            createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 60, true); 
           }
         } else if (isAdmin) {
           if (b.splits > 0) {
@@ -2041,7 +2044,7 @@
               let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
               let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
               let newSize = Math.random() * 8 + 12; 
-              createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180, true); 
+              createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 60, true); 
             }
           } else { 
             for(let i=0; i<2; i++) { 
@@ -2055,7 +2058,7 @@
               let startOffsetX = (Math.random() * 40 - 20); 
               let sprayVx = (startOffsetX / 2); 
               let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
-              createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 180, false); 
+              createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 60, false); 
             }
           }
         } else {
@@ -2063,7 +2066,7 @@
           for(let i=0; i<count; i++) { 
             let startOffsetX = (Math.random() * 20 - 10); 
             let sprayVx = (startOffsetX / 2); 
-            createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180, false); 
+            createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 60, false); 
           }
         }
         b.el.remove(); 
@@ -2088,7 +2091,7 @@
             let size = Math.random() * 60 + 20; 
             let vy = Math.random() * 0.4 + 0.1; 
             let vx = Math.random() * 2 - 1; 
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180, true); 
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 60, true); 
           } 
         }, 1200); 
       } else if (isAdmin || isPhotoEditor) {
@@ -2096,7 +2099,7 @@
           let size = Math.random() * 20 + 30; 
           let vy = Math.random() * 0.8 + 0.5; 
           let vx = Math.random() * 2 - 1; 
-          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180, true); 
+          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 60, true); 
         }, 5000);
       } else if (isOfficer) {
         bubbleInterval = setInterval(() => { 
@@ -2105,7 +2108,7 @@
             let size = Math.random() * 15 + 15; 
             let vy = Math.random() * 1.5 + 1; 
             let vx = Math.random() * 2 - 1; 
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 180, false); 
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 60, false); 
           } 
         }, 1000);
       }
