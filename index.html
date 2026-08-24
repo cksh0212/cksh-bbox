@@ -134,6 +134,7 @@
       background: #ff4b2b;
       box-shadow: 0 2px 5px rgba(255, 75, 43, 0.5);
     }
+    
     #auth-btn-float {
       position: fixed;
       right: 30px;
@@ -197,8 +198,8 @@
       display: none;
     }
     
-    /* 維修紀錄滾動與展開樣式 */
-    #maintenance-display {
+    /* 左側面板滾動與展開樣式 */
+    .scrollable-content {
       max-height: 80px;
       overflow-y: auto;
       font-size: 12px;
@@ -209,13 +210,13 @@
       padding-right: 4px;
       transition: max-height 0.3s ease;
     }
-    #maintenance-display.expanded {
+    .scrollable-content.expanded {
       max-height: 220px;
     }
-    #maintenance-display::-webkit-scrollbar {
+    .scrollable-content::-webkit-scrollbar {
       width: 4px;
     }
-    #maintenance-display::-webkit-scrollbar-thumb {
+    .scrollable-content::-webkit-scrollbar-thumb {
       background: #555;
       border-radius: 2px;
     }
@@ -744,6 +745,19 @@
   </div>
 
   <div id="left-info-panel">
+    <!-- 活動日曆 (新增) -->
+    <div class="info-box">
+      <div class="panel-header">
+        活動日曆
+        <button class="small-btn" id="edit-calendar-btn" style="display:none;" onclick="toggleEditCalendar()">編輯</button>
+      </div>
+      <div class="toggle-text" id="toggle-calendar-text" onclick="toggleCalendar()">[展開/收起]</div>
+      <div class="scrollable-content" id="calendar-display" style="display:none;">讀取中...</div>
+      <textarea class="edit-textarea" id="edit-calendar-textarea"></textarea>
+      <button class="save-btn" id="save-calendar-btn" onclick="saveCalendar()">儲存</button>
+    </div>
+
+    <!-- 舊有：社團公告 -->
     <div class="info-box">
       <div class="panel-header">
         社團公告
@@ -755,6 +769,7 @@
       <button class="save-btn" id="save-announcement-btn" onclick="saveAnnouncement()">儲存</button>
     </div>
     
+    <!-- 舊有：維修紀錄 -->
     <div class="info-box">
       <div class="panel-header">
         維修紀錄
@@ -764,7 +779,7 @@
         </div>
       </div>
       <div class="toggle-text" id="toggle-maintenance-text" onclick="toggleMaintenance()">[展開/收起]</div>
-      <div class="panel-content" id="maintenance-display">讀取中...</div>
+      <div class="scrollable-content" id="maintenance-display" style="display:none;">讀取中...</div>
       <textarea class="edit-textarea" id="edit-maintenance-textarea"></textarea>
       <button class="save-btn" id="save-maintenance-btn" onclick="saveMaintenance()">儲存</button>
       
@@ -815,6 +830,20 @@
     </div>
   </div>
 
+  <!-- 社幹行重新命名彈窗 -->
+  <div id="row-name-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>修改行數標題</h3>
+      <label style="font-size:12px; color:#aaa;">(例如將「第1行」改為「幹部核心」)</label>
+      <input type="hidden" id="edit-row-id">
+      <input type="text" id="edit-row-title" placeholder="輸入新標題">
+      <div class="modal-btns" style="margin-top:10px;">
+        <button class="btn-cancel" onclick="closeRowNameModal()">取消</button>
+        <button class="btn-submit" onclick="saveRowName()">儲存</button>
+      </div>
+    </div>
+  </div>
+
   <div class="content-wrapper">
     <div class="content-track" id="slider-track">
       <!-- Page 0: 基本介紹 -->
@@ -822,7 +851,6 @@
         <h1>🎤 基本介紹</h1>
         <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
         
-        <!-- 基本介紹專用左右滑動照片區 -->
         <div class="horizontal-photo-scroll" id="intro-photo-list"></div>
 
         <div class="admin-add-box" id="admin-intro-box" style="display: none;">
@@ -940,6 +968,7 @@
     let shirtsData = []; 
     let logosData = [];  
     let isShowingLogo = false;
+    let rowNamesData = {}; // 儲存社幹行數名稱
     
     const adminPwdB64 = btoa('thomas0212');
     let officerPwdB64 = btoa('ckshbbox2026');
@@ -964,7 +993,6 @@
         if (isAdmin) renderReports();
       });
 
-      // 監聽各圖庫
       db.collection("intro_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         introPhotosData = []; snapshot.forEach(doc => introPhotosData.push({ id: doc.id, ...doc.data() }));
         renderIntroPhotos();
@@ -986,16 +1014,32 @@
         renderGridList('logos');
       });
 
+      // 監聽社幹行數名稱設定
+      db.collection("config").doc("row_names").onSnapshot((doc) => {
+        if (doc.exists) {
+          rowNamesData = doc.data();
+          renderOfficers(); // 更新顯示名稱
+        }
+      });
+
       db.collection("config").doc("announcement").onSnapshot((doc) => {
         let content = doc.exists ? doc.data().content : "目前無新公告。";
         document.getElementById('announcement-display').innerText = content;
         document.getElementById('edit-announcement-textarea').value = content;
       });
 
+      // 監聽維修紀錄
       db.collection("config").doc("maintenance").onSnapshot((doc) => {
         let content = doc.exists ? doc.data().content : "維修紀錄：\n- 2026/08/23";
         document.getElementById('maintenance-display').innerText = content;
         document.getElementById('edit-maintenance-textarea').value = content;
+      });
+
+      // 監聽活動日曆
+      db.collection("config").doc("calendar").onSnapshot((doc) => {
+        let content = doc.exists ? doc.data().content : "尚未新增活動日程。";
+        document.getElementById('calendar-display').innerText = content;
+        document.getElementById('edit-calendar-textarea').value = content;
       });
 
       db.collection("config").doc("passwords").onSnapshot((doc) => {
@@ -1043,7 +1087,7 @@
       });
     }
 
-    /* --- 介紹社幹二維結構渲染 --- */
+    /* --- 介紹社幹二維結構渲染與行數命名 --- */
     function renderOfficers() {
       const container = document.getElementById('officer-list');
       container.innerHTML = '';
@@ -1053,7 +1097,6 @@
          return;
       }
 
-      // 依 row 分組
       const rowsMap = {};
       officersData.forEach(item => {
         const rowKey = item.row || 1;
@@ -1067,10 +1110,16 @@
         const rowWrapper = document.createElement('div');
         rowWrapper.className = 'officer-row-wrapper';
         
+        // 取得自訂名稱或預設名稱
+        const rowTitle = rowNamesData[`row_${rowKey}`] || `第 ${rowKey} 行幹部`;
+        
         let rowHtml = `
           <div class="officer-row-header">
-            <span class="officer-row-title">第 ${rowKey} 行幹部</span>
-            ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="quickAddOfficerRow('${rowKey}')">+ 此行新增</button>` : ''}
+            <span class="officer-row-title">${rowTitle}</span>
+            <div>
+              ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="openRowNameModal('${rowKey}', '${rowTitle}')">[編輯標題]</button>` : ''}
+              ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="quickAddOfficerRow('${rowKey}')">+ 此行新增</button>` : ''}
+            </div>
           </div>
           <div class="officer-row-track">
         `;
@@ -1104,7 +1153,31 @@
       document.getElementById('admin-officer-box').scrollIntoView({ behavior: 'smooth' });
     }
 
-    /* --- 標準網格列表渲染 (合照、社服、社徽) --- */
+    function openRowNameModal(rowId, currentTitle) {
+      document.getElementById('row-name-modal').style.display = 'flex';
+      document.getElementById('edit-row-id').value = rowId;
+      document.getElementById('edit-row-title').value = currentTitle;
+    }
+    
+    function closeRowNameModal() {
+      document.getElementById('row-name-modal').style.display = 'none';
+    }
+
+    function saveRowName() {
+      const rowId = document.getElementById('edit-row-id').value;
+      const newTitle = document.getElementById('edit-row-title').value.trim();
+      
+      let updates = {};
+      updates[`row_${rowId}`] = newTitle;
+      
+      db.collection("config").doc("row_names").set(updates, { merge: true }).then(() => {
+        closeRowNameModal();
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
+    }
+
+    /* --- 標準網格列表渲染 --- */
     function renderGridList(type) {
       let containerId, dataArray, emptyText;
       if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
@@ -1507,6 +1580,7 @@
           
           document.getElementById('edit-announcement-btn').style.display = 'none';
           document.getElementById('edit-maintenance-btn').style.display = 'none';
+          document.getElementById('edit-calendar-btn').style.display = 'none';
           document.getElementById('admin-settings-container').style.display = 'none';
           document.getElementById('admin-reports-section').style.display = 'none';
           
@@ -1591,6 +1665,7 @@
         
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
+        document.getElementById('edit-calendar-btn').style.display = 'inline-block';
         document.getElementById('admin-settings-container').style.display = 'block';
         document.getElementById('admin-reports-section').style.display = 'block';
         
@@ -1613,7 +1688,9 @@
         isOfficer = true; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
         const btn = document.getElementById('auth-btn-float');
         btn.innerText = '已認證'; 
+        
         document.getElementById('edit-announcement-btn').style.display = 'inline-block';
+        document.getElementById('edit-calendar-btn').style.display = 'inline-block';
         
         closeAuthModal();
         renderQA();
@@ -1623,6 +1700,7 @@
       }
     }
 
+    /* --- 左側面板控制 --- */
     function toggleAnnouncement() {
       const content = document.getElementById('announcement-display');
       const toggleText = document.getElementById('toggle-announcement-text');
@@ -1651,20 +1729,26 @@
       const newContent = document.getElementById('edit-announcement-textarea').value.trim();
       db.collection("config").doc("announcement").set({ content: newContent }, { merge: true }).then(() => {
         toggleEditAnnouncement();
-      }).catch((error) => {
-        alert('儲存失敗: ' + error.message);
-      });
+      }).catch((error) => alert('儲存失敗: ' + error.message));
     }
 
+    // 維修紀錄展開/收起
     function toggleMaintenance() {
       const content = document.getElementById('maintenance-display');
       const toggleText = document.getElementById('toggle-maintenance-text');
-      if (content.classList.contains('expanded')) {
-        content.classList.remove('expanded');
-        toggleText.innerText = '[展開]';
-      } else {
-        content.classList.add('expanded');
+      
+      if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
         toggleText.innerText = '[收起]';
+      } else {
+        if (content.classList.contains('expanded')) {
+          content.classList.remove('expanded');
+          content.style.display = 'none';
+          toggleText.innerText = '[展開/收起]';
+        } else {
+          content.classList.add('expanded');
+          toggleText.innerText = '[收起]';
+        }
       }
     }
 
@@ -1672,11 +1756,14 @@
         const content = document.getElementById('maintenance-display');
         const textarea = document.getElementById('edit-maintenance-textarea');
         const saveBtn = document.getElementById('save-maintenance-btn');
+        const toggleText = document.getElementById('toggle-maintenance-text');
 
         if (textarea.style.display === 'block') {
-            textarea.style.display = 'none'; saveBtn.style.display = 'none'; content.style.display = 'block';
+            textarea.style.display = 'none'; saveBtn.style.display = 'none'; 
+            content.style.display = 'block'; toggleText.style.display = 'inline';
         } else {
-            content.style.display = 'none'; textarea.style.display = 'block'; saveBtn.style.display = 'block';
+            content.style.display = 'none'; textarea.style.display = 'block'; 
+            saveBtn.style.display = 'block'; toggleText.style.display = 'none';
         }
     }
 
@@ -1684,9 +1771,49 @@
       const newContent = document.getElementById('edit-maintenance-textarea').value.trim();
       db.collection("config").doc("maintenance").set({ content: newContent }, { merge: true }).then(() => {
         toggleEditMaintenance();
-      }).catch((error) => {
-        alert('儲存失敗: ' + error.message);
-      });
+      }).catch((error) => alert('儲存失敗: ' + error.message));
+    }
+
+    // 活動日曆展開/收起與編輯
+    function toggleCalendar() {
+      const content = document.getElementById('calendar-display');
+      const toggleText = document.getElementById('toggle-calendar-text');
+      
+      if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        toggleText.innerText = '[收起]';
+      } else {
+        if (content.classList.contains('expanded')) {
+          content.classList.remove('expanded');
+          content.style.display = 'none';
+          toggleText.innerText = '[展開/收起]';
+        } else {
+          content.classList.add('expanded');
+          toggleText.innerText = '[收起]';
+        }
+      }
+    }
+
+    function toggleEditCalendar() {
+        const content = document.getElementById('calendar-display');
+        const textarea = document.getElementById('edit-calendar-textarea');
+        const saveBtn = document.getElementById('save-calendar-btn');
+        const toggleText = document.getElementById('toggle-calendar-text');
+
+        if (textarea.style.display === 'block') {
+            textarea.style.display = 'none'; saveBtn.style.display = 'none'; 
+            content.style.display = 'block'; toggleText.style.display = 'inline';
+        } else {
+            content.style.display = 'none'; textarea.style.display = 'block'; 
+            saveBtn.style.display = 'block'; toggleText.style.display = 'none';
+        }
+    }
+
+    function saveCalendar() {
+      const newContent = document.getElementById('edit-calendar-textarea').value.trim();
+      db.collection("config").doc("calendar").set({ content: newContent }, { merge: true }).then(() => {
+        toggleEditCalendar();
+      }).catch((error) => alert('儲存失敗: ' + error.message));
     }
 
     function savePasswords() {
@@ -1698,9 +1825,7 @@
         db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => {
           alert('社幹密碼已更新。');
           closePwdModal();
-        }).catch((error) => {
-          alert('更新失敗: ' + error.message);
-        });
+        }).catch((error) => alert('更新失敗: ' + error.message));
       } else {
         closePwdModal();
       }
@@ -1718,9 +1843,7 @@
           alert('回報已送出，感謝。');
           document.getElementById('report-input').value = '';
           if (!isAdmin) closeReportModal(); 
-        }).catch((error) => {
-          alert('送出失敗: ' + error.message);
-        });
+        }).catch((error) => alert('送出失敗: ' + error.message));
       } else {
         alert('請輸入內容。');
       }
@@ -1772,9 +1895,7 @@
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
           input.value = '';
-        }).catch((error) => {
-          alert('發布失敗: ' + error.message);
-        });
+        }).catch((error) => alert('發布失敗: ' + error.message));
       } else {
         alert('請輸入內容。');
       }
