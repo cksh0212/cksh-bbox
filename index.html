@@ -21,13 +21,13 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", "微軟正黑體", sans-serif;
     }
     body {
-      background-color: #000000; /* Apple 深色模式純黑底 */
+      background-color: #000000; 
       color: #f5f5f7;
       overflow-x: hidden;
       position: relative;
     }
     
-    /* 物理氣泡系統樣式 (保留互動性但降低視覺干擾) */
+    /* 物理氣泡系統樣式 */
     #bubble-container {
       position: fixed;
       top: 0;
@@ -64,7 +64,7 @@
       border-color: rgba(255, 65, 108, 0.4);
     }
 
-    /* 左右無限滾動相片牆 (訪客專屬，極致柔和化) */
+    /* 左右無限滾動相片牆 (訪客專屬) */
     .side-marquee {
       position: fixed;
       top: 0;
@@ -270,7 +270,7 @@
 
     .toggle-text {
       font-size: 12px;
-      color: #0a84ff; /* Apple iOS Blue */
+      color: #0a84ff;
       cursor: pointer;
     }
     .toggle-text:hover { opacity: 0.8; }
@@ -304,7 +304,7 @@
     }
     .save-btn {
       display: none;
-      background: #34c759; /* Apple Green */
+      background: #34c759; 
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -387,7 +387,6 @@
     .btn-cancel { background: #3a3a3c; color: #fff; }
     .btn-submit { background: #0a84ff; color: #fff; }
 
-    /* 錯誤回報列表 */
     .report-item {
       background: rgba(0,0,0,0.3);
       padding: 15px;
@@ -395,7 +394,7 @@
       margin-bottom: 10px;
       font-size: 13px;
       line-height: 1.5;
-      border-left: 3px solid #ff453a; /* Apple Red */
+      border-left: 3px solid #ff453a; 
     }
     .report-item.yellow-border { border-left-color: #ffd60a; }
 
@@ -421,24 +420,134 @@
       align-items: center;
       position: relative;
       
-      /* Apple-style 極簡過渡：純淨的淡入與微上浮 */
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s ease, transform 0.8s var(--apple-ease);
+      transform: scale(0.94) translateY(15px);
+      transition: opacity 0.8s ease, transform 0.9s var(--apple-ease);
       pointer-events: none;
     }
     .section-page.active-page {
       opacity: 1;
-      transform: translateY(0);
+      transform: scale(1) translateY(0);
       pointer-events: auto;
     }
 
+    /* 視角縮放特效 */
+    #page-officers { transform: scale(0.85) translateY(20px); }
+    #page-officers.active-page { transform: scale(1) translateY(0); }
+
+    #page-groups { transform: scale(1.1) translateY(0); }
+    #page-groups.active-page { transform: scale(1) translateY(0); }
+    
+    /* ------------------------------------------------------------------- */
+    /* 特效優化加回 1: 基本介紹 (主畫面) - 毛玻璃斜角 45度滑入           */
+    /* ------------------------------------------------------------------- */
+    .intro-corner {
+      position: absolute;
+      width: 300px;
+      height: 600px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      z-index: 0; /* 藏在文字跟圖片下方 */
+      pointer-events: none;
+      opacity: 0;
+      transition: transform 1.2s var(--apple-ease) 0.1s, opacity 1s ease 0.1s;
+    }
+    .intro-corner.top-left {
+      top: -150px;
+      left: -150px;
+      transform: rotate(45deg) translateY(-200px) translateX(-200px);
+    }
+    .intro-corner.bottom-right {
+      bottom: -150px;
+      right: -150px;
+      transform: rotate(45deg) translateY(200px) translateX(200px);
+    }
+    #page-intro.active-page .intro-corner.top-left,
+    #page-intro.active-page .intro-corner.bottom-right {
+      opacity: 1;
+      transform: rotate(45deg) translateY(0) translateX(0);
+    }
+
+    /* ------------------------------------------------------------------- */
+    /* 特效優化加回 2: 介紹社幹 - 白色圓角指示條 (延遲一秒跟上呼吸)        */
+    /* ------------------------------------------------------------------- */
+    .officer-rect {
+      position: absolute;
+      width: 6px;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 6px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0; /* 背景層 */
+      transition: transform 1.5s var(--apple-ease) 0.8s, opacity 1.2s ease 0.8s;
+    }
+    .officer-rect.left {
+      left: 5%;
+      top: 20%;
+      height: 55%;
+      transform: translateY(-80px);
+    }
+    .officer-rect.right {
+      right: 5%;
+      top: 25%;
+      height: 50%;
+      transform: translateY(80px);
+    }
+    #page-officers.active-page .officer-rect {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @keyframes floatRect {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(15px); }
+    }
+    #page-officers.active-page .officer-rect.left {
+      animation: floatRect 6s ease-in-out infinite 2.2s;
+    }
+    #page-officers.active-page .officer-rect.right {
+      animation: floatRect 7s ease-in-out infinite 2.5s;
+    }
+
+    /* ------------------------------------------------------------------- */
+    /* 特效優化加回 3: 各年合照 - 相機框滑入 (聚焦縮小感)                  */
+    /* ------------------------------------------------------------------- */
+    .photo-frame-corner {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transition: opacity 0.6s ease 0.3s, top 1s var(--apple-ease) 0.2s, right 1s var(--apple-ease) 0.2s, bottom 1s var(--apple-ease) 0.2s, left 1s var(--apple-ease) 0.2s;
+      pointer-events: none;
+      z-index: 5;
+      border-radius: 8px; 
+    }
+    .photo-frame-corner.tr {
+      top: -30px; right: -30px;
+      border-top: 3px solid rgba(255,255,255,0.4); border-right: 3px solid rgba(255,255,255,0.4);
+    }
+    .photo-frame-corner.bl {
+      bottom: -30px; left: -30px;
+      border-bottom: 3px solid rgba(255,255,255,0.4); border-left: 3px solid rgba(255,255,255,0.4);
+    }
+    #page-groups.active-page .photo-frame-corner { opacity: 1; }
+    #page-groups.active-page .photo-frame-corner.tr { top: 7%; right: 7%; }
+    #page-groups.active-page .photo-frame-corner.bl { bottom: 7%; left: 7%; }
+
+    /* 文字與內容 (設定 Z-index 確保在裝飾之上) */
     h1 {
       font-size: 2.4rem;
       margin-bottom: 20px;
       color: #fff;
       font-weight: 700;
       letter-spacing: 1px;
+      position: relative;
+      z-index: 2;
     }
     p {
       line-height: 1.6;
@@ -448,6 +557,8 @@
       font-size: 1.1rem;
       margin-bottom: 20px;
       padding: 0 10px;
+      position: relative;
+      z-index: 2;
     }
 
     /* 統一卡片與照片網格 (Apple UI) */
@@ -459,6 +570,8 @@
       max-width: 900px;
       margin-top: 10px;
       padding-bottom: 50px;
+      position: relative;
+      z-index: 2;
     }
     .large-grid { max-width: 750px; grid-template-columns: 1fr; }
     
@@ -516,8 +629,10 @@
       padding: 10px 5px 20px 5px;
       margin-bottom: 20px;
       scroll-snap-type: x mandatory;
+      position: relative;
+      z-index: 2;
     }
-    .horizontal-photo-scroll::-webkit-scrollbar { display: none; } /* 隱藏滾動條更像 iOS */
+    .horizontal-photo-scroll::-webkit-scrollbar { display: none; } 
     .intro-photo-card { flex: 0 0 260px; scroll-snap-align: center; }
 
     /* 介紹社幹二維結構 */
@@ -528,6 +643,8 @@
       width: 100%;
       max-width: 900px;
       margin-top: 10px;
+      position: relative;
+      z-index: 2;
     }
     .officer-row-wrapper {
       padding: 20px;
@@ -561,6 +678,8 @@
       width: 100%;
       max-width: 650px;
       padding-bottom: 90px;
+      position: relative;
+      z-index: 2;
     }
     .ask-box {
       display: flex;
@@ -617,6 +736,8 @@
       width: 100%;
       max-width: 400px;
       margin: 30px auto 0;
+      position: relative;
+      z-index: 20;
     }
     .admin-add-box h4 { color: #fff; text-align: center; font-weight: 600; margin-bottom: 5px; }
     .admin-add-box input { padding: 12px; border-radius: 12px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.3); color: #fff; }
@@ -799,6 +920,10 @@
       
       <!-- Page 0: 基本介紹 -->
       <div class="section-page" id="page-intro">
+        <!-- 45度斜角毛玻璃特效 -->
+        <div class="intro-corner top-left"></div>
+        <div class="intro-corner bottom-right"></div>
+        
         <h1>基本介紹</h1>
         <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
         
@@ -814,6 +939,10 @@
       
       <!-- Page 1: 介紹社幹 -->
       <div class="section-page" id="page-officers">
+        <!-- Apple 風白色長條 (延遲滑入) -->
+        <div class="officer-rect left"></div>
+        <div class="officer-rect right"></div>
+        
         <h1>介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
@@ -830,6 +959,10 @@
       
       <!-- Page 2: 各年合照 -->
       <div class="section-page" id="page-groups">
+        <!-- 聚焦相機框特效 -->
+        <div class="photo-frame-corner tr"></div>
+        <div class="photo-frame-corner bl"></div>
+        
         <h1>各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下來。</p>
         
