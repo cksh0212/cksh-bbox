@@ -26,6 +26,7 @@
       color: #f5f5f7;
       overflow-x: hidden;
       position: relative;
+      padding-top: 75px; /* 為了 fixed 導覽列預留頂部空間，避免內容被遮擋 */
     }
     
     /* 物理氣泡系統樣式 */
@@ -113,15 +114,18 @@
       100% { transform: translateY(-50%); }
     }
 
-    /* Apple 懸浮動態島導覽列 */
+    /* Apple 懸浮動態島導覽列 (修復手機版點擊失效) */
     .nav-container {
       display: flex;
       justify-content: center;
       padding: 15px 0;
-      position: sticky;
+      position: fixed; /* 改用強制的 fixed 定位 */
+      width: 100%;
       top: 0;
+      left: 0;
       z-index: 998;
       background: transparent;
+      pointer-events: none; /* 讓整條透明區域不會擋住下方的點擊 (可隔空戳氣泡) */
     }
 
     .nav-menu {
@@ -136,6 +140,7 @@
       border-radius: 40px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.5);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      pointer-events: auto; /* 只有選單本體接收點擊 */
     }
 
     .nav-item {
@@ -151,6 +156,8 @@
       display: flex;
       align-items: center;
       letter-spacing: 0.5px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent; /* 移除手機版點擊灰底閃爍 */
     }
 
     .nav-item.active {
@@ -226,6 +233,9 @@
       justify-content: center;
       line-height: 1.2;
       text-align: center;
+      pointer-events: auto;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     #auth-btn-float:hover {
@@ -247,6 +257,7 @@
       gap: 12px;
       z-index: 997;
       transition: left 0.8s var(--apple-ease);
+      pointer-events: auto;
     }
 
     body.design-mode #left-info-panel {
@@ -490,7 +501,7 @@
     .section-page {
       width: 20%;
       min-height: 85vh;
-      padding: 40px 20px 80px 20px;
+      padding: 20px 20px 80px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -513,7 +524,7 @@
     #page-groups { transform: scale(1.1) translateY(0); }
     #page-groups.active-page { transform: scale(1) translateY(0); }
     
-    /* --- 舞台聚光燈 (社服社徽區) --- */
+    /* 舞台聚光燈 (社服社徽區) */
     .stage-spotlight {
       position: absolute;
       top: -100px;
@@ -540,7 +551,7 @@
       100% { opacity: 1; clip-path: polygon(34% 0, 66% 0, 105% 100%, -5% 100%); }
     }
 
-    /* --- 基本介紹 (著陸頁設計 + 動態公告) --- */
+    /* 基本介紹 (著陸頁設計 + 動態公告) */
     .intro-hero {
       display: flex;
       flex-direction: column;
@@ -730,7 +741,7 @@
       transform: rotate(45deg) translateY(0) translateX(0);
     }
 
-    /* --- 介紹社幹特效 --- */
+    /* 介紹社幹特效 */
     .officer-rect {
       position: absolute;
       width: 6px;
@@ -777,7 +788,7 @@
       animation: floatRect 7s ease-in-out infinite 2.5s;
     }
 
-    /* --- 各年合照特效 --- */
+    /* 各年合照特效 */
     .photo-frame-corner {
       position: absolute;
       width: 60px;
@@ -901,7 +912,7 @@
       margin-bottom: 4px;
     }
 
-    /* 水平滾動條加回並美化 (Apple UI 風格) */
+    /* 水平滾動條 */
     .horizontal-photo-scroll {
       display: flex;
       gap: 15px;
@@ -1502,6 +1513,7 @@
     let tickerInterval;
 
     window.onload = function() {
+      // 確保第一頁載入時就有絲滑的 active 狀態
       document.querySelectorAll('.section-page')[0].classList.add('active-page');
       
       const activeItem = document.querySelector('.nav-item.active');
@@ -1948,7 +1960,7 @@
                    }
                    let pairId = b1.id < b2.id ? b1.id + "_" + b2.id : b2.id + "_" + b1.id;
                    currentCollisions[pairId] = (collisionFrames[pairId] || 0) + 1;
-                   if (currentCollisions[pairId] >= 90) { 
+                   if (currentCollisions[pairId] >= 45) { 
                        let maxSize = isBubbleMode ? 800 : 150; 
                        let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
                        b1.size = newSize; b1.el.style.width = newSize + 'px'; b1.el.style.height = newSize + 'px'; b1.splits = Math.max(b1.splits, b2.splits);
@@ -1956,9 +1968,11 @@
                        b2.el.remove(); bubbles.splice(j, 1); j--; 
                        delete currentCollisions[pairId];
                    } else { 
-                       let pushForce = 0.1; 
-                       if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; } 
-                       else { b1.vx += pushForce; b2.vx -= pushForce; } 
+                       let pullForce = 0.05; 
+                       if (b1.x < b2.x) { b1.vx += pullForce; b2.vx -= pullForce; } 
+                       else { b1.vx -= pullForce; b2.vx += pullForce; } 
+                       if (b1.y < b2.y) { b1.vy -= pullForce; b2.vy += pullForce; } 
+                       else { b1.vy += pullForce; b2.vy -= pullForce; } 
                    }
                }
             }
