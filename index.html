@@ -20,6 +20,7 @@
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", "微軟正黑體", sans-serif;
     }
+
     body {
       background-color: #000000; 
       color: #f5f5f7;
@@ -38,6 +39,7 @@
       z-index: 995;
       overflow: hidden;
     }
+
     .game-bubble {
       position: absolute;
       border-radius: 50%;
@@ -54,11 +56,13 @@
       will-change: transform;
       transition: width 0.4s var(--apple-ease), height 0.4s var(--apple-ease);
     }
+
     .game-bubble.unclickable {
       pointer-events: none;
       background: rgba(100, 100, 100, 0.05);
       border-color: rgba(255, 255, 255, 0.1);
     }
+
     .game-bubble:hover:not(.unclickable) {
       background: rgba(255, 65, 108, 0.2);
       border-color: rgba(255, 65, 108, 0.4);
@@ -78,10 +82,12 @@
       pointer-events: none; 
       filter: grayscale(20%) brightness(0.2) blur(3px); 
     }
+
     .side-marquee.show-marquee {
       opacity: 1;
       visibility: visible;
     }
+
     #left-marquee { left: 2vw; }
     #right-marquee { right: 2vw; }
     
@@ -91,14 +97,17 @@
       gap: 20px;
       animation: scrollVertical 50s linear infinite;
     }
+
     #right-marquee .marquee-track {
       animation-direction: reverse; 
     }
+
     .marquee-track img {
       width: 100%;
       border-radius: 12px;
       object-fit: cover;
     }
+
     @keyframes scrollVertical {
       0% { transform: translateY(0); }
       100% { transform: translateY(-50%); }
@@ -114,6 +123,7 @@
       z-index: 998;
       background: transparent;
     }
+
     .nav-menu {
       position: relative;
       display: flex;
@@ -127,6 +137,7 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.5);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .nav-item {
       position: relative;
       z-index: 2;
@@ -141,9 +152,11 @@
       align-items: center;
       letter-spacing: 0.5px;
     }
+
     .nav-item.active {
       color: #ffffff;
     }
+
     .bubble {
       position: absolute;
       top: 6px;
@@ -155,11 +168,13 @@
       transition: all 0.6s var(--apple-ease);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
+
     .design-toggle-wrapper {
       display: flex;
       align-items: center;
       gap: 10px;
     }
+
     .toggle-track {
       width: 40px;
       height: 22px;
@@ -170,6 +185,7 @@
       transition: 0.4s var(--apple-ease);
       border: 1px solid rgba(255,255,255,0.1);
     }
+
     .toggle-thumb {
       width: 16px;
       height: 16px;
@@ -180,6 +196,7 @@
       left: 2px;
       transition: 0.5s var(--apple-ease);
     }
+
     .toggle-track.switched .toggle-thumb {
       left: 20px;
       background: var(--theme-red);
@@ -210,11 +227,15 @@
       line-height: 1.2;
       text-align: center;
     }
+
     #auth-btn-float:hover {
       transform: scale(1.08);
       background: rgba(50, 50, 55, 0.9);
     }
-    body.design-mode #auth-btn-float { right: -100px; }
+
+    body.design-mode #auth-btn-float {
+      right: -100px;
+    }
 
     /* 左下角面板 */
     #left-info-panel {
@@ -227,7 +248,10 @@
       z-index: 997;
       transition: left 0.8s var(--apple-ease);
     }
-    body.design-mode #left-info-panel { left: -350px; }
+
+    body.design-mode #left-info-panel {
+      left: -350px;
+    }
 
     .info-box {
       background: var(--glass-bg);
@@ -241,6 +265,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       max-width: 280px;
     }
+
     .panel-header {
       font-weight: 600;
       color: #fff;
@@ -250,8 +275,16 @@
       align-items: center;
       font-size: 14px;
     }
-    .panel-content { margin-top: 5px; line-height: 1.6; color: #a1a1a6; }
-    .announcement-content { display: none; }
+
+    .panel-content {
+      margin-top: 5px;
+      line-height: 1.6;
+      color: #a1a1a6;
+    }
+
+    .announcement-content {
+      display: none;
+    }
     
     .scrollable-content {
       max-height: 80px;
@@ -264,75 +297,217 @@
       padding-right: 4px;
       transition: max-height 0.6s var(--apple-ease);
     }
-    .scrollable-content.expanded { max-height: 220px; }
-    .scrollable-content::-webkit-scrollbar { width: 4px; }
-    .scrollable-content::-webkit-scrollbar-thumb { background: #636366; border-radius: 4px; }
 
-    .toggle-text { font-size: 12px; color: #0a84ff; cursor: pointer; }
-    .toggle-text:hover { opacity: 0.8; }
+    .scrollable-content.expanded {
+      max-height: 220px;
+    }
+
+    .scrollable-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb {
+      background: #636366;
+      border-radius: 4px;
+    }
+
+    .toggle-text {
+      font-size: 12px;
+      color: #0a84ff;
+      cursor: pointer;
+    }
+
+    .toggle-text:hover {
+      opacity: 0.8;
+    }
     
     .small-btn, .action-btn {
-      background: #0a84ff; color: #fff; border: none; border-radius: 12px;
-      padding: 4px 10px; font-size: 12px; cursor: pointer; font-weight: 600; transition: background 0.3s ease;
+      background: #0a84ff;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
     }
-    .small-btn:hover, .action-btn:hover { background: #0071e3; }
+
+    .small-btn:hover, .action-btn:hover {
+      background: #0071e3;
+    }
     
     .edit-textarea {
-      width: 100%; background: rgba(0,0,0,0.3); color: #fff; border: 1px solid #3a3a3c;
-      border-radius: 12px; padding: 10px; font-size: 13px; resize: vertical; min-height: 60px;
-      display: none; margin-top: 10px; outline: none;
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      border: 1px solid #3a3a3c;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 60px;
+      display: none;
+      margin-top: 10px;
+      outline: none;
     }
+
     .save-btn {
-      display: none; background: #34c759; color: #fff; border: none; border-radius: 12px;
-      padding: 6px 12px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: 600;
+      display: none;
+      background: #34c759; 
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: 600;
     }
     
     /* 彈出視窗 */
     .modal-overlay {
-      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-      z-index: 999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s var(--apple-ease);
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.4s var(--apple-ease);
     }
+
     .modal-content {
-      background: rgba(30, 30, 32, 0.8); padding: 35px 30px; border-radius: 24px; width: 340px;
-      display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      border: 1px solid var(--glass-border); transform: scale(0.95) translateY(10px); transition: transform 0.5s var(--apple-ease);
+      background: rgba(30, 30, 32, 0.8);
+      padding: 35px 30px;
+      border-radius: 24px;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.5s var(--apple-ease);
     }
-    .modal-overlay.show { opacity: 1; }
-    .modal-overlay.show .modal-content { transform: scale(1) translateY(0); }
-    .modal-content h3 { text-align: center; color: #fff; font-weight: 600; letter-spacing: 0.5px; }
+
+    .modal-overlay.show {
+      opacity: 1;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-content h3 {
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
     .modal-content input, .modal-content textarea {
-      padding: 14px; border-radius: 14px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.2);
-      color: #fff; outline: none; transition: 0.3s; font-size: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid #3a3a3c;
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+      font-size: 14px;
     }
-    .modal-content input:focus, .modal-content textarea:focus { border-color: #0a84ff; }
-    .modal-btns { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
+
+    .modal-content input:focus, .modal-content textarea:focus {
+      border-color: #0a84ff;
+    }
+
+    .modal-btns {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
     .modal-btns button {
-      flex: 1; padding: 12px; border: none; border-radius: 14px; cursor: pointer;
-      font-weight: 600; font-size: 14px; transition: transform 0.2s ease, filter 0.2s ease;
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: transform 0.2s ease, filter 0.2s ease;
     }
-    .modal-btns button:active { transform: scale(0.96); }
-    .btn-cancel { background: #3a3a3c; color: #fff; }
-    .btn-submit { background: #0a84ff; color: #fff; }
+
+    .modal-btns button:active {
+      transform: scale(0.96);
+    }
+
+    .btn-cancel {
+      background: #3a3a3c;
+      color: #fff;
+    }
+
+    .btn-submit {
+      background: #0a84ff;
+      color: #fff;
+    }
 
     .report-item {
-      background: rgba(0,0,0,0.3); padding: 15px; border-radius: 14px; margin-bottom: 10px;
-      font-size: 13px; line-height: 1.5; border-left: 3px solid #ff453a; 
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      border-left: 3px solid #ff453a; 
     }
-    .report-item.yellow-border { border-left-color: #ffd60a; }
+
+    .report-item.yellow-border {
+      border-left-color: #ffd60a;
+    }
 
     /* 內容區塊 */
-    .content-wrapper { width: 100%; overflow: hidden; position: relative; z-index: 10; }
-    .content-track { display: flex; width: 500%; transition: transform 0.8s var(--apple-ease); }
+    .content-wrapper {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    .content-track {
+      display: flex;
+      width: 500%;
+      transition: transform 0.8s var(--apple-ease);
+    }
     
     .section-page {
-      width: 20%; min-height: 85vh; padding: 40px 20px 80px 20px;
-      display: flex; flex-direction: column; align-items: center; position: relative;
-      opacity: 0; transform: scale(0.94) translateY(15px);
-      transition: opacity 0.8s ease, transform 0.9s var(--apple-ease); pointer-events: none;
+      width: 20%;
+      min-height: 85vh;
+      padding: 40px 20px 80px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.94) translateY(15px);
+      transition: opacity 0.8s ease, transform 0.9s var(--apple-ease);
+      pointer-events: none;
     }
-    .section-page.active-page { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
 
+    .section-page.active-page {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+
+    /* 視角縮放特效 */
     #page-officers { transform: scale(0.85) translateY(20px); }
     #page-officers.active-page { transform: scale(1) translateY(0); }
     #page-groups { transform: scale(1.1) translateY(0); }
@@ -340,14 +515,26 @@
     
     /* --- 舞台聚光燈 (社服社徽區) --- */
     .stage-spotlight {
-      position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 100%; height: 120%;
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 120%;
       background: linear-gradient(180deg, rgba(0, 195, 227, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
-      clip-path: polygon(38% 0, 62% 0, 100% 100%, 0% 100%); pointer-events: none; z-index: 0;
-      opacity: 0; filter: blur(12px); transition: opacity 1.5s var(--apple-ease) 0.6s;
+      clip-path: polygon(38% 0, 62% 0, 100% 100%, 0% 100%);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      filter: blur(12px);
+      transition: opacity 1.5s var(--apple-ease) 0.6s;
     }
+
     #page-design.active-page .stage-spotlight {
-      opacity: 1; animation: spotlightBreathe 5s ease-in-out infinite alternate 2s;
+      opacity: 1;
+      animation: spotlightBreathe 5s ease-in-out infinite alternate 2s;
     }
+
     @keyframes spotlightBreathe {
       0% { opacity: 0.85; clip-path: polygon(38% 0, 62% 0, 100% 100%, 0% 100%); }
       100% { opacity: 1; clip-path: polygon(34% 0, 66% 0, 105% 100%, -5% 100%); }
@@ -355,62 +542,122 @@
 
     /* --- 基本介紹 (著陸頁設計 + 動態公告) --- */
     .intro-hero {
-      display: flex; flex-direction: column; align-items: center; text-align: center;
-      margin-bottom: 30px; position: relative; z-index: 2; width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+      width: 100%;
     }
+
     .intro-hero h1 {
-      font-size: 3.5rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 15px;
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
       background: linear-gradient(135deg, #ff416c, #ff4b2b, #00c3e3);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+
     .intro-hero p {
-      line-height: 1.6; max-width: 600px; color: #a1a1a6; font-size: 1.15rem;
-      background: transparent; box-shadow: none; border: none; margin-bottom: 0; padding: 0;
+      line-height: 1.6;
+      max-width: 600px;
+      color: #a1a1a6;
+      font-size: 1.15rem;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      margin-bottom: 0;
+      padding: 0;
     }
     
     /* 聲波特效 (Soundwave) */
     .soundwave {
-      display: flex; gap: 6px; height: 40px; align-items: flex-end; margin-bottom: 15px;
+      display: flex;
+      gap: 6px;
+      height: 40px;
+      align-items: flex-end;
+      margin-bottom: 15px;
     }
+
     .soundwave span {
-      display: block; width: 6px; background: #00c3e3; border-radius: 3px;
+      display: block;
+      width: 6px;
+      background: #00c3e3;
+      border-radius: 3px;
       animation: wave 1s ease-in-out infinite alternate;
     }
+
     .soundwave span:nth-child(1) { animation-delay: 0.0s; height: 10px; }
     .soundwave span:nth-child(2) { animation-delay: 0.2s; height: 25px; }
     .soundwave span:nth-child(3) { animation-delay: 0.4s; height: 40px; }
     .soundwave span:nth-child(4) { animation-delay: 0.2s; height: 25px; }
     .soundwave span:nth-child(5) { animation-delay: 0.0s; height: 10px; }
+
     @keyframes wave {
       0% { height: 8px; background: #00c3e3; }
       100% { height: 40px; background: #ff4b2b; }
     }
 
-    /* 🔥 動態公告列 (跑馬燈取代原本的 Tags) */
+    /* 🔥 動態公告列 */
     .intro-announcement-wrapper {
-      display: flex; align-items: center; gap: 12px; margin-top: 30px;
-      padding: 10px 18px; background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
-      backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-      max-width: 550px; width: 95%; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 30px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      max-width: 550px;
+      width: 95%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.3s ease, background 0.3s ease;
     }
+
+    .intro-announcement-wrapper:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.02);
+    }
+
+    .intro-announcement-wrapper:active {
+      transform: scale(0.98);
+    }
+
     .intro-announcement-label {
-      font-size: 0.8rem; font-weight: 700; color: #00c3e3;
-      background: rgba(0, 195, 227, 0.15); padding: 4px 12px;
-      border-radius: 12px; white-space: nowrap; letter-spacing: 0.5px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #00c3e3;
+      background: rgba(0, 195, 227, 0.15);
+      padding: 4px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
     }
+
     .intro-announcement-content {
-      font-size: 0.95rem; color: #f5f5f7; font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      flex: 1; text-align: left;
-      /* 用於控制切換的絲滑過渡 */
+      font-size: 0.95rem;
+      color: #f5f5f7;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      text-align: left;
       transition: all 0.4s var(--apple-ease);
       transform: translateY(0);
       opacity: 1;
     }
-    /* 切換文字時的淡出與淡入狀態 */
+
     .intro-announcement-content.fade-out { opacity: 0; transform: translateY(-8px); }
     .intro-announcement-content.fade-in { opacity: 0; transform: translateY(8px); }
+    .intro-announcement-view-btn { font-size: 12px; color: #0a84ff; font-weight: bold; white-space: nowrap; }
 
     /* 延遲漸層與絲滑進場 (階梯式) */
     #page-intro > .intro-hero .soundwave { opacity: 0; transform: translateY(20px); transition: all 0.8s var(--apple-ease) 0.1s; }
@@ -430,142 +677,530 @@
     }
     
     .cinematic-flare {
-      position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 50%;
+      height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-      transform: skewX(-25deg); pointer-events: none; z-index: 20;
+      transform: skewX(-25deg);
+      pointer-events: none;
+      z-index: 20;
     }
-    #page-intro.active-page .cinematic-flare { animation: sweepFlare 2.5s var(--apple-ease) 0.3s forwards; }
-    @keyframes sweepFlare { 0% { left: -100%; } 100% { left: 200%; } }
+
+    #page-intro.active-page .cinematic-flare {
+      animation: sweepFlare 2.5s var(--apple-ease) 0.3s forwards;
+    }
+
+    @keyframes sweepFlare {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
 
     .intro-corner {
-      position: absolute; width: 300px; height: 600px;
+      position: absolute;
+      width: 300px;
+      height: 600px;
       background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
-      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      border: 1px solid var(--glass-border); border-radius: 40px;
-      z-index: 0; pointer-events: none; opacity: 0; transition: transform 1.2s var(--apple-ease) 0.1s, opacity 1s ease 0.1s;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: transform 1.2s var(--apple-ease) 0.1s, opacity 1s ease 0.1s;
     }
-    .intro-corner.top-left { top: -150px; left: -150px; transform: rotate(45deg) translateY(-200px) translateX(-200px); }
-    .intro-corner.bottom-right { bottom: -150px; right: -150px; transform: rotate(45deg) translateY(200px) translateX(200px); }
+
+    .intro-corner.top-left {
+      top: -150px;
+      left: -150px;
+      transform: rotate(45deg) translateY(-200px) translateX(-200px);
+    }
+
+    .intro-corner.bottom-right {
+      bottom: -150px;
+      right: -150px;
+      transform: rotate(45deg) translateY(200px) translateX(200px);
+    }
+
     #page-intro.active-page .intro-corner.top-left,
-    #page-intro.active-page .intro-corner.bottom-right { opacity: 1; transform: rotate(45deg) translateY(0) translateX(0); }
+    #page-intro.active-page .intro-corner.bottom-right {
+      opacity: 1;
+      transform: rotate(45deg) translateY(0) translateX(0);
+    }
 
     /* --- 介紹社幹特效 --- */
     .officer-rect {
-      position: absolute; width: 6px; background: rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border-radius: 6px; box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
-      opacity: 0; pointer-events: none; z-index: 0; 
+      position: absolute;
+      width: 6px;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 6px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0; 
       transition: transform 1.5s var(--apple-ease) 0.8s, opacity 1.2s ease 0.8s;
     }
-    .officer-rect.left { left: 5%; top: 20%; height: 55%; transform: translateY(-80px); }
-    .officer-rect.right { right: 5%; top: 25%; height: 50%; transform: translateY(80px); }
-    #page-officers.active-page .officer-rect { opacity: 1; transform: translateY(0); }
-    @keyframes floatRect { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(15px); } }
-    #page-officers.active-page .officer-rect.left { animation: floatRect 6s ease-in-out infinite 2.2s; }
-    #page-officers.active-page .officer-rect.right { animation: floatRect 7s ease-in-out infinite 2.5s; }
+
+    .officer-rect.left {
+      left: 5%;
+      top: 20%;
+      height: 55%;
+      transform: translateY(-80px);
+    }
+
+    .officer-rect.right {
+      right: 5%;
+      top: 25%;
+      height: 50%;
+      transform: translateY(80px);
+    }
+
+    #page-officers.active-page .officer-rect {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes floatRect {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(15px); }
+    }
+
+    #page-officers.active-page .officer-rect.left {
+      animation: floatRect 6s ease-in-out infinite 2.2s;
+    }
+
+    #page-officers.active-page .officer-rect.right {
+      animation: floatRect 7s ease-in-out infinite 2.5s;
+    }
 
     /* --- 各年合照特效 --- */
     .photo-frame-corner {
-      position: absolute; width: 60px; height: 60px; opacity: 0;
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
       transition: opacity 0.6s ease 0.3s, top 1s var(--apple-ease) 0.2s, right 1s var(--apple-ease) 0.2s, bottom 1s var(--apple-ease) 0.2s, left 1s var(--apple-ease) 0.2s;
-      pointer-events: none; z-index: 5; border-radius: 8px; 
+      pointer-events: none;
+      z-index: 5;
+      border-radius: 8px; 
     }
-    .photo-frame-corner.tr { top: -30px; right: -30px; border-top: 3px solid rgba(255,255,255,0.4); border-right: 3px solid rgba(255,255,255,0.4); }
-    .photo-frame-corner.bl { bottom: -30px; left: -30px; border-bottom: 3px solid rgba(255,255,255,0.4); border-left: 3px solid rgba(255,255,255,0.4); }
+
+    .photo-frame-corner.tr {
+      top: -30px;
+      right: -30px;
+      border-top: 3px solid rgba(255,255,255,0.4);
+      border-right: 3px solid rgba(255,255,255,0.4);
+    }
+
+    .photo-frame-corner.bl {
+      bottom: -30px;
+      left: -30px;
+      border-bottom: 3px solid rgba(255,255,255,0.4);
+      border-left: 3px solid rgba(255,255,255,0.4);
+    }
+
     #page-groups.active-page .photo-frame-corner { opacity: 1; }
     #page-groups.active-page .photo-frame-corner.tr { top: 7%; right: 7%; }
     #page-groups.active-page .photo-frame-corner.bl { bottom: 7%; left: 7%; }
 
     /* 通用文字設定 */
-    h1 { font-size: 2.4rem; margin-bottom: 20px; color: #fff; font-weight: 700; letter-spacing: 1px; position: relative; z-index: 2; }
-    p { line-height: 1.6; max-width: 650px; text-align: justify; color: #a1a1a6; font-size: 1.1rem; margin-bottom: 20px; padding: 0 10px; position: relative; z-index: 2; }
-    .card-p { background: rgba(30, 30, 30, 0.7); backdrop-filter: blur(10px); padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); }
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 20px;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 2;
+    }
+
+    p {
+      line-height: 1.6;
+      max-width: 650px;
+      text-align: justify;
+      color: #a1a1a6;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      padding: 0 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-p {
+      background: rgba(30, 30, 30, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
 
     /* 統一卡片與照片網格 */
     .photo-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;
-      width: 100%; max-width: 900px; margin-top: 10px; padding-bottom: 50px; position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 10px;
+      padding-bottom: 50px;
+      position: relative;
+      z-index: 2;
     }
+
     .large-grid { max-width: 750px; grid-template-columns: 1fr; }
     
     .photo-card, .officer-row-wrapper, .qa-item, .ask-box {
-      background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; width: 100%;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      overflow: hidden;
+      width: 100%;
     }
-    .photo-card { display: flex; flex-direction: column; align-items: center; transition: transform 0.4s var(--apple-ease); }
+
+    .photo-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.4s var(--apple-ease);
+    }
+
     .photo-card:hover { transform: scale(1.02); }
-    .photo-img { width: 100%; height: 220px; object-fit: cover; background: rgba(0,0,0,0.3); cursor: pointer; }
-    .large-photo-img { height: auto; max-height: 400px; object-fit: contain; }
-    .photo-info { padding: 16px; text-align: center; width: 100%; }
-    .photo-title { font-weight: 600; color: #fff; font-size: 1.1rem; margin-bottom: 4px; }
+
+    .photo-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: rgba(0,0,0,0.3);
+      cursor: pointer; 
+    }
+
+    .large-photo-img {
+      height: auto;
+      max-height: 400px;
+      object-fit: contain; 
+    }
+
+    .photo-info {
+      padding: 16px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .photo-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
 
     /* 水平滾動條加回並美化 (Apple UI 風格) */
     .horizontal-photo-scroll {
-      display: flex; gap: 15px; overflow-x: auto; width: 100%; max-width: 680px; padding: 10px 5px 20px 5px; margin-bottom: 20px; scroll-snap-type: x mandatory; position: relative; z-index: 2;
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      width: 100%;
+      max-width: 680px;
+      padding: 10px 5px 20px 5px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
     }
-    .horizontal-photo-scroll::-webkit-scrollbar, .officer-row-track::-webkit-scrollbar { height: 6px; display: block; } 
-    .horizontal-photo-scroll::-webkit-scrollbar-track, .officer-row-track::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
-    .horizontal-photo-scroll::-webkit-scrollbar-thumb, .officer-row-track::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-    .horizontal-photo-scroll::-webkit-scrollbar-thumb:hover, .officer-row-track::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
 
-    .intro-photo-card { flex: 0 0 260px; scroll-snap-align: center; }
+    .officer-row-track {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding-bottom: 15px;
+    }
 
-    .officer-rows-container { display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 900px; margin-top: 10px; position: relative; z-index: 2; }
-    .officer-row-wrapper { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-    .officer-row-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
-    .officer-row-title { font-size: 16px; font-weight: 700; color: #fff; }
-    .officer-row-track { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-snap-type: x mandatory; }
-    .officer-card-item { flex: 0 0 220px; scroll-snap-align: start; }
+    /* 恢復滾動條並美化 */
+    .horizontal-photo-scroll::-webkit-scrollbar,
+    .officer-row-track::-webkit-scrollbar {
+      height: 8px;
+      display: block;
+    }
 
-    .qa-container { width: 100%; max-width: 650px; padding-bottom: 90px; position: relative; z-index: 2; }
-    .ask-box { display: flex; gap: 12px; margin-bottom: 35px; padding: 20px; }
-    .ask-box input { flex: 1; padding: 14px 18px; border-radius: 14px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.2); color: #fff; outline: none; transition: 0.3s; font-size: 15px; }
-    .ask-box input:focus { border-color: #0a84ff; }
-    .ask-box button { padding: 0 25px; background: #0a84ff; color: white; border: none; border-radius: 14px; cursor: pointer; font-weight: 600; transition: transform 0.2s ease; }
-    .ask-box button:active { transform: scale(0.95); }
-    .qa-list { display: flex; flex-direction: column; gap: 20px; }
-    .qa-item { padding: 25px; }
-    .qa-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
-    .qa-q-text { font-weight: 600; color: #fff; font-size: 1.15rem; line-height: 1.4; }
-    .delete-btn { background: #ff453a; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 12px; cursor: pointer; }
-    .qa-a { color: #a1a1a6; line-height: 1.6; font-size: 15px; }
-    .qa-pending { color: #636366; font-size: 14px; }
+    .horizontal-photo-scroll::-webkit-scrollbar-track,
+    .officer-row-track::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+    }
+
+    .horizontal-photo-scroll::-webkit-scrollbar-thumb,
+    .officer-row-track::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+
+    .horizontal-photo-scroll::-webkit-scrollbar-thumb:hover,
+    .officer-row-track::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    .intro-photo-card, .officer-card-item {
+      flex: 0 0 220px;
+    }
+
+    .officer-rows-container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .officer-row-wrapper {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .officer-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .officer-row-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Q&A 區塊 */
+    .qa-container {
+      width: 100%;
+      max-width: 650px;
+      padding-bottom: 90px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .ask-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 35px;
+      padding: 20px;
+    }
+
+    .ask-box input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid #3a3a3c;
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      outline: none;
+      transition: 0.3s;
+      font-size: 15px;
+    }
+
+    .ask-box input:focus {
+      border-color: #0a84ff;
+    }
+
+    .ask-box button {
+      padding: 0 25px;
+      background: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s ease;
+    }
+
+    .ask-box button:active {
+      transform: scale(0.95);
+    }
+
+    .qa-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .qa-item {
+      padding: 25px;
+    }
+
+    .qa-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .qa-q-text {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1.15rem;
+      line-height: 1.4;
+    }
+
+    .delete-btn {
+      background: #ff453a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .qa-a {
+      color: #a1a1a6;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .qa-pending {
+      color: #636366;
+      font-size: 14px;
+    }
     
-    .reply-box { margin-top: 15px; display: flex; gap: 10px; }
-    .reply-box input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.3); color: #fff; outline: none; }
-    .reply-box button { padding: 0 15px; background: #30d158; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    .reply-box {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .reply-box input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #3a3a3c;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      outline: none;
+    }
+
+    .reply-box button {
+      padding: 0 15px;
+      background: #30d158;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
     .admin-add-box {
-      background: rgba(20, 20, 22, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      padding: 25px; border-radius: 20px; border: 1px solid #3a3a3c; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; margin: 30px auto 0; position: relative; z-index: 20;
+      background: rgba(20, 20, 22, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 25px;
+      border-radius: 20px;
+      border: 1px solid #3a3a3c;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 400px;
+      margin: 30px auto 0;
+      position: relative;
+      z-index: 20;
     }
-    .admin-add-box h4 { color: #fff; text-align: center; font-weight: 600; margin-bottom: 5px; }
-    .admin-add-box input { padding: 12px; border-radius: 12px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.3); color: #fff; }
 
+    .admin-add-box h4 {
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .admin-add-box input {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #3a3a3c;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+    }
+
+    /* Lightbox 系統 */
     #lightbox {
-      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; opacity: 0; transition: opacity 0.4s var(--apple-ease);
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      cursor: zoom-out; 
+      opacity: 0;
+      transition: opacity 0.4s var(--apple-ease);
     }
-    #lightbox.show { opacity: 1; }
+
+    #lightbox.show {
+      opacity: 1;
+    }
+
     #lightbox-img {
-      max-width: 90vw; max-height: 90vh; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; transform: scale(0.95); transition: transform 0.5s var(--apple-ease);
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      object-fit: contain;
+      transform: scale(0.95);
+      transition: transform 0.5s var(--apple-ease);
     }
-    #lightbox.show #lightbox-img { transform: scale(1); }
+
+    #lightbox.show #lightbox-img {
+      transform: scale(1);
+    }
 
     .design-view {
-      position: absolute; top: 40px; width: 100%; display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.6s ease; height: 75vh; overflow-y: auto;
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      height: 75vh;
+      overflow-y: auto;
     }
-    .design-view.active-view { opacity: 1; pointer-events: auto; }
-    .design-view::-webkit-scrollbar { display: none; }
+
+    .design-view.active-view {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .design-view::-webkit-scrollbar {
+      display: none;
+    }
   </style>
 </head>
 <body id="app-body">
 
   <div id="bubble-container"></div>
   
-  <div id="left-marquee" class="side-marquee"><div class="marquee-track" id="left-marquee-track"></div></div>
-  <div id="right-marquee" class="side-marquee"><div class="marquee-track" id="right-marquee-track"></div></div>
+  <div id="left-marquee" class="side-marquee">
+    <div class="marquee-track" id="left-marquee-track"></div>
+  </div>
+  <div id="right-marquee" class="side-marquee">
+    <div class="marquee-track" id="right-marquee-track"></div>
+  </div>
 
   <div id="lightbox" onclick="closeLightbox()">
     <img id="lightbox-img" src="" alt="">
@@ -603,17 +1238,6 @@
       <textarea class="edit-textarea" id="edit-calendar-textarea"></textarea>
       <button class="save-btn" id="save-calendar-btn" onclick="saveCalendar()">儲存</button>
     </div>
-
-    <!-- 舊有公告面板隱藏，因為移到中間了 -->
-    <div class="info-box" style="display:none;">
-      <div class="panel-header">
-        社團公告
-        <button class="small-btn" id="edit-announcement-btn" style="display:none;" onclick="toggleEditAnnouncement()">編輯</button>
-      </div>
-      <div class="panel-content announcement-content" id="announcement-display">讀取中...</div>
-      <textarea class="edit-textarea" id="edit-announcement-textarea"></textarea>
-      <button class="save-btn" id="save-announcement-btn" onclick="saveAnnouncement()">儲存</button>
-    </div>
     
     <div class="info-box">
       <div class="panel-header">
@@ -630,16 +1254,14 @@
       
       <div id="admin-settings-container" style="display:none; margin-top:10px; border-top:1px solid #3a3a3c; padding-top:10px;">
         <button class="action-btn" style="width:100%; margin:0;" onclick="openPwdModal()">修改社幹密碼</button>
-        <!-- 新增: 管理員仍能在面板修改公告，只是顯示在中間 -->
-        <button class="action-btn" style="width:100%; margin:10px 0 0 0;" onclick="toggleEditAnnouncement()">編輯首頁公告</button>
+        <button class="action-btn" style="width:100%; margin:10px 0 0 0;" onclick="openEditAnnouncementModal()">編輯首頁公告</button>
       </div>
     </div>
   </div>
 
   <button id="auth-btn-float" onclick="handleAuthBtnClick()">系統<br>認證</button>
 
-  <!-- 所有 Modal 共用樣式處理 -->
-  <div id="auth-modal" class="modal-overlay">
+  <div id="auth-modal" class="modal-overlay" onclick="if(event.target===this) closeAuthModal()">
     <div class="modal-content">
       <h3>系統認證</h3>
       <input type="password" id="auth-password" placeholder="請輸入密碼">
@@ -650,7 +1272,7 @@
     </div>
   </div>
 
-  <div id="report-modal" class="modal-overlay">
+  <div id="report-modal" class="modal-overlay" onclick="if(event.target===this) closeReportModal()">
     <div class="modal-content" style="width: 380px;">
       <h3>錯誤回報</h3>
       <textarea id="report-input" placeholder="請描述遇到的問題..." style="height: 80px;"></textarea>
@@ -666,7 +1288,7 @@
     </div>
   </div>
 
-  <div id="pwd-modal" class="modal-overlay">
+  <div id="pwd-modal" class="modal-overlay" onclick="if(event.target===this) closePwdModal()">
     <div class="modal-content">
       <h3>修改社幹密碼</h3>
       <label style="font-size:12px; color:#a1a1a6;">一般社幹密碼</label>
@@ -678,7 +1300,7 @@
     </div>
   </div>
 
-  <div id="row-name-modal" class="modal-overlay">
+  <div id="row-name-modal" class="modal-overlay" onclick="if(event.target===this) closeRowNameModal()">
     <div class="modal-content">
       <h3>修改行數標題</h3>
       <label style="font-size:12px; color:#a1a1a6;">(例如將「第1行」改為「幹部核心」)</label>
@@ -687,6 +1309,29 @@
       <div class="modal-btns" style="margin-top:10px;">
         <button class="btn-cancel" onclick="closeRowNameModal()">取消</button>
         <button class="btn-submit" onclick="saveRowName()">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="announcement-view-modal" class="modal-overlay" onclick="if(event.target===this) closeViewAnnouncementModal()">
+    <div class="modal-content" style="max-height: 70vh; overflow-y: auto; width: 400px;">
+      <h3>歷史公告列表</h3>
+      <div id="announcement-full-list" style="color: #f5f5f7; font-size: 14px; line-height: 1.8; text-align: left; padding: 10px;">
+      </div>
+      <div class="modal-btns">
+        <button class="btn-cancel" style="background:#0a84ff;" onclick="closeViewAnnouncementModal()">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="announcement-edit-modal" class="modal-overlay" onclick="if(event.target===this) closeEditAnnouncementModal()">
+    <div class="modal-content" style="width: 400px;">
+      <h3>編輯首頁公告</h3>
+      <label style="font-size:12px; color:#a1a1a6; text-align:center;">(每換一行視為一則獨立跑馬燈公告)</label>
+      <textarea id="edit-announcement-textarea-modal" style="height: 150px; font-size:14px; line-height:1.5;"></textarea>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeEditAnnouncementModal()">取消</button>
+        <button class="btn-submit" onclick="saveAnnouncement()">儲存</button>
       </div>
     </div>
   </div>
@@ -707,10 +1352,10 @@
           <h1 class="gradient-text">建功口技社<br><span style="font-size:1.2rem; color:#a1a1a6; font-weight:normal;">CKSH Beatbox</span></h1>
           <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
           
-          <!-- 全新動態公告列 (跑馬燈) -->
-          <div class="intro-announcement-wrapper">
+          <div class="intro-announcement-wrapper" onclick="openViewAnnouncementModal()">
              <div class="intro-announcement-label">最新公告</div>
              <div class="intro-announcement-content" id="intro-ticker-text">讀取中...</div>
+             <div class="intro-announcement-view-btn">查看全部 &rsaquo;</div>
           </div>
         </div>
         
@@ -849,62 +1494,72 @@
     let dragStartX = 0, dragStartY = 0, dragStartTime = 0;
     let collisionFrames = {};
     
-    // 公告跑馬燈變數
+    let rawAnnouncementContent = "";
     let announcementLines = [];
     let currentAnnouncementIndex = 0;
     let tickerInterval;
 
     window.onload = function() {
-      // 確保第一頁載入時就有絲滑的 active 狀態
       document.querySelectorAll('.section-page')[0].classList.add('active-page');
       
       const activeItem = document.querySelector('.nav-item.active');
       updateBubble(activeItem);
       
       db.collection("qa").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        qaData = []; snapshot.forEach(doc => qaData.push({ id: doc.id, ...doc.data() }));
+        qaData = []; 
+        snapshot.forEach(doc => qaData.push({ id: doc.id, ...doc.data() }));
         renderQA();
       });
 
       db.collection("reports").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        reportsData = []; snapshot.forEach(doc => reportsData.push({ id: doc.id, ...doc.data() }));
+        reportsData = []; 
+        snapshot.forEach(doc => reportsData.push({ id: doc.id, ...doc.data() }));
         if (isAdmin) renderReports();
       });
 
       db.collection("intro_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-        introPhotosData = []; snapshot.forEach(doc => introPhotosData.push({ id: doc.id, ...doc.data() }));
+        introPhotosData = []; 
+        snapshot.forEach(doc => introPhotosData.push({ id: doc.id, ...doc.data() }));
         renderIntroPhotos();
         updateSideMarquees(); 
       });
+
       db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-        officersData = []; snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
+        officersData = []; 
+        snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
         renderOfficers();
       });
+
       db.collection("group_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-        groupPhotosData = []; snapshot.forEach(doc => groupPhotosData.push({ id: doc.id, ...doc.data() }));
+        groupPhotosData = []; 
+        snapshot.forEach(doc => groupPhotosData.push({ id: doc.id, ...doc.data() }));
         renderGridList('groups');
       });
+
       db.collection("shirts").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-        shirtsData = []; snapshot.forEach(doc => shirtsData.push({ id: doc.id, ...doc.data() }));
+        shirtsData = []; 
+        snapshot.forEach(doc => shirtsData.push({ id: doc.id, ...doc.data() }));
         renderGridList('shirts');
       });
+
       db.collection("logos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
-        logosData = []; snapshot.forEach(doc => logosData.push({ id: doc.id, ...doc.data() }));
+        logosData = []; 
+        snapshot.forEach(doc => logosData.push({ id: doc.id, ...doc.data() }));
         renderGridList('logos');
       });
 
       db.collection("config").doc("row_names").onSnapshot((doc) => {
-        if (doc.exists) { rowNamesData = doc.data(); renderOfficers(); }
+        if (doc.exists) { 
+          rowNamesData = doc.data(); 
+          renderOfficers(); 
+        }
       });
       
-      // 動態公告讀取與切換
       db.collection("config").doc("announcement").onSnapshot((doc) => {
-        let content = doc.exists ? doc.data().content : "目前無新公告。";
-        // 隱藏的編輯區仍保留賦值
-        document.getElementById('edit-announcement-textarea').value = content;
+        rawAnnouncementContent = doc.exists ? doc.data().content : "目前無新公告。";
+        document.getElementById('edit-announcement-textarea-modal').value = rawAnnouncementContent;
         
-        // 分離多行文字
-        announcementLines = content.split('\n').filter(line => line.trim() !== '');
+        announcementLines = rawAnnouncementContent.split('\n').filter(line => line.trim() !== '');
         if (announcementLines.length === 0) announcementLines = ["目前無新公告。"];
         
         currentAnnouncementIndex = 0;
@@ -913,7 +1568,7 @@
         
         clearInterval(tickerInterval);
         if (announcementLines.length > 1) {
-          tickerInterval = setInterval(nextTickerLine, 3500); // 每 3.5 秒切換
+          tickerInterval = setInterval(nextTickerLine, 3500); 
         }
       });
       
@@ -922,11 +1577,13 @@
         document.getElementById('maintenance-display').innerText = content;
         document.getElementById('edit-maintenance-textarea').value = content;
       });
+
       db.collection("config").doc("calendar").onSnapshot((doc) => {
         let content = doc.exists ? doc.data().content : "尚未新增活動日程。";
         document.getElementById('calendar-display').innerText = content;
         document.getElementById('edit-calendar-textarea').value = content;
       });
+
       db.collection("config").doc("passwords").onSnapshot((doc) => {
         if (doc.exists && doc.data().officer) officerPwdB64 = doc.data().officer;
       });
@@ -939,55 +1596,87 @@
       requestAnimationFrame(physicsLoop);
     };
 
-    /* --- 動態公告切換邏輯 --- */
     function nextTickerLine() {
       const tickerEl = document.getElementById('intro-ticker-text');
       if (!tickerEl) return;
-      
       tickerEl.classList.add('fade-out');
-      
       setTimeout(() => {
         currentAnnouncementIndex = (currentAnnouncementIndex + 1) % announcementLines.length;
         tickerEl.innerText = announcementLines[currentAnnouncementIndex];
-        
-        // 關閉過渡，瞬間移到底部
         tickerEl.style.transition = 'none';
         tickerEl.classList.remove('fade-out');
         tickerEl.classList.add('fade-in');
-        
-        void tickerEl.offsetWidth; // 強制重繪
-        
-        // 恢復過渡，滑入原位
+        void tickerEl.offsetWidth; 
         tickerEl.style.transition = '';
         tickerEl.classList.remove('fade-in');
-      }, 400); // 配合 CSS transition 0.4s
+      }, 400); 
     }
 
     function openModal(id) {
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10);
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
     }
+
     function closeModal(id) {
       const modal = document.getElementById(id);
       modal.classList.remove('show');
-      setTimeout(() => modal.style.display = 'none', 400);
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 400);
     }
 
     function openLightbox(imgUrl) {
       document.getElementById('lightbox-img').src = imgUrl;
       openModal('lightbox');
     }
+
     function closeLightbox() {
       closeModal('lightbox');
-      setTimeout(() => document.getElementById('lightbox-img').src = '', 400);
+      setTimeout(() => {
+        document.getElementById('lightbox-img').src = '';
+      }, 400);
+    }
+
+    function openViewAnnouncementModal() {
+      const listContainer = document.getElementById('announcement-full-list');
+      let html = `<ul style="list-style-type: none; padding-left: 0; margin: 0;">`;
+      announcementLines.forEach(line => {
+        html += `<li style="margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">${line}</li>`;
+      });
+      html += `</ul>`;
+      listContainer.innerHTML = html;
+      openModal('announcement-view-modal');
+    }
+
+    function closeViewAnnouncementModal() {
+      closeModal('announcement-view-modal');
+    }
+
+    function openEditAnnouncementModal() {
+      document.getElementById('edit-announcement-textarea-modal').value = rawAnnouncementContent;
+      openModal('announcement-edit-modal');
+    }
+
+    function closeEditAnnouncementModal() {
+      closeModal('announcement-edit-modal');
+    }
+
+    function saveAnnouncement() {
+      const newContent = document.getElementById('edit-announcement-textarea-modal').value.trim();
+      db.collection("config").doc("announcement").set({ content: newContent }, { merge: true }).then(() => {
+        closeEditAnnouncementModal();
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
     }
 
     function updateSideMarquees() {
       const leftTrack = document.getElementById('left-marquee-track');
       const rightTrack = document.getElementById('right-marquee-track');
       if (!leftTrack || !rightTrack) return;
-
       let html = '';
       if (introPhotosData.length > 0) {
         let baseHtml = '';
@@ -1046,27 +1735,24 @@
     function renderOfficers() {
       const container = document.getElementById('officer-list');
       container.innerHTML = '';
-      
       if (officersData.length === 0 && !isAdmin && !isPhotoEditor) {
          container.innerHTML = '<div style="color:#a1a1a6; text-align:center; width:100%; margin-top:20px;">目前尚未新增幹部。</div>';
          return;
       }
-
       const rowsMap = {};
       officersData.forEach(item => {
         const rowKey = item.row || 1;
-        if (!rowsMap[rowKey]) rowsMap[rowKey] = [];
+        if (!rowsMap[rowKey]) {
+          rowsMap[rowKey] = [];
+        }
         rowsMap[rowKey].push(item);
       });
-
       const sortedRows = Object.keys(rowsMap).sort((a, b) => (parseInt(a) || a) - (parseInt(b) || b));
 
       sortedRows.forEach(rowKey => {
         const rowWrapper = document.createElement('div');
         rowWrapper.className = 'officer-row-wrapper';
-        
         const rowTitle = rowNamesData[`row_${rowKey}`] || `第 ${rowKey} 行幹部`;
-        
         let rowHtml = `
           <div class="officer-row-header">
             <span class="officer-row-title">${rowTitle}</span>
@@ -1077,7 +1763,6 @@
           </div>
           <div class="officer-row-track">
         `;
-        
         rowsMap[rowKey].forEach(officer => {
           const displayUrl = officer.photoUrl || 'https://via.placeholder.com/200x200';
           rowHtml += `
@@ -1094,7 +1779,6 @@
             </div>
           `;
         });
-
         rowHtml += `</div>`;
         rowWrapper.innerHTML = rowHtml;
         container.appendChild(rowWrapper);
@@ -1112,6 +1796,7 @@
       document.getElementById('edit-row-title').value = currentTitle;
       openModal('row-name-modal');
     }
+
     function closeRowNameModal() {
       closeModal('row-name-modal');
     }
@@ -1119,45 +1804,43 @@
     function saveRowName() {
       const rowId = document.getElementById('edit-row-id').value;
       const newTitle = document.getElementById('edit-row-title').value.trim();
-      let updates = {};
+      let updates = {}; 
       updates[`row_${rowId}`] = newTitle;
-      
       db.collection("config").doc("row_names").set(updates, { merge: true }).then(() => {
-        closeRowNameModal();
+        closeRowNameModal(); 
       }).catch((error) => {
-        alert('儲存失敗: ' + error.message);
+        alert('儲存失敗: ' + error.message); 
       });
     }
 
     function renderGridList(type) {
       let containerId, dataArray, emptyText;
-      if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
-      else if (type === 'shirts') { containerId = 'shirt-list'; dataArray = shirtsData; emptyText = '目前尚未新增社服照片。'; }
-      else if (type === 'logos') { containerId = 'logo-list'; dataArray = logosData; emptyText = '目前尚未新增社徽照片。'; }
+      if (type === 'groups') {
+        containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。';
+      } else if (type === 'shirts') {
+        containerId = 'shirt-list'; dataArray = shirtsData; emptyText = '目前尚未新增社服照片。';
+      } else if (type === 'logos') {
+        containerId = 'logo-list'; dataArray = logosData; emptyText = '目前尚未新增社徽照片。';
+      }
       
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-      
       if (dataArray.length === 0 && !isAdmin && !isPhotoEditor) {
          container.innerHTML = `<div style="color:#a1a1a6; text-align:center; width:100%; margin-top: 20px;">${emptyText}</div>`;
          return;
       }
-
       const imgClass = (type === 'shirts' || type === 'logos') ? 'photo-img large-photo-img' : 'photo-img';
 
       dataArray.forEach(item => {
         const card = document.createElement('div');
         card.className = 'photo-card';
         const displayUrl = item.photoUrl || 'https://via.placeholder.com/300x200';
-        
         let html = `
           <img class="${imgClass}" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
           <div class="photo-info">
             <div class="photo-title">${item.title}</div>
             ${(isAdmin || isPhotoEditor) ? `
-              <div class="admin-controls">
-                <button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button>
-              </div>
+              <div class="admin-controls"><button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button></div>
             ` : ''}
           </div>
         `;
@@ -1168,16 +1851,18 @@
 
     function addGridItem(type) {
       let titleInputId, photoInputId, collectionName, extraData = {};
-      if (type === 'intro') { titleInputId = 'new-intro-title'; photoInputId = 'new-intro-photo'; collectionName = 'intro_photos'; }
-      else if (type === 'officers') { 
-        titleInputId = 'new-officer-name'; 
-        photoInputId = 'new-officer-photo'; 
-        collectionName = 'officers';
+      if (type === 'intro') {
+        titleInputId = 'new-intro-title'; photoInputId = 'new-intro-photo'; collectionName = 'intro_photos';
+      } else if (type === 'officers') { 
+        titleInputId = 'new-officer-name'; photoInputId = 'new-officer-photo'; collectionName = 'officers';
         extraData.row = parseInt(document.getElementById('new-officer-row').value) || 1;
+      } else if (type === 'groups') {
+        titleInputId = 'new-group-title'; photoInputId = 'new-group-photo'; collectionName = 'group_photos';
+      } else if (type === 'shirts') {
+        titleInputId = 'new-shirt-title'; photoInputId = 'new-shirt-photo'; collectionName = 'shirts';
+      } else if (type === 'logos') {
+        titleInputId = 'new-logo-title'; photoInputId = 'new-logo-photo'; collectionName = 'logos';
       }
-      else if (type === 'groups') { titleInputId = 'new-group-title'; photoInputId = 'new-group-photo'; collectionName = 'group_photos'; }
-      else if (type === 'shirts') { titleInputId = 'new-shirt-title'; photoInputId = 'new-shirt-photo'; collectionName = 'shirts'; }
-      else if (type === 'logos') { titleInputId = 'new-logo-title'; photoInputId = 'new-logo-photo'; collectionName = 'logos'; }
       
       const title = document.getElementById(titleInputId).value.trim();
       const photoUrl = document.getElementById(photoInputId).value.trim();
@@ -1185,12 +1870,12 @@
       if (!title) { alert("請輸入名稱/標題！"); return; }
 
       db.collection(collectionName).add({
-        title: title,
-        photoUrl: photoUrl,
-        ...extraData,
+        title: title, 
+        photoUrl: photoUrl, 
+        ...extraData, 
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        document.getElementById(titleInputId).value = '';
+        document.getElementById(titleInputId).value = ''; 
         document.getElementById(photoInputId).value = '';
       }).catch((error) => {
         alert('新增失敗: ' + error.message);
@@ -1210,229 +1895,185 @@
       }
     }
 
-    /* --- 物理引擎系統 --- */
     function physicsLoop() {
       const qaBox = document.getElementById('qa-target-box');
       let qaRect = null;
-      if (currentTabIndex === 4 && qaBox) {
-         qaRect = qaBox.getBoundingClientRect();
-      }
-
+      if (currentTabIndex === 4 && qaBox) qaRect = qaBox.getBoundingClientRect();
       let currentCollisions = {};
-
       for (let i = 0; i < bubbles.length; i++) {
          let b = bubbles[i];
          if (b.cooldown > 0) b.cooldown--; 
-         
-         if (!b.isUnclickable && Math.random() < (1 / 600)) {
-             triggerSplit(b);
-             i--; 
-             continue;
+         if (!b.isUnclickable && Math.random() < (1 / 600)) { 
+           triggerSplit(b); i--; continue; 
          }
-
          if (b !== activeBubble) {
-            b.y -= b.vy;
-            b.x += b.vx;
-
+            b.y -= b.vy; b.x += b.vx;
             if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) {
                 let edgeLimit = window.innerWidth * 0.15;
                 if (b.x > edgeLimit && b.x < window.innerWidth - edgeLimit) {
-                    if (b.x < window.innerWidth / 2) b.vx -= 0.5; 
-                    else b.vx += 0.5; 
+                    if (b.x < window.innerWidth / 2) b.vx -= 0.5; else b.vx += 0.5; 
                 }
             }
-
             if (currentTabIndex === 4 && qaRect) {
-                let padding = b.size / 2 + 10;
-                let leftBound = qaRect.left - padding;
-                let rightBound = qaRect.right + padding;
-                let topBound = qaRect.top - padding;
+                let padding = b.size / 2 + 10; 
+                let leftBound = qaRect.left - padding; 
+                let rightBound = qaRect.right + padding; 
+                let topBound = qaRect.top - padding; 
                 let bottomBound = qaRect.bottom + padding;
-                
                 if (b.x > leftBound && b.x < rightBound && b.y > topBound && b.y < bottomBound) {
                     let centerX = qaRect.left + qaRect.width / 2;
-                    if (b.x < centerX) b.vx -= 1.5; 
-                    else b.vx += 1.5;
+                    if (b.x < centerX) b.vx -= 1.5; else b.vx += 1.5;
                 }
             }
             b.vx *= 0.98;
          }
-
          b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
-
-         if (b.y < -100) {
-            b.el.remove();
-            bubbles.splice(i, 1);
-            i--;
-            continue;
-         }
+         if (b.y < -100) { b.el.remove(); bubbles.splice(i, 1); i--; continue; }
       }
 
       for (let i = 0; i < bubbles.length; i++) {
          for (let j = i + 1; j < bubbles.length; j++) {
-            let b1 = bubbles[i];
-            let b2 = bubbles[j];
-            
+            let b1 = bubbles[i]; let b2 = bubbles[j];
             if (!b1.isUnclickable && !b2.isUnclickable) {
-               let dx = b1.x - b2.x;
-               let dy = b1.y - b2.y;
-               let dist = Math.hypot(dx, dy);
-               
+               let dx = b1.x - b2.x; let dy = b1.y - b2.y; let dist = Math.hypot(dx, dy);
                if (dist < (b1.size + b2.size) / 2) {
                    if (b1.cooldown > 0 || b2.cooldown > 0) {
-                       let pushForce = 0.8;
-                       if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
-                       else { b1.vx += pushForce; b2.vx -= pushForce; }
+                       let pushForce = 0.8; 
+                       if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; } 
+                       else { b1.vx += pushForce; b2.vx -= pushForce; } 
                        continue;
                    }
-
                    let pairId = b1.id < b2.id ? b1.id + "_" + b2.id : b2.id + "_" + b1.id;
                    currentCollisions[pairId] = (collisionFrames[pairId] || 0) + 1;
-                   
                    if (currentCollisions[pairId] >= 180) { 
                        let maxSize = isBubbleMode ? 800 : 150; 
                        let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
-                       b1.size = newSize;
-                       b1.el.style.width = newSize + 'px';
-                       b1.el.style.height = newSize + 'px';
-                       b1.splits = Math.max(b1.splits, b2.splits);
-                       
-                       if (b2 === activeBubble) activeBubble = b1;
-                       
-                       b2.el.remove();
-                       bubbles.splice(j, 1);
-                       j--;
+                       b1.size = newSize; b1.el.style.width = newSize + 'px'; b1.el.style.height = newSize + 'px'; b1.splits = Math.max(b1.splits, b2.splits);
+                       if (b2 === activeBubble) activeBubble = b1; 
+                       b2.el.remove(); bubbles.splice(j, 1); j--; 
                        delete currentCollisions[pairId];
-                   } else {
-                       let pushForce = 0.5;
-                       if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
-                       else { b1.vx += pushForce; b2.vx -= pushForce; }
+                   } else { 
+                       let pushForce = 0.5; 
+                       if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; } 
+                       else { b1.vx += pushForce; b2.vx -= pushForce; } 
                    }
                }
             }
          }
       }
       collisionFrames = currentCollisions;
-
       let limit = isBubbleMode ? 500 : 200; 
-      if (bubbles.length > limit) {
-         let oldest = bubbles.shift();
-         oldest.el.remove();
-      }
-
+      if (bubbles.length > limit) { let oldest = bubbles.shift(); oldest.el.remove(); }
       requestAnimationFrame(physicsLoop);
     }
 
     let globalBubbleId = 0;
     function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0, isDraggable = true) {
       const container = document.getElementById('bubble-container');
-      const el = document.createElement('div');
-      el.className = 'game-bubble' + (isUnclickable ? ' unclickable' : '');
-      el.style.width = size + 'px';
+      const el = document.createElement('div'); 
+      el.className = 'game-bubble' + (isUnclickable ? ' unclickable' : ''); 
+      el.style.width = size + 'px'; 
       el.style.height = size + 'px';
       
-      globalBubbleId++;
+      globalBubbleId++; 
       let bubbleObj = { id: globalBubbleId, el, x, y, vx, vy, size, splits, isUnclickable, cooldown, isDraggable };
       
       if (!isUnclickable) {
          const startInteraction = function(e) {
-            if (isDraggable) {
-                e.preventDefault(); 
-                activeBubble = bubbleObj;
+            if (isDraggable) { 
+              e.preventDefault(); 
+              activeBubble = bubbleObj; 
             }
-            bubbleObj.clickStartX = e.touches ? e.touches[0].clientX : e.clientX;
-            bubbleObj.clickStartY = e.touches ? e.touches[0].clientY : e.clientY;
+            bubbleObj.clickStartX = e.touches ? e.touches[0].clientX : e.clientX; 
+            bubbleObj.clickStartY = e.touches ? e.touches[0].clientY : e.clientY; 
             bubbleObj.clickStartTime = Date.now();
          };
-         
          const endInteraction = function(e) {
-            let dt = Date.now() - bubbleObj.clickStartTime;
-            let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            let dt = Date.now() - bubbleObj.clickStartTime; 
+            let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX; 
             let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-            let dist = Math.hypot(clientX - bubbleObj.clickStartX, clientY - bubbleObj.clickStartY);
-            if (dt < 250 && dist < 15) triggerSplit(bubbleObj);
+            let dist = Math.hypot(clientX - bubbleObj.clickStartX, clientY - bubbleObj.clickStartY); 
+            if (dt < 250 && dist < 15) triggerSplit(bubbleObj); 
             if (activeBubble === bubbleObj) activeBubble = null;
          };
-
-         el.onmousedown = startInteraction;
-         el.ontouchstart = startInteraction;
-         el.onmouseup = endInteraction;
+         el.onmousedown = startInteraction; 
+         el.ontouchstart = startInteraction; 
+         el.onmouseup = endInteraction; 
          el.ontouchend = endInteraction;
       }
-      
-      container.appendChild(el);
-      bubbles.push(bubbleObj);
+      container.appendChild(el); 
+      bubbles.push(bubbleObj); 
       return bubbleObj;
     }
 
-    window.addEventListener('mousemove', (e) => {
-        if(activeBubble && activeBubble.isDraggable) { 
-            activeBubble.x = e.clientX; 
-            activeBubble.y = e.clientY; 
-        }
+    window.addEventListener('mousemove', (e) => { 
+      if(activeBubble && activeBubble.isDraggable) { 
+        activeBubble.x = e.clientX; 
+        activeBubble.y = e.clientY; 
+      } 
     });
-    window.addEventListener('touchmove', (e) => {
-        if(activeBubble && activeBubble.isDraggable) {
-            activeBubble.x = e.touches[0].clientX;
-            activeBubble.y = e.touches[0].clientY;
-            e.preventDefault(); 
-        }
+    
+    window.addEventListener('touchmove', (e) => { 
+      if(activeBubble && activeBubble.isDraggable) { 
+        activeBubble.x = e.touches[0].clientX; 
+        activeBubble.y = e.touches[0].clientY; 
+        e.preventDefault(); 
+      } 
     }, {passive: false});
 
     function triggerSplit(b) {
         if (!bubbles.includes(b)) return; 
-        
         if (isBubbleMode) {
           let count = Math.floor(Math.random() * 3) + 2; 
-          for(let i=0; i<count; i++) {
-               let startOffsetX = (Math.random() * 40 - 20);
-               let sprayVx = (startOffsetX / 3);
-               let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
-               let newSize = Math.max(Math.random() * b.size, 10); 
-               createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180, true);
+          for(let i=0; i<count; i++) { 
+            let startOffsetX = (Math.random() * 40 - 20); 
+            let sprayVx = (startOffsetX / 3); 
+            let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
+            let newSize = Math.max(Math.random() * b.size, 10); 
+            createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180, true); 
           }
         } else if (isAdmin) {
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 21) + 10; 
-            for(let i=0; i<count; i++) {
-               let startOffsetX = (Math.random() * 40 - 20);
-               let startOffsetY = (Math.random() * 40 - 20);
-               let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
-               let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
-               let newSize = Math.random() * 8 + 12;
-               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180, true);
+            for(let i=0; i<count; i++) { 
+              let startOffsetX = (Math.random() * 40 - 20); 
+              let startOffsetY = (Math.random() * 40 - 20); 
+              let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
+              let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
+              let newSize = Math.random() * 8 + 12; 
+              createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180, true); 
             }
-          } else {
-            for(let i=0; i<2; i++) {
-               createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true, 0, false);
-            }
+          } else { 
+            for(let i=0; i<2; i++) { 
+              createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true, 0, false); 
+            } 
           }
         } else if (isOfficer) {
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 2) + 2; 
-            for(let i=0; i<count; i++) {
-               let startOffsetX = (Math.random() * 40 - 20);
-               let sprayVx = (startOffsetX / 2);
-               let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
-               createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 180, false);
+            for(let i=0; i<count; i++) { 
+              let startOffsetX = (Math.random() * 40 - 20); 
+              let sprayVx = (startOffsetX / 2); 
+              let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
+              createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 180, false); 
             }
           }
         } else {
           let count = Math.floor(Math.random() * 2) + 2; 
-          for(let i=0; i<count; i++) {
-             let startOffsetX = (Math.random() * 20 - 10);
-             let sprayVx = (startOffsetX / 2);
-             createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180, false);
+          for(let i=0; i<count; i++) { 
+            let startOffsetX = (Math.random() * 20 - 10); 
+            let sprayVx = (startOffsetX / 2); 
+            createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180, false); 
           }
         }
-        b.el.remove();
+        b.el.remove(); 
         bubbles = bubbles.filter(item => item !== b);
     }
 
     function getSpawnX() {
         let w = window.innerWidth;
-        if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) {
-            return Math.random() < 0.5 ? Math.random() * (w * 0.15) : w - (Math.random() * (w * 0.15));
+        if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) { 
+          return Math.random() < 0.5 ? Math.random() * (w * 0.15) : w - (Math.random() * (w * 0.15)); 
         }
         return Math.random() * w;
     }
@@ -1440,111 +2081,118 @@
     function startBubbleSystem() {
       clearInterval(bubbleInterval);
       let h = window.innerHeight + 100; 
-      
       if (isBubbleMode) {
-        bubbleInterval = setInterval(() => {
+        bubbleInterval = setInterval(() => { 
           let count = (Math.floor(Math.random() * 3) + 2) * 2; 
-          for(let i=0; i<count; i++) {
+          for(let i=0; i<count; i++) { 
             let size = Math.random() * 60 + 20; 
             let vy = Math.random() * 0.4 + 0.1; 
-            let vx = Math.random() * 2 - 1;
+            let vx = Math.random() * 2 - 1; 
             createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180, true); 
-          }
+          } 
         }, 1200); 
       } else if (isAdmin || isPhotoEditor) {
-        bubbleInterval = setInterval(() => {
-          let size = Math.random() * 20 + 30;
-          let vy = Math.random() * 0.8 + 0.5;
-          let vx = Math.random() * 2 - 1;
-          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180, true);
+        bubbleInterval = setInterval(() => { 
+          let size = Math.random() * 20 + 30; 
+          let vy = Math.random() * 0.8 + 0.5; 
+          let vx = Math.random() * 2 - 1; 
+          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180, true); 
         }, 5000);
       } else if (isOfficer) {
-        bubbleInterval = setInterval(() => {
-          let count = Math.floor(Math.random() * 4) + 1;
-          for(let i=0; i<count; i++) {
-            let size = Math.random() * 15 + 15;
-            let vy = Math.random() * 1.5 + 1;
-            let vx = Math.random() * 2 - 1;
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 180, false);
-          }
+        bubbleInterval = setInterval(() => { 
+          let count = Math.floor(Math.random() * 4) + 1; 
+          for(let i=0; i<count; i++) { 
+            let size = Math.random() * 15 + 15; 
+            let vy = Math.random() * 1.5 + 1; 
+            let vx = Math.random() * 2 - 1; 
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 180, false); 
+          } 
         }, 1000);
       }
     }
 
     function switchTab(index, element) {
       currentTabIndex = index; 
-      const items = document.querySelectorAll('.nav-item');
-      items.forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
+      const items = document.querySelectorAll('.nav-item'); 
+      items.forEach(item => item.classList.remove('active')); 
+      element.classList.add('active'); 
       updateBubble(element);
       
-      const track = document.getElementById('slider-track');
+      const track = document.getElementById('slider-track'); 
       track.style.transform = `translateX(-${index * 20}%)`;
-
+      
       const pages = document.querySelectorAll('.section-page');
-      pages.forEach((page, i) => {
-          if (i === index) page.classList.add('active-page');
-          else page.classList.remove('active-page');
+      pages.forEach((page, i) => { 
+        if (i === index) page.classList.add('active-page'); 
+        else page.classList.remove('active-page'); 
       });
       
-      if (index === 3) document.body.classList.add('design-mode');
-      else document.body.classList.remove('design-mode');
-
+      if (index === 3) {
+        document.body.classList.add('design-mode'); 
+      } else {
+        document.body.classList.remove('design-mode'); 
+      }
+      
       checkSideMarquees();
     }
 
-    function updateBubble(element) {
-      const bubble = document.getElementById('bubble');
-      bubble.style.width = element.offsetWidth + 'px';
-      bubble.style.left = element.offsetLeft + 'px';
+    function updateBubble(element) { 
+      const bubble = document.getElementById('bubble'); 
+      bubble.style.width = element.offsetWidth + 'px'; 
+      bubble.style.left = element.offsetLeft + 'px'; 
     }
 
     function triggerBubbleTransition() {
       if (!isOfficer && !isAdmin && !isBubbleMode && !isPhotoEditor) return;
-      let cx = window.innerWidth / 2;
+      let cx = window.innerWidth / 2; 
       let cy = window.innerHeight / 2;
-      for (let i = 0; i < 35; i++) {
-         let size = Math.random() * 20 + 10;
-         let startOffsetX = (Math.random() * 100 - 50);
-         let startOffsetY = (Math.random() * 100 - 50);
-         let vx = (startOffsetX / 3);
-         let vy = (startOffsetY / 3);
-         createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true, 0, false);
+      for (let i = 0; i < 35; i++) { 
+        let size = Math.random() * 20 + 10; 
+        let startOffsetX = (Math.random() * 100 - 50); 
+        let startOffsetY = (Math.random() * 100 - 50); 
+        let vx = (startOffsetX / 3); 
+        let vy = (startOffsetY / 3); 
+        createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true, 0, false); 
       }
     }
 
     function handleToggleClick(event) {
       event.stopPropagation(); 
       switchTab(3, document.getElementById('nav-tab-3')); 
-      const toggle = document.getElementById('design-toggle');
+      const toggle = document.getElementById('design-toggle'); 
       isShowingLogo = !isShowingLogo;
       
-      if (isShowingLogo) toggle.classList.add('switched');
-      else toggle.classList.remove('switched');
+      if (isShowingLogo) {
+        toggle.classList.add('switched'); 
+      } else {
+        toggle.classList.remove('switched');
+      }
       
       triggerBubbleTransition(); 
       
       setTimeout(() => {
-        if (isShowingLogo) {
-          document.getElementById('view-shirt').classList.remove('active-view');
-          document.getElementById('view-logo').classList.add('active-view');
-        } else {
-          document.getElementById('view-logo').classList.remove('active-view');
-          document.getElementById('view-shirt').classList.add('active-view');
+        if (isShowingLogo) { 
+          document.getElementById('view-shirt').classList.remove('active-view'); 
+          document.getElementById('view-logo').classList.add('active-view'); 
+        } else { 
+          document.getElementById('view-logo').classList.remove('active-view'); 
+          document.getElementById('view-shirt').classList.add('active-view'); 
         }
       }, 200); 
     }
 
-    /* --- Auth & 登出控制 --- */
     function handleAuthBtnClick() {
       if (isOfficer || isAdmin || isBubbleMode || isPhotoEditor) {
         if (confirm("要登出當前帳號嗎？")) {
-          isOfficer = false; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
-          const btn = document.getElementById('auth-btn-float');
-          btn.innerHTML = '系統<br>認證';
+          isOfficer = false; 
+          isAdmin = false; 
+          isBubbleMode = false; 
+          isPhotoEditor = false;
+          
+          const btn = document.getElementById('auth-btn-float'); 
+          btn.innerHTML = '系統<br>認證'; 
           btn.disabled = false;
           
-          document.getElementById('edit-announcement-btn').style.display = 'none';
           document.getElementById('edit-maintenance-btn').style.display = 'none';
           document.getElementById('edit-calendar-btn').style.display = 'none';
           document.getElementById('admin-settings-container').style.display = 'none';
@@ -1556,15 +2204,13 @@
           document.getElementById('admin-shirt-box').style.display = 'none';
           document.getElementById('admin-logo-box').style.display = 'none';
           
-          document.getElementById('ask-box').style.display = 'flex';
-          
-          renderQA();
-          renderIntroPhotos();
-          renderOfficers();
-          renderGridList('groups');
-          renderGridList('shirts');
-          renderGridList('logos');
-          checkSideMarquees();
+          renderQA(); 
+          renderIntroPhotos(); 
+          renderOfficers(); 
+          renderGridList('groups'); 
+          renderGridList('shirts'); 
+          renderGridList('logos'); 
+          checkSideMarquees(); 
           startBubbleSystem(); 
         }
       } else {
@@ -1572,17 +2218,27 @@
       }
     }
 
-    function closeAuthModal() { closeModal('auth-modal'); }
-    function openReportModal() {
-      document.getElementById('report-input').value = '';
-      openModal('report-modal');
+    function closeAuthModal() { 
+      closeModal('auth-modal'); 
     }
-    function closeReportModal() { closeModal('report-modal'); }
-    function openPwdModal() {
-      document.getElementById('new-officer-pwd').value = '';
-      openModal('pwd-modal');
+
+    function openReportModal() { 
+      document.getElementById('report-input').value = ''; 
+      openModal('report-modal'); 
     }
-    function closePwdModal() { closeModal('pwd-modal'); }
+
+    function closeReportModal() { 
+      closeModal('report-modal'); 
+    }
+
+    function openPwdModal() { 
+      document.getElementById('new-officer-pwd').value = ''; 
+      openModal('pwd-modal'); 
+    }
+
+    function closePwdModal() { 
+      closeModal('pwd-modal'); 
+    }
 
     function verifyOfficer() {
       const pwd = document.getElementById('auth-password').value;
@@ -1590,39 +2246,38 @@
 
       if (pwd === 'bubble') {
         isBubbleMode = true; isPhotoEditor = false; isOfficer = false; isAdmin = false;
-        const btn = document.getElementById('auth-btn-float');
+        const btn = document.getElementById('auth-btn-float'); 
         btn.innerText = '泡泡模式'; 
-        closeAuthModal();
-        renderQA();
-        checkSideMarquees();
+        
+        closeAuthModal(); 
+        renderQA(); 
+        checkSideMarquees(); 
         startBubbleSystem(); 
       } else if (pwd === 'photoeditor') {
         isPhotoEditor = true; isBubbleMode = false; isOfficer = false; isAdmin = false;
-        const btn = document.getElementById('auth-btn-float');
+        const btn = document.getElementById('auth-btn-float'); 
         btn.innerText = '修圖員'; 
         
-        document.getElementById('ask-box').style.display = 'none';
         document.getElementById('admin-intro-box').style.display = 'flex';
         document.getElementById('admin-officer-box').style.display = 'flex';
         document.getElementById('admin-group-photo-box').style.display = 'flex';
         document.getElementById('admin-shirt-box').style.display = 'flex';
         document.getElementById('admin-logo-box').style.display = 'flex';
         
-        closeAuthModal();
-        renderQA();
-        renderIntroPhotos();
-        renderOfficers();
-        renderGridList('groups');
-        renderGridList('shirts');
-        renderGridList('logos');
-        checkSideMarquees();
+        closeAuthModal(); 
+        renderQA(); 
+        renderIntroPhotos(); 
+        renderOfficers(); 
+        renderGridList('groups'); 
+        renderGridList('shirts'); 
+        renderGridList('logos'); 
+        checkSideMarquees(); 
         startBubbleSystem(); 
       } else if (b64Pwd === adminPwdB64) {
         isAdmin = true; isOfficer = true; isBubbleMode = false; isPhotoEditor = false;
-        const btn = document.getElementById('auth-btn-float');
+        const btn = document.getElementById('auth-btn-float'); 
         btn.innerText = '管理員'; 
         
-        document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
         document.getElementById('edit-calendar-btn').style.display = 'inline-block';
         document.getElementById('admin-settings-container').style.display = 'block';
@@ -1634,151 +2289,139 @@
         document.getElementById('admin-shirt-box').style.display = 'flex';
         document.getElementById('admin-logo-box').style.display = 'flex';
         
-        closeAuthModal();
-        renderQA();
-        renderReports();
-        renderIntroPhotos();
-        renderOfficers();
-        renderGridList('groups');
-        renderGridList('shirts');
-        renderGridList('logos');
-        checkSideMarquees();
+        closeAuthModal(); 
+        renderQA(); 
+        renderReports(); 
+        renderIntroPhotos(); 
+        renderOfficers(); 
+        renderGridList('groups'); 
+        renderGridList('shirts'); 
+        renderGridList('logos'); 
+        checkSideMarquees(); 
         startBubbleSystem(); 
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
-        const btn = document.getElementById('auth-btn-float');
+        const btn = document.getElementById('auth-btn-float'); 
         btn.innerText = '已認證'; 
-        
-        document.getElementById('edit-announcement-btn').style.display = 'inline-block';
         document.getElementById('edit-calendar-btn').style.display = 'inline-block';
         
-        closeAuthModal();
-        renderQA();
-        checkSideMarquees();
+        closeAuthModal(); 
+        renderQA(); 
+        checkSideMarquees(); 
         startBubbleSystem();
-      } else {
-        alert('密碼錯誤。');
+      } else { 
+        alert('密碼錯誤。'); 
       }
     }
 
-    /* --- 左側面板控制 --- */
-    function toggleAnnouncement() {
-      const content = document.getElementById('announcement-display');
-      const toggleText = document.getElementById('toggle-announcement-text');
-      const textarea = document.getElementById('edit-announcement-textarea');
-      const saveBtn = document.getElementById('save-announcement-btn');
-
-      if (textarea.style.display === 'block') { textarea.style.display = 'none'; saveBtn.style.display = 'none'; }
-      if (content.style.display === 'block') { content.style.display = 'none'; toggleText.innerText = '[點擊查看]'; } 
-      else { content.style.display = 'block'; toggleText.innerText = '[收起]'; }
-    }
-
-    function toggleEditAnnouncement() {
-        // 因設計調整，此功能目前僅透過主畫面的跑馬燈展示，不再使用左下角編輯面板，直接透過 firebase 更新
-        alert("請直接聯絡開發者修改資料庫公告");
-    }
-
-    function saveAnnouncement() {
-      const newContent = document.getElementById('edit-announcement-textarea').value.trim();
-      db.collection("config").doc("announcement").set({ content: newContent }, { merge: true }).then(() => {
-        toggleEditAnnouncement();
-      }).catch((error) => alert('儲存失敗: ' + error.message));
-    }
-
     function toggleMaintenance() {
-      const content = document.getElementById('maintenance-display');
+      const content = document.getElementById('maintenance-display'); 
       const toggleText = document.getElementById('toggle-maintenance-text');
       
-      if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        toggleText.innerText = '[收起]';
+      if (content.style.display === 'none' || content.style.display === '') { 
+        content.style.display = 'block'; 
+        toggleText.innerText = '[收起]'; 
       } else {
-        if (content.classList.contains('expanded')) {
-          content.classList.remove('expanded');
-          content.style.display = 'none';
-          toggleText.innerText = '[展開/收起]';
-        } else {
-          content.classList.add('expanded');
-          toggleText.innerText = '[收起]';
+        if (content.classList.contains('expanded')) { 
+          content.classList.remove('expanded'); 
+          content.style.display = 'none'; 
+          toggleText.innerText = '[展開/收起]'; 
+        } else { 
+          content.classList.add('expanded'); 
+          toggleText.innerText = '[收起]'; 
         }
       }
     }
 
     function toggleEditMaintenance() {
-        const content = document.getElementById('maintenance-display');
-        const textarea = document.getElementById('edit-maintenance-textarea');
-        const saveBtn = document.getElementById('save-maintenance-btn');
+        const content = document.getElementById('maintenance-display'); 
+        const textarea = document.getElementById('edit-maintenance-textarea'); 
+        const saveBtn = document.getElementById('save-maintenance-btn'); 
         const toggleText = document.getElementById('toggle-maintenance-text');
-
-        if (textarea.style.display === 'block') {
-            textarea.style.display = 'none'; saveBtn.style.display = 'none'; 
-            content.style.display = 'block'; toggleText.style.display = 'inline';
-        } else {
-            content.style.display = 'none'; textarea.style.display = 'block'; 
-            saveBtn.style.display = 'block'; toggleText.style.display = 'none';
+        
+        if (textarea.style.display === 'block') { 
+          textarea.style.display = 'none'; 
+          saveBtn.style.display = 'none'; 
+          content.style.display = 'block'; 
+          toggleText.style.display = 'inline'; 
+        } else { 
+          content.style.display = 'none'; 
+          textarea.style.display = 'block'; 
+          saveBtn.style.display = 'block'; 
+          toggleText.style.display = 'none'; 
         }
     }
 
     function saveMaintenance() {
       const newContent = document.getElementById('edit-maintenance-textarea').value.trim();
-      db.collection("config").doc("maintenance").set({ content: newContent }, { merge: true }).then(() => {
-        toggleEditMaintenance();
-      }).catch((error) => alert('儲存失敗: ' + error.message));
+      db.collection("config").doc("maintenance").set({ content: newContent }, { merge: true }).then(() => { 
+        toggleEditMaintenance(); 
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
     }
 
     function toggleCalendar() {
-      const content = document.getElementById('calendar-display');
+      const content = document.getElementById('calendar-display'); 
       const toggleText = document.getElementById('toggle-calendar-text');
       
-      if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        toggleText.innerText = '[收起]';
+      if (content.style.display === 'none' || content.style.display === '') { 
+        content.style.display = 'block'; 
+        toggleText.innerText = '[收起]'; 
       } else {
-        if (content.classList.contains('expanded')) {
-          content.classList.remove('expanded');
-          content.style.display = 'none';
-          toggleText.innerText = '[展開/收起]';
-        } else {
-          content.classList.add('expanded');
-          toggleText.innerText = '[收起]';
+        if (content.classList.contains('expanded')) { 
+          content.classList.remove('expanded'); 
+          content.style.display = 'none'; 
+          toggleText.innerText = '[展開/收起]'; 
+        } else { 
+          content.classList.add('expanded'); 
+          toggleText.innerText = '[收起]'; 
         }
       }
     }
 
     function toggleEditCalendar() {
-        const content = document.getElementById('calendar-display');
-        const textarea = document.getElementById('edit-calendar-textarea');
-        const saveBtn = document.getElementById('save-calendar-btn');
+        const content = document.getElementById('calendar-display'); 
+        const textarea = document.getElementById('edit-calendar-textarea'); 
+        const saveBtn = document.getElementById('save-calendar-btn'); 
         const toggleText = document.getElementById('toggle-calendar-text');
-
-        if (textarea.style.display === 'block') {
-            textarea.style.display = 'none'; saveBtn.style.display = 'none'; 
-            content.style.display = 'block'; toggleText.style.display = 'inline';
-        } else {
-            content.style.display = 'none'; textarea.style.display = 'block'; 
-            saveBtn.style.display = 'block'; toggleText.style.display = 'none';
+        
+        if (textarea.style.display === 'block') { 
+          textarea.style.display = 'none'; 
+          saveBtn.style.display = 'none'; 
+          content.style.display = 'block'; 
+          toggleText.style.display = 'inline'; 
+        } else { 
+          content.style.display = 'none'; 
+          textarea.style.display = 'block'; 
+          saveBtn.style.display = 'block'; 
+          toggleText.style.display = 'none'; 
         }
     }
 
     function saveCalendar() {
       const newContent = document.getElementById('edit-calendar-textarea').value.trim();
-      db.collection("config").doc("calendar").set({ content: newContent }, { merge: true }).then(() => {
-        toggleEditCalendar();
-      }).catch((error) => alert('儲存失敗: ' + error.message));
+      db.collection("config").doc("calendar").set({ content: newContent }, { merge: true }).then(() => { 
+        toggleEditCalendar(); 
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
     }
 
     function savePasswords() {
-      const newOfficer = document.getElementById('new-officer-pwd').value.trim();
-      let updates = {};
+      const newOfficer = document.getElementById('new-officer-pwd').value.trim(); 
+      let updates = {}; 
       if (newOfficer) updates.officer = btoa(newOfficer);
-
-      if (Object.keys(updates).length > 0) {
-        db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => {
-          alert('社幹密碼已更新。');
-          closePwdModal();
-        }).catch((error) => alert('更新失敗: ' + error.message));
-      } else {
-        closePwdModal();
+      
+      if (Object.keys(updates).length > 0) { 
+        db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => { 
+          alert('社幹密碼已更新。'); 
+          closePwdModal(); 
+        }).catch((error) => {
+          alert('更新失敗: ' + error.message);
+        }); 
+      } else { 
+        closePwdModal(); 
       }
     }
 
@@ -1786,35 +2429,39 @@
       const text = document.getElementById('report-input').value.trim();
       if (text !== '') {
         const role = isOfficer ? 'officer' : 'user';
-        db.collection("reports").add({
-          text: text,
-          role: role,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert('回報已送出，感謝。');
-          document.getElementById('report-input').value = '';
+        db.collection("reports").add({ 
+          text: text, 
+          role: role, 
+          timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }).then(() => { 
+          alert('回報已送出，感謝。'); 
+          document.getElementById('report-input').value = ''; 
           if (!isAdmin) closeReportModal(); 
-        }).catch((error) => alert('送出失敗: ' + error.message));
-      } else {
-        alert('請輸入內容。');
+        }).catch((error) => {
+          alert('送出失敗: ' + error.message);
+        });
+      } else { 
+        alert('請輸入內容。'); 
       }
     }
 
-    function deleteReport(docId) {
-      if (confirm('確認刪除此回報？')) {
-        db.collection("reports").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message));
-      }
+    function deleteReport(docId) { 
+      if (confirm('確認刪除此回報？')) { 
+        db.collection("reports").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); 
+      } 
     }
 
     function renderReports() {
-      const container = document.getElementById('report-list');
+      const container = document.getElementById('report-list'); 
       container.innerHTML = '';
-      if (reportsData.length === 0) {
-        container.innerHTML = '<div style="color:#888; font-size:12px;">目前無回報紀錄。</div>';
-        return;
+      
+      if (reportsData.length === 0) { 
+        container.innerHTML = '<div style="color:#888; font-size:12px; text-align:center;">目前無回報紀錄。</div>'; 
+        return; 
       }
+      
       reportsData.forEach(item => {
-         const div = document.createElement('div');
+         const div = document.createElement('div'); 
          div.className = 'report-item ' + (item.role === 'officer' ? 'red-border' : 'yellow-border');
          const timeString = item.timestamp ? new Date(item.timestamp.toDate()).toLocaleString() : '剛剛';
          div.innerHTML = `
@@ -1827,81 +2474,89 @@
     }
 
     function postQuestion() {
-      if (isPhotoEditor) return; 
+      if (isPhotoEditor) {
+        alert('修圖員無發問權限。');
+        return; 
+      }
       
-      const input = document.getElementById('new-question');
+      const input = document.getElementById('new-question'); 
       const text = input.value.trim();
       
       if (text !== '') {
         const existing = qaData.find(item => item.q === text);
-        if (existing) {
-          if (existing.a) alert('此問題已有解答。\n\n答覆：' + existing.a);
-          else alert('此問題已存在，等待回覆中。');
-          input.value = '';
-          return;
+        if (existing) { 
+          if (existing.a) alert('此問題已有解答。\n\n答覆：' + existing.a); 
+          else alert('此問題已存在，等待回覆中。'); 
+          input.value = ''; 
+          return; 
         }
-        db.collection("qa").add({
-          q: text,
-          a: null,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          input.value = '';
-        }).catch((error) => alert('發布失敗: ' + error.message));
-      } else {
-        alert('請輸入內容。');
+        db.collection("qa").add({ 
+          q: text, 
+          a: null, 
+          timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }).then(() => { 
+          input.value = ''; 
+        }).catch((error) => {
+          alert('發布失敗: ' + error.message);
+        });
+      } else { 
+        alert('請輸入內容。'); 
       }
     }
 
     function submitReply(docId) {
-      const replyInput = document.getElementById(`reply-${docId}`);
+      const replyInput = document.getElementById(`reply-${docId}`); 
       const replyText = replyInput.value.trim();
-      if (replyText !== '') {
-        db.collection("qa").doc(docId).update({ a: replyText }).then(() => {
-            alert('回覆/修改成功！');
-        });
-      } else {
-        alert('請輸入回覆內容。');
+      
+      if (replyText !== '') { 
+        db.collection("qa").doc(docId).update({ a: replyText }).then(() => { 
+          alert('回覆/修改成功！'); 
+        }); 
+      } else { 
+        alert('請輸入回覆內容。'); 
       }
     }
 
-    function deleteQuestion(docId) {
-      if (confirm('確認刪除此問題？')) {
-        db.collection("qa").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message));
-      }
+    function deleteQuestion(docId) { 
+      if (confirm('確認刪除此問題？')) { 
+        db.collection("qa").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); 
+      } 
     }
 
     function renderQA() {
-      const listContainer = document.getElementById('qa-list');
+      const listContainer = document.getElementById('qa-list'); 
       listContainer.innerHTML = '';
+      
       qaData.forEach(item => {
-        const qaItem = document.createElement('div');
+        const qaItem = document.createElement('div'); 
         qaItem.className = 'qa-item';
+        
         let html = `<div class="qa-header"><div class="qa-q-text">Q: ${item.q}</div>`;
         if (isAdmin || isOfficer) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         html += `</div>`;
         
-        if (item.a) {
-          html += `<div class="qa-a">A: ${item.a}</div>`;
-          if (isAdmin || isOfficer) {
+        if (item.a) { 
+          html += `<div class="qa-a">A: ${item.a}</div>`; 
+          if (isAdmin || isOfficer) { 
             html += `
               <div class="reply-box" style="margin-top: 8px;">
                 <input type="text" id="reply-${item.id}" placeholder="重新輸入以覆寫回覆...">
                 <button onclick="submitReply('${item.id}')">覆寫</button>
               </div>
-            `;
-          }
-        } else {
-          html += `<div class="qa-pending">（等待回覆中）</div>`;
-          if (isAdmin || isOfficer) {
+            `; 
+          } 
+        } else { 
+          html += `<div class="qa-pending">（等待回覆中）</div>`; 
+          if (isAdmin || isOfficer) { 
             html += `
               <div class="reply-box">
                 <input type="text" id="reply-${item.id}" placeholder="輸入回覆內容...">
                 <button onclick="submitReply('${item.id}')">送出</button>
               </div>
-            `;
-          }
+            `; 
+          } 
         }
-        qaItem.innerHTML = html;
+        qaItem.innerHTML = html; 
         listContainer.appendChild(qaItem);
       });
     }
