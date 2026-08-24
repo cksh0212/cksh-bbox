@@ -95,26 +95,27 @@
 
     .info-box { background: var(--glass-bg); padding: 15px; border-radius: 18px; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid var(--glass-border); font-size: 13px; color: #ebebf5; box-shadow: 0 10px 30px rgba(0,0,0,0.4); max-width: 280px; }
     .panel-header { font-weight: 600; color: #fff; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-    .scrollable-content { max-height: 80px; overflow-y: auto; font-size: 13px; color: #a1a1a6; white-space: pre-wrap; line-height: 1.6; margin-top: 5px; padding-right: 4px; transition: max-height 0.6s var(--apple-ease); }
-    .scrollable-content.expanded { max-height: 220px; }
+    
+    /* 滾動內容基礎設定 */
+    .scrollable-content { overflow-y: auto; font-size: 13px; color: #a1a1a6; white-space: pre-wrap; line-height: 1.6; padding-right: 4px; transition: all 0.6s var(--apple-ease); }
     .scrollable-content::-webkit-scrollbar { width: 4px; }
     .scrollable-content::-webkit-scrollbar-thumb { background: #636366; border-radius: 4px; }
+
+    /* 💡 修復: 活動日曆狀態 (預設隱藏，點擊展開) */
+    #calendar-display { max-height: 0; opacity: 0; margin-top: 0; pointer-events: none; }
+    #calendar-display.expanded { max-height: 220px; opacity: 1; margin-top: 5px; pointer-events: auto; }
+
+    /* 💡 修復: 維修紀錄狀態 (預設小窗，點擊展開) */
+    #maintenance-display { max-height: 80px; opacity: 1; margin-top: 5px; pointer-events: auto; }
+    #maintenance-display.expanded { max-height: 220px; }
+    
     .toggle-text { font-size: 12px; color: #0a84ff; cursor: pointer; }
     .toggle-text:hover { opacity: 0.8; }
     .small-btn, .action-btn { background: #0a84ff; color: #fff; border: none; border-radius: 12px; padding: 4px 10px; font-size: 12px; cursor: pointer; font-weight: 600; transition: background 0.3s ease; }
     .small-btn:hover, .action-btn:hover { background: #0071e3; }
     
-    /* Freeze 狀態樣式 (鎖定操作) */
-    .frozen-state .admin-add-box,
-    .frozen-state .ask-box,
-    .frozen-state .reply-box,
-    .frozen-state .small-btn,
-    .frozen-state .action-btn,
-    .frozen-state .delete-btn {
-      opacity: 0.3;
-      pointer-events: none;
-      filter: grayscale(100%);
-    }
+    /* Freeze 狀態樣式 */
+    .frozen-state .admin-add-box, .frozen-state .ask-box, .frozen-state .reply-box, .frozen-state .small-btn, .frozen-state .action-btn, .frozen-state .delete-btn { opacity: 0.3; pointer-events: none; filter: grayscale(100%); }
     
     /* 彈出視窗 */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s var(--apple-ease); pointer-events: none; }
@@ -223,8 +224,9 @@
     .officer-row-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
     .officer-row-title { font-size: 16px; font-weight: 700; color: #fff; }
 
-    /* Q&A 區塊 */
+    /* Q&A 區塊 Stopchat 狀態 */
     #qa-forbidden-msg { display: none; text-align: center; padding: 50px 20px; color: #ff453a; background: var(--glass-bg); border-radius: 20px; font-weight: 600; font-size: 1.2rem; border: 1px solid var(--glass-border); margin-top: 20px; }
+    
     .qa-container { width: 100%; max-width: 650px; padding-bottom: 90px; position: relative; z-index: 2; }
     .ask-box { display: flex; gap: 12px; margin-bottom: 35px; padding: 20px; }
     .ask-box input { flex: 1; padding: 14px 18px; border-radius: 14px; border: 1px solid #3a3a3c; background: rgba(0,0,0,0.2); color: #fff; outline: none; transition: 0.3s; font-size: 15px; }
@@ -249,6 +251,9 @@
     .design-view { position: absolute; top: 40px; width: 100%; display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.6s ease; height: 75vh; overflow-y: auto; }
     .design-view.active-view { opacity: 1; pointer-events: auto; }
     .design-view::-webkit-scrollbar { display: none; }
+    
+    .edit-textarea { width: 100%; background: rgba(0,0,0,0.3); color: #fff; border: 1px solid #3a3a3c; border-radius: 12px; padding: 10px; font-size: 13px; resize: vertical; min-height: 60px; display: none; margin-top: 10px; outline: none; }
+    .save-btn { display: none; background: #34c759; color: #fff; border: none; border-radius: 12px; padding: 6px 12px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: 600; }
   </style>
 </head>
 <body id="app-body">
@@ -266,7 +271,7 @@
     <img id="lightbox-img" src="" alt="">
   </div>
   
-  <!-- 維修封鎖遮罩 (Block) 終極防護版 -->
+  <!-- 維修封鎖遮罩 (Block) -->
   <div id="maintenance-block-overlay">
     <h1>維修中</h1>
     <p>系統目前正在維護，請稍後再試。</p>
@@ -303,7 +308,7 @@
         <button class="small-btn" id="edit-calendar-btn" style="display:none;" onclick="toggleEditCalendar()">編輯</button>
       </div>
       <div class="toggle-text" id="toggle-calendar-text" onclick="toggleCalendar()">[點開查看]</div>
-      <div class="scrollable-content" id="calendar-display" style="display:none;">讀取中...</div>
+      <div class="scrollable-content" id="calendar-display">讀取中...</div>
       <textarea class="edit-textarea" id="edit-calendar-textarea"></textarea>
       <button class="save-btn" id="save-calendar-btn" onclick="saveCalendar()">儲存</button>
     </div>
@@ -423,7 +428,7 @@
     </div>
   </div>
 
-  <!-- 主內容區塊 (被 Block 時會強制隱藏) -->
+  <!-- 主內容區塊 -->
   <div class="content-wrapper" id="main-content-wrapper">
     <div class="content-track" id="slider-track">
       
@@ -569,7 +574,7 @@
     let sysBlock = false;
     let sysStopchat = false;
     let lastShoutId = null;
-    let lastReloadTime = null; // 新增：紀錄全域重新整理時間
+    let lastReloadTime = null; 
     let shoutTimer;
     
     let qaData = [];
@@ -608,7 +613,6 @@
         sysBlock = data.block === true;
         sysStopchat = data.stopchat === true;
 
-        // 全域廣播
         if (data.shoutId && data.shoutId !== lastShoutId) {
             lastShoutId = data.shoutId;
             if (data.shoutTime && (Date.now() - data.shoutTime < 20000)) {
@@ -616,12 +620,11 @@
             }
         }
         
-        // 全域強制重新整理 (解決快取舊網頁問題)
         if (data.reloadTime && data.reloadTime !== lastReloadTime) {
             if (lastReloadTime === null) {
-                lastReloadTime = data.reloadTime; // 第一次載入不觸發
+                lastReloadTime = data.reloadTime; 
             } else {
-                window.location.reload(true); // 收到新指令，強制不使用快取刷新
+                window.location.reload(true); 
             }
         }
 
@@ -708,7 +711,6 @@
         if (doc.exists && doc.data().officer) officerPwdB64 = doc.data().officer;
       });
       
-      /* 修復 iOS 鍵盤游標偏移 Bug */
       document.addEventListener('focusout', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
           setTimeout(() => {
@@ -727,7 +729,6 @@
 
     /* === 系統控制核心 === */
     function applySystemStates() {
-      // 1. Block 維修模式 - 終極防護：拔掉整個網頁軀殼並禁用滾動
       const blockOverlay = document.getElementById("maintenance-block-overlay");
       const navContainer = document.querySelector(".nav-container");
       const contentWrapper = document.getElementById("main-content-wrapper");
@@ -740,7 +741,7 @@
           contentWrapper.style.display = "none";
           leftPanel.style.display = "none";
           bubbleContainer.style.display = "none";
-          document.body.style.overflow = "hidden"; // 鎖死滾動
+          document.body.style.overflow = "hidden"; 
           document.querySelectorAll(".side-marquee").forEach(m => m.style.display = "none");
       } else {
           blockOverlay.style.display = "none";
@@ -752,7 +753,6 @@
           checkSideMarquees(); 
       }
 
-      // 2. Stopchat 聊天室封鎖模式
       const qaTargetBox = document.getElementById("qa-target-box");
       const qaForbiddenMsg = document.getElementById("qa-forbidden-msg");
       if (sysStopchat && !isAdmin && !isOfficer) {
@@ -763,7 +763,6 @@
           if (qaForbiddenMsg) qaForbiddenMsg.style.display = "none";
       }
 
-      // 3. Freeze 凍結模式
       if (sysFreeze && !isAdmin) {
           document.body.classList.add("frozen-state");
       } else {
@@ -798,7 +797,7 @@
             else if (cmd === 'unblock') updateSysState({block: false});
             else if (cmd === 'stopchat') updateSysState({stopchat: true});
             else if (cmd === 'unstopchat') updateSysState({stopchat: false});
-            else if (cmd === 'reload') updateSysState({reloadTime: Date.now()}); // 新增：全域強制刷新
+            else if (cmd === 'reload') updateSysState({reloadTime: Date.now()}); 
             else alert("未知或無效的指令！");
         } else {
             alert("未知指令或無使用權限！");
@@ -857,7 +856,9 @@
     function openModal(id) {
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
-      setTimeout(() => { modal.classList.add('show'); }, 10);
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
     }
 
     function closeModal(id) {
@@ -866,7 +867,9 @@
       }
       const modal = document.getElementById(id);
       modal.classList.remove('show');
-      setTimeout(() => { modal.style.display = 'none'; }, 400);
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 400);
     }
 
     function openLightbox(imgUrl) {
@@ -876,7 +879,9 @@
 
     function closeLightbox() {
       closeModal('lightbox');
-      setTimeout(() => { document.getElementById('lightbox-img').src = ''; }, 400);
+      setTimeout(() => {
+        document.getElementById('lightbox-img').src = '';
+      }, 400);
     }
 
     function openViewAnnouncementModal() {
@@ -890,7 +895,9 @@
       openModal('announcement-view-modal');
     }
 
-    function closeViewAnnouncementModal() { closeModal('announcement-view-modal'); }
+    function closeViewAnnouncementModal() {
+      closeModal('announcement-view-modal');
+    }
 
     function openEditAnnouncementModal() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法編輯！"); return; }
@@ -898,14 +905,18 @@
       openModal('announcement-edit-modal');
     }
 
-    function closeEditAnnouncementModal() { closeModal('announcement-edit-modal'); }
+    function closeEditAnnouncementModal() {
+      closeModal('announcement-edit-modal');
+    }
 
     function saveAnnouncement() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法儲存！"); return; }
       const newContent = document.getElementById('edit-announcement-textarea-modal').value.trim();
       db.collection("config").doc("announcement").set({ content: newContent }, { merge: true }).then(() => {
         closeEditAnnouncementModal();
-      }).catch((error) => { alert('儲存失敗: ' + error.message); });
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message);
+      });
     }
 
     function updateSideMarquees() {
@@ -929,9 +940,11 @@
       const left = document.getElementById('left-marquee');
       const right = document.getElementById('right-marquee');
       if (currentTabIndex === 3 && !isOfficer && !isAdmin && !isBubbleMode && !isPhotoEditor) {
-          left.classList.add('show-marquee'); right.classList.add('show-marquee');
+          left.classList.add('show-marquee');
+          right.classList.add('show-marquee');
       } else {
-          left.classList.remove('show-marquee'); right.classList.remove('show-marquee');
+          left.classList.remove('show-marquee');
+          right.classList.remove('show-marquee');
       }
     }
 
@@ -939,18 +952,29 @@
       const container = document.getElementById('intro-photo-list');
       container.innerHTML = '';
       if (introPhotosData.length === 0 && !isAdmin && !isPhotoEditor) {
-         container.style.display = 'none'; return;
+         container.style.display = 'none';
+         return;
       }
       container.style.display = 'flex';
       introPhotosData.forEach(item => {
-        const card = document.createElement('div'); card.className = 'photo-card intro-photo-card';
+        const card = document.createElement('div');
+        card.className = 'photo-card intro-photo-card';
         const displayUrl = item.photoUrl || 'https://via.placeholder.com/240x180';
+        
         let html = `<img class="photo-img" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">`;
+        
         if (isAdmin || isPhotoEditor) {
-          html += `<div class="photo-info"><div class="photo-title">${item.title}</div>
-                   <div class="admin-controls"><button class="delete-btn" onclick="deleteGridItem('intro', '${item.id}')">刪除</button></div></div>`;
+          html += `
+            <div class="photo-info">
+              <div class="photo-title">${item.title}</div>
+              <div class="admin-controls">
+                <button class="delete-btn" onclick="deleteGridItem('intro', '${item.id}')">刪除</button>
+              </div>
+            </div>
+          `;
         }
-        card.innerHTML = html; container.appendChild(card);
+        card.innerHTML = html;
+        container.appendChild(card);
       });
     }
 
@@ -958,18 +982,22 @@
       const container = document.getElementById('officer-list');
       container.innerHTML = '';
       if (officersData.length === 0 && !isAdmin && !isPhotoEditor) {
-         container.innerHTML = '<div style="color:#a1a1a6; text-align:center; width:100%; margin-top:20px;">目前尚未新增幹部。</div>'; return;
+         container.innerHTML = '<div style="color:#a1a1a6; text-align:center; width:100%; margin-top:20px;">目前尚未新增幹部。</div>';
+         return;
       }
       const rowsMap = {};
       officersData.forEach(item => {
         const rowKey = item.row || 1;
-        if (!rowsMap[rowKey]) rowsMap[rowKey] = [];
+        if (!rowsMap[rowKey]) {
+          rowsMap[rowKey] = [];
+        }
         rowsMap[rowKey].push(item);
       });
-      
       const sortedRows = Object.keys(rowsMap).sort((a, b) => (parseInt(a) || a) - (parseInt(b) || b));
+
       sortedRows.forEach(rowKey => {
-        const rowWrapper = document.createElement('div'); rowWrapper.className = 'officer-row-wrapper';
+        const rowWrapper = document.createElement('div');
+        rowWrapper.className = 'officer-row-wrapper';
         const rowTitle = rowNamesData[`row_${rowKey}`] || `第 ${rowKey} 行幹部`;
         let rowHtml = `
           <div class="officer-row-header">
@@ -986,13 +1014,20 @@
           rowHtml += `
             <div class="photo-card officer-card-item">
               <img class="photo-img" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
-              <div class="photo-info"><div class="photo-title">${officer.title || officer.name}</div>
-              ${(isAdmin || isPhotoEditor) ? `<div class="admin-controls"><button class="delete-btn" onclick="deleteGridItem('officers', '${officer.id}')">刪除</button></div>` : ''}
+              <div class="photo-info">
+                <div class="photo-title">${officer.title || officer.name}</div>
+                ${(isAdmin || isPhotoEditor) ? `
+                  <div class="admin-controls">
+                    <button class="delete-btn" onclick="deleteGridItem('officers', '${officer.id}')">刪除</button>
+                  </div>
+                ` : ''}
               </div>
-            </div>`;
+            </div>
+          `;
         });
         rowHtml += `</div>`;
-        rowWrapper.innerHTML = rowHtml; container.appendChild(rowWrapper);
+        rowWrapper.innerHTML = rowHtml;
+        container.appendChild(rowWrapper);
       });
     }
 
@@ -1009,115 +1044,166 @@
       document.getElementById('edit-row-title').value = currentTitle;
       openModal('row-name-modal');
     }
-    function closeRowNameModal() { closeModal('row-name-modal'); }
+
+    function closeRowNameModal() {
+      closeModal('row-name-modal');
+    }
 
     function saveRowName() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法儲存！"); return; }
       const rowId = document.getElementById('edit-row-id').value;
       const newTitle = document.getElementById('edit-row-title').value.trim();
-      let updates = {}; updates[`row_${rowId}`] = newTitle;
+      let updates = {}; 
+      updates[`row_${rowId}`] = newTitle;
       db.collection("config").doc("row_names").set(updates, { merge: true }).then(() => {
         closeRowNameModal(); 
-      }).catch((error) => { alert('儲存失敗: ' + error.message); });
+      }).catch((error) => {
+        alert('儲存失敗: ' + error.message); 
+      });
     }
 
     function renderGridList(type) {
       let containerId, dataArray, emptyText;
-      if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
-      else if (type === 'shirts') { containerId = 'shirt-list'; dataArray = shirtsData; emptyText = '目前尚未新增社服照片。'; }
-      else if (type === 'logos') { containerId = 'logo-list'; dataArray = logosData; emptyText = '目前尚未新增社徽照片。'; }
+      if (type === 'groups') {
+        containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。';
+      } else if (type === 'shirts') {
+        containerId = 'shirt-list'; dataArray = shirtsData; emptyText = '目前尚未新增社服照片。';
+      } else if (type === 'logos') {
+        containerId = 'logo-list'; dataArray = logosData; emptyText = '目前尚未新增社徽照片。';
+      }
       
       const container = document.getElementById(containerId);
       container.innerHTML = '';
       if (dataArray.length === 0 && !isAdmin && !isPhotoEditor) {
-         container.innerHTML = `<div style="color:#a1a1a6; text-align:center; width:100%; margin-top: 20px;">${emptyText}</div>`; return;
+         container.innerHTML = `<div style="color:#a1a1a6; text-align:center; width:100%; margin-top: 20px;">${emptyText}</div>`;
+         return;
       }
       const imgClass = (type === 'shirts' || type === 'logos') ? 'photo-img large-photo-img' : 'photo-img';
 
       dataArray.forEach(item => {
-        const card = document.createElement('div'); card.className = 'photo-card';
+        const card = document.createElement('div');
+        card.className = 'photo-card';
         const displayUrl = item.photoUrl || 'https://via.placeholder.com/300x200';
         let html = `
           <img class="${imgClass}" src="${displayUrl}" alt="" onclick="openLightbox('${displayUrl}')">
-          <div class="photo-info"><div class="photo-title">${item.title}</div>
-            ${(isAdmin || isPhotoEditor) ? `<div class="admin-controls"><button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button></div>` : ''}
-          </div>`;
-        card.innerHTML = html; container.appendChild(card);
+          <div class="photo-info">
+            <div class="photo-title">${item.title}</div>
+            ${(isAdmin || isPhotoEditor) ? `
+              <div class="admin-controls"><button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button></div>
+            ` : ''}
+          </div>
+        `;
+        card.innerHTML = html;
+        container.appendChild(card);
       });
     }
 
     function addGridItem(type) {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法新增！"); return; }
       let titleInputId, photoInputId, collectionName, extraData = {};
-      if (type === 'intro') { titleInputId = 'new-intro-title'; photoInputId = 'new-intro-photo'; collectionName = 'intro_photos'; }
-      else if (type === 'officers') { 
+      if (type === 'intro') {
+        titleInputId = 'new-intro-title'; photoInputId = 'new-intro-photo'; collectionName = 'intro_photos';
+      } else if (type === 'officers') { 
         titleInputId = 'new-officer-name'; photoInputId = 'new-officer-photo'; collectionName = 'officers';
         extraData.row = parseInt(document.getElementById('new-officer-row').value) || 1;
+      } else if (type === 'groups') {
+        titleInputId = 'new-group-title'; photoInputId = 'new-group-photo'; collectionName = 'group_photos';
+      } else if (type === 'shirts') {
+        titleInputId = 'new-shirt-title'; photoInputId = 'new-shirt-photo'; collectionName = 'shirts';
+      } else if (type === 'logos') {
+        titleInputId = 'new-logo-title'; photoInputId = 'new-logo-photo'; collectionName = 'logos';
       }
-      else if (type === 'groups') { titleInputId = 'new-group-title'; photoInputId = 'new-group-photo'; collectionName = 'group_photos'; }
-      else if (type === 'shirts') { titleInputId = 'new-shirt-title'; photoInputId = 'new-shirt-photo'; collectionName = 'shirts'; }
-      else if (type === 'logos') { titleInputId = 'new-logo-title'; photoInputId = 'new-logo-photo'; collectionName = 'logos'; }
       
       const title = document.getElementById(titleInputId).value.trim();
       const photoUrl = document.getElementById(photoInputId).value.trim();
+      
       if (!title) { alert("請輸入名稱/標題！"); return; }
 
-      db.collection(collectionName).add({ title: title, photoUrl: photoUrl, ...extraData, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
-        .then(() => { document.getElementById(titleInputId).value = ''; document.getElementById(photoInputId).value = ''; })
-        .catch((error) => { alert('新增失敗: ' + error.message); });
+      db.collection(collectionName).add({
+        title: title, 
+        photoUrl: photoUrl, 
+        ...extraData, 
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById(titleInputId).value = ''; 
+        document.getElementById(photoInputId).value = '';
+      }).catch((error) => {
+        alert('新增失敗: ' + error.message);
+      });
     }
 
     function deleteGridItem(type, docId) {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法刪除！"); return; }
       let collectionName;
-      if (type === 'intro') collectionName = 'intro_photos'; else if (type === 'officers') collectionName = 'officers';
-      else if (type === 'groups') collectionName = 'group_photos'; else if (type === 'shirts') collectionName = 'shirts';
+      if (type === 'intro') collectionName = 'intro_photos';
+      else if (type === 'officers') collectionName = 'officers';
+      else if (type === 'groups') collectionName = 'group_photos';
+      else if (type === 'shirts') collectionName = 'shirts';
       else if (type === 'logos') collectionName = 'logos';
-      if (confirm('確定要刪除這張照片嗎？')) { db.collection(collectionName).doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); }
+      
+      if (confirm('確定要刪除這張照片嗎？')) {
+        db.collection(collectionName).doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message));
+      }
     }
 
     function physicsLoop() {
       const qaBox = document.getElementById('qa-target-box');
       let qaRect = null;
-      if (currentTabIndex === 4 && qaBox) qaRect = qaBox.getBoundingClientRect();
+      if (currentTabIndex === 4 && qaBox) {
+        qaRect = qaBox.getBoundingClientRect();
+      }
+      
       let currentCollisions = {};
       
       for (let i = 0; i < bubbles.length; i++) {
          let b = bubbles[i];
+         
          if (b.cooldown > 0) b.cooldown--; 
          
-         // 降壓：如果是泡泡模式，分裂機率大減，避免卡死
-         let splitChance = isBubbleMode ? (1 / 1500) : (1 / 600);
-         if (!b.isUnclickable && Math.random() < splitChance) { triggerSplit(b); i--; continue; }
+         if (!b.isUnclickable && Math.random() < (1 / 600)) { 
+           triggerSplit(b); i--; continue; 
+         }
          
          if (b !== activeBubble) {
             b.y -= b.vy; b.x += b.vx;
+            
             if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) {
                 let edgeLimit = window.innerWidth * 0.15;
                 if (b.x > edgeLimit && b.x < window.innerWidth - edgeLimit) {
                     if (b.x < window.innerWidth / 2) b.vx -= 0.5; else b.vx += 0.5; 
                 }
             }
+            
             if (currentTabIndex === 4 && qaRect) {
                 let padding = b.size / 2 + 10; 
-                let leftBound = qaRect.left - padding; let rightBound = qaRect.right + padding; 
-                let topBound = qaRect.top - padding; let bottomBound = qaRect.bottom + padding;
+                let leftBound = qaRect.left - padding; 
+                let rightBound = qaRect.right + padding; 
+                let topBound = qaRect.top - padding; 
+                let bottomBound = qaRect.bottom + padding;
+                
                 if (b.x > leftBound && b.x < rightBound && b.y > topBound && b.y < bottomBound) {
                     let centerX = qaRect.left + qaRect.width / 2;
                     if (b.x < centerX) b.vx -= 1.5; else b.vx += 1.5;
                 }
             }
+            
             b.vx *= 0.98;
          }
+         
          b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
-         if (b.y < -100) { b.el.remove(); bubbles.splice(i, 1); i--; continue; }
+         
+         if (b.y < -100) { 
+           b.el.remove(); bubbles.splice(i, 1); i--; continue; 
+         }
       }
 
       for (let i = 0; i < bubbles.length; i++) {
          for (let j = i + 1; j < bubbles.length; j++) {
             let b1 = bubbles[i]; let b2 = bubbles[j];
+            
             if (!b1.isUnclickable && !b2.isUnclickable) {
                let dx = b1.x - b2.x; let dy = b1.y - b2.y; let dist = Math.hypot(dx, dy);
+               
                if (dist < (b1.size + b2.size) / 2) {
                    if (b1.cooldown > 0 || b2.cooldown > 0) {
                        let pushForce = 0.4; 
@@ -1125,14 +1211,19 @@
                        else { b1.vx += pushForce; b2.vx -= pushForce; } 
                        continue;
                    }
+                   
                    let pairId = b1.id < b2.id ? b1.id + "_" + b2.id : b2.id + "_" + b1.id;
                    currentCollisions[pairId] = (collisionFrames[pairId] || 0) + 1;
+                   
                    if (currentCollisions[pairId] >= 45) { 
                        let maxSize = isBubbleMode ? 800 : 150; 
                        let newSize = Math.min(Math.sqrt(b1.size**2 + b2.size**2), maxSize);
+                       
                        b1.size = newSize; b1.el.style.width = newSize + 'px'; b1.el.style.height = newSize + 'px'; b1.splits = Math.max(b1.splits, b2.splits);
                        if (b2 === activeBubble) activeBubble = b1; 
-                       b2.el.remove(); bubbles.splice(j, 1); j--; delete currentCollisions[pairId];
+                       
+                       b2.el.remove(); bubbles.splice(j, 1); j--; 
+                       delete currentCollisions[pairId];
                    } else { 
                        let pullForce = 0.05; 
                        if (b1.x < b2.x) { b1.vx += pullForce; b2.vx -= pullForce; } 
@@ -1144,127 +1235,251 @@
             }
          }
       }
+      
       collisionFrames = currentCollisions;
-      let limit = isBubbleMode ? 300 : 200; // 降壓
-      if (bubbles.length > limit) { let oldest = bubbles.shift(); oldest.el.remove(); }
+      let limit = isBubbleMode ? 500 : 200; 
+      
+      if (bubbles.length > limit) { 
+        let oldest = bubbles.shift(); oldest.el.remove(); 
+      }
+      
       requestAnimationFrame(physicsLoop);
     }
 
     let globalBubbleId = 0;
+    
     function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0, isDraggable = true) {
       const container = document.getElementById('bubble-container');
-      const el = document.createElement('div'); el.className = 'game-bubble' + (isUnclickable ? ' unclickable' : ''); el.style.width = size + 'px'; el.style.height = size + 'px';
-      globalBubbleId++; let bubbleObj = { id: globalBubbleId, el, x, y, vx, vy, size, splits, isUnclickable, cooldown, isDraggable };
+      const el = document.createElement('div'); 
+      el.className = 'game-bubble' + (isUnclickable ? ' unclickable' : ''); 
+      el.style.width = size + 'px'; 
+      el.style.height = size + 'px';
+      
+      globalBubbleId++; 
+      let bubbleObj = { id: globalBubbleId, el, x, y, vx, vy, size, splits, isUnclickable, cooldown, isDraggable };
+      
       if (!isUnclickable) {
          const startInteraction = function(e) {
-            if (isDraggable) { e.preventDefault(); activeBubble = bubbleObj; }
+            if (isDraggable) { 
+              e.preventDefault(); 
+              activeBubble = bubbleObj; 
+            }
             bubbleObj.clickStartX = e.touches ? e.touches[0].clientX : e.clientX; 
             bubbleObj.clickStartY = e.touches ? e.touches[0].clientY : e.clientY; 
             bubbleObj.clickStartTime = Date.now();
          };
+         
          const endInteraction = function(e) {
             let dt = Date.now() - bubbleObj.clickStartTime; 
             let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX; 
             let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
             let dist = Math.hypot(clientX - bubbleObj.clickStartX, clientY - bubbleObj.clickStartY); 
+            
             if (dt < 250 && dist < 15) triggerSplit(bubbleObj); 
             if (activeBubble === bubbleObj) activeBubble = null;
          };
-         el.onmousedown = startInteraction; el.ontouchstart = startInteraction; el.onmouseup = endInteraction; el.ontouchend = endInteraction;
+         
+         el.onmousedown = startInteraction; 
+         el.ontouchstart = startInteraction; 
+         el.onmouseup = endInteraction; 
+         el.ontouchend = endInteraction;
       }
-      container.appendChild(el); bubbles.push(bubbleObj); return bubbleObj;
+      
+      container.appendChild(el); 
+      bubbles.push(bubbleObj); 
+      return bubbleObj;
     }
 
-    window.addEventListener('mousemove', (e) => { if(activeBubble && activeBubble.isDraggable) { activeBubble.x = e.clientX; activeBubble.y = e.clientY; } });
-    window.addEventListener('touchmove', (e) => { if(activeBubble && activeBubble.isDraggable) { activeBubble.x = e.touches[0].clientX; activeBubble.y = e.touches[0].clientY; e.preventDefault(); } }, {passive: false});
+    window.addEventListener('mousemove', (e) => { 
+      if(activeBubble && activeBubble.isDraggable) { 
+        activeBubble.x = e.clientX; 
+        activeBubble.y = e.clientY; 
+      } 
+    });
+    
+    window.addEventListener('touchmove', (e) => { 
+      if(activeBubble && activeBubble.isDraggable) { 
+        activeBubble.x = e.touches[0].clientX; 
+        activeBubble.y = e.touches[0].clientY; 
+        e.preventDefault(); 
+      } 
+    }, {passive: false});
 
     function triggerSplit(b) {
         if (!bubbles.includes(b)) return; 
+        
         if (isBubbleMode) {
-          // 降壓：每次分裂只產生 1-2 顆
-          let count = Math.floor(Math.random() * 2) + 1; 
+          let count = Math.floor(Math.random() * 3) + 1; 
           for(let i=0; i<count; i++) { 
-            let startOffsetX = (Math.random() * 40 - 20); let sprayVx = (startOffsetX / 3); let sprayVy = Math.abs(b.vy) + Math.random() * 1; let newSize = Math.max(Math.random() * b.size, 10); 
+            let startOffsetX = (Math.random() * 40 - 20); 
+            let sprayVx = (startOffsetX / 3); 
+            let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
+            let newSize = Math.max(Math.random() * b.size, 10); 
             createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 60, true); 
           }
         } else if (isAdmin) {
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 21) + 10; 
             for(let i=0; i<count; i++) { 
-              let startOffsetX = (Math.random() * 40 - 20); let startOffsetY = (Math.random() * 40 - 20); let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); let sprayVy = Math.abs(b.vy) + (Math.random() * 5); let newSize = Math.random() * 8 + 12; 
+              let startOffsetX = (Math.random() * 40 - 20); 
+              let startOffsetY = (Math.random() * 40 - 20); 
+              let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
+              let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
+              let newSize = Math.random() * 8 + 12; 
               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 60, true); 
             }
-          } else { for(let i=0; i<2; i++) { createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true, 0, false); } }
+          } else { 
+            for(let i=0; i<2; i++) { 
+              createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true, 0, false); 
+            } 
+          }
         } else if (isOfficer) {
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 2) + 2; 
             for(let i=0; i<count; i++) { 
-              let startOffsetX = (Math.random() * 40 - 20); let sprayVx = (startOffsetX / 2); let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
+              let startOffsetX = (Math.random() * 40 - 20); 
+              let sprayVx = (startOffsetX / 2); 
+              let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
               createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 60, false); 
             }
           }
         } else {
           let count = Math.floor(Math.random() * 2) + 2; 
           for(let i=0; i<count; i++) { 
-            let startOffsetX = (Math.random() * 20 - 10); let sprayVx = (startOffsetX / 2); createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 60, false); 
+            let startOffsetX = (Math.random() * 20 - 10); 
+            let sprayVx = (startOffsetX / 2); 
+            createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 60, false); 
           }
         }
-        b.el.remove(); bubbles = bubbles.filter(item => item !== b);
+        
+        b.el.remove(); 
+        bubbles = bubbles.filter(item => item !== b);
     }
 
     function getSpawnX() {
         let w = window.innerWidth;
-        if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) { return Math.random() < 0.5 ? Math.random() * (w * 0.15) : w - (Math.random() * (w * 0.15)); }
+        if (currentTabIndex === 1 || currentTabIndex === 2 || currentTabIndex === 3) { 
+          return Math.random() < 0.5 ? Math.random() * (w * 0.15) : w - (Math.random() * (w * 0.15)); 
+        }
         return Math.random() * w;
     }
 
     function startBubbleSystem() {
       clearInterval(bubbleInterval);
       let h = window.innerHeight + 100; 
+      
       if (isBubbleMode) {
-        // 降壓：生成間隔變長，單次產生量減少
-        bubbleInterval = setInterval(() => { let count = Math.floor(Math.random() * 2) + 1; for(let i=0; i<count; i++) { let size = Math.random() * 60 + 20; let vy = Math.random() * 0.4 + 0.1; let vx = Math.random() * 2 - 1; createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 60, true); } }, 2000); 
+        bubbleInterval = setInterval(() => { 
+          let count = Math.floor(Math.random() * 3) + 1; 
+          for(let i=0; i<count; i++) { 
+            let size = Math.random() * 60 + 20; 
+            let vy = Math.random() * 0.4 + 0.1; 
+            let vx = Math.random() * 2 - 1; 
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 60, true); 
+          } 
+        }, 1500); 
       } else if (isAdmin || isPhotoEditor) {
-        bubbleInterval = setInterval(() => { let size = Math.random() * 20 + 30; let vy = Math.random() * 0.8 + 0.5; let vx = Math.random() * 2 - 1; createBubble(size, getSpawnX(), h, vx, vy, 2, false, 60, true); }, 5000);
+        bubbleInterval = setInterval(() => { 
+          let size = Math.random() * 20 + 30; 
+          let vy = Math.random() * 0.8 + 0.5; 
+          let vx = Math.random() * 2 - 1; 
+          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 60, true); 
+        }, 5000);
       } else if (isOfficer) {
-        bubbleInterval = setInterval(() => { let count = Math.floor(Math.random() * 4) + 1; for(let i=0; i<count; i++) { let size = Math.random() * 15 + 15; let vy = Math.random() * 1.5 + 1; let vx = Math.random() * 2 - 1; createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 60, false); } }, 1000);
+        bubbleInterval = setInterval(() => { 
+          let count = Math.floor(Math.random() * 4) + 1; 
+          for(let i=0; i<count; i++) { 
+            let size = Math.random() * 15 + 15; 
+            let vy = Math.random() * 1.5 + 1; 
+            let vx = Math.random() * 2 - 1; 
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 60, false); 
+          } 
+        }, 1000);
       }
     }
 
     function switchTab(index, element) {
       currentTabIndex = index; 
-      const items = document.querySelectorAll('.nav-item'); items.forEach(item => item.classList.remove('active')); element.classList.add('active'); updateBubble(element);
-      const track = document.getElementById('slider-track'); track.style.transform = `translateX(-${index * 20}%)`;
+      
+      const items = document.querySelectorAll('.nav-item'); 
+      items.forEach(item => item.classList.remove('active')); 
+      element.classList.add('active'); 
+      updateBubble(element);
+      
+      const track = document.getElementById('slider-track'); 
+      track.style.transform = `translateX(-${index * 20}%)`;
+      
       const pages = document.querySelectorAll('.section-page');
-      pages.forEach((page, i) => { if (i === index) page.classList.add('active-page'); else page.classList.remove('active-page'); });
-      if (index === 3) document.body.classList.add('design-mode'); else document.body.classList.remove('design-mode');
+      pages.forEach((page, i) => { 
+        if (i === index) page.classList.add('active-page'); 
+        else page.classList.remove('active-page'); 
+      });
+      
+      if (index === 3) {
+        document.body.classList.add('design-mode'); 
+      } else {
+        document.body.classList.remove('design-mode'); 
+      }
+      
       checkSideMarquees();
     }
 
-    function updateBubble(element) { const bubble = document.getElementById('bubble'); bubble.style.width = element.offsetWidth + 'px'; bubble.style.left = element.offsetLeft + 'px'; }
+    function updateBubble(element) { 
+      const bubble = document.getElementById('bubble'); 
+      bubble.style.width = element.offsetWidth + 'px'; 
+      bubble.style.left = element.offsetLeft + 'px'; 
+    }
 
     function triggerBubbleTransition() {
       if (!isOfficer && !isAdmin && !isBubbleMode && !isPhotoEditor) return;
-      let cx = window.innerWidth / 2; let cy = window.innerHeight / 2;
-      for (let i = 0; i < 35; i++) { let size = Math.random() * 20 + 10; let startOffsetX = (Math.random() * 100 - 50); let startOffsetY = (Math.random() * 100 - 50); let vx = (startOffsetX / 3); let vy = (startOffsetY / 3); createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true, 0, false); }
+      let cx = window.innerWidth / 2; 
+      let cy = window.innerHeight / 2;
+      for (let i = 0; i < 35; i++) { 
+        let size = Math.random() * 20 + 10; 
+        let startOffsetX = (Math.random() * 100 - 50); 
+        let startOffsetY = (Math.random() * 100 - 50); 
+        let vx = (startOffsetX / 3); 
+        let vy = (startOffsetY / 3); 
+        createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true, 0, false); 
+      }
     }
 
     function handleToggleClick(event) {
-      event.stopPropagation(); switchTab(3, document.getElementById('nav-tab-3')); 
-      const toggle = document.getElementById('design-toggle'); isShowingLogo = !isShowingLogo;
-      if (isShowingLogo) toggle.classList.add('switched'); else toggle.classList.remove('switched');
+      event.stopPropagation(); 
+      switchTab(3, document.getElementById('nav-tab-3')); 
+      const toggle = document.getElementById('design-toggle'); 
+      isShowingLogo = !isShowingLogo;
+      
+      if (isShowingLogo) {
+        toggle.classList.add('switched'); 
+      } else {
+        toggle.classList.remove('switched');
+      }
+      
       triggerBubbleTransition(); 
+      
       setTimeout(() => {
-        if (isShowingLogo) { document.getElementById('view-shirt').classList.remove('active-view'); document.getElementById('view-logo').classList.add('active-view'); } 
-        else { document.getElementById('view-logo').classList.remove('active-view'); document.getElementById('view-shirt').classList.add('active-view'); }
+        if (isShowingLogo) { 
+          document.getElementById('view-shirt').classList.remove('active-view'); 
+          document.getElementById('view-logo').classList.add('active-view'); 
+        } else { 
+          document.getElementById('view-logo').classList.remove('active-view'); 
+          document.getElementById('view-shirt').classList.add('active-view'); 
+        }
       }, 200); 
     }
 
     function handleAuthBtnClick() {
       if (isOfficer || isAdmin || isBubbleMode || isPhotoEditor) {
         if (confirm("要登出當前帳號嗎？")) {
-          isOfficer = false; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
-          const btn = document.getElementById('auth-btn-float'); btn.innerHTML = '系統<br>認證'; btn.disabled = false;
+          isOfficer = false; 
+          isAdmin = false; 
+          isBubbleMode = false; 
+          isPhotoEditor = false;
+          
+          const btn = document.getElementById('auth-btn-float'); 
+          btn.innerHTML = '系統<br>認證'; 
+          btn.disabled = false;
           
           document.getElementById('edit-maintenance-btn').style.display = 'none';
           document.getElementById('edit-calendar-btn').style.display = 'none';
@@ -1278,18 +1493,42 @@
           document.getElementById('admin-shirt-box').style.display = 'none';
           document.getElementById('admin-logo-box').style.display = 'none';
           
-          renderQA(); renderIntroPhotos(); renderOfficers(); renderGridList('groups'); renderGridList('shirts'); renderGridList('logos'); checkSideMarquees(); startBubbleSystem(); applySystemStates();
+          renderQA(); 
+          renderIntroPhotos(); 
+          renderOfficers(); 
+          renderGridList('groups'); 
+          renderGridList('shirts'); 
+          renderGridList('logos'); 
+          checkSideMarquees(); 
+          startBubbleSystem(); 
+          applySystemStates();
         }
       } else {
         openModal('auth-modal');
       }
     }
 
-    function closeAuthModal() { closeModal('auth-modal'); }
-    function openReportModal() { document.getElementById('report-input').value = ''; openModal('report-modal'); }
-    function closeReportModal() { closeModal('report-modal'); }
-    function openPwdModal() { document.getElementById('new-officer-pwd').value = ''; openModal('pwd-modal'); }
-    function closePwdModal() { closeModal('pwd-modal'); }
+    function closeAuthModal() { 
+      closeModal('auth-modal'); 
+    }
+
+    function openReportModal() { 
+      document.getElementById('report-input').value = ''; 
+      openModal('report-modal'); 
+    }
+
+    function closeReportModal() { 
+      closeModal('report-modal'); 
+    }
+
+    function openPwdModal() { 
+      document.getElementById('new-officer-pwd').value = ''; 
+      openModal('pwd-modal'); 
+    }
+
+    function closePwdModal() { 
+      closeModal('pwd-modal'); 
+    }
 
     function verifyOfficer() {
       const pwd = document.getElementById('auth-password').value;
@@ -1297,11 +1536,18 @@
 
       if (pwd === 'bubble') {
         isBubbleMode = true; isPhotoEditor = false; isOfficer = false; isAdmin = false;
-        const btn = document.getElementById('auth-btn-float'); btn.innerText = '泡泡模式'; 
-        closeAuthModal(); renderQA(); checkSideMarquees(); startBubbleSystem(); applySystemStates();
+        const btn = document.getElementById('auth-btn-float'); 
+        btn.innerText = '泡泡模式'; 
+        
+        closeAuthModal(); 
+        renderQA(); 
+        checkSideMarquees(); 
+        startBubbleSystem(); 
+        applySystemStates();
       } else if (pwd === 'photoeditor') {
         isPhotoEditor = true; isBubbleMode = false; isOfficer = false; isAdmin = false;
-        const btn = document.getElementById('auth-btn-float'); btn.innerText = '修圖員'; 
+        const btn = document.getElementById('auth-btn-float'); 
+        btn.innerText = '修圖員'; 
         
         document.getElementById('admin-intro-box').style.display = 'flex';
         document.getElementById('admin-officer-box').style.display = 'flex';
@@ -1309,10 +1555,20 @@
         document.getElementById('admin-shirt-box').style.display = 'flex';
         document.getElementById('admin-logo-box').style.display = 'flex';
         
-        closeAuthModal(); renderQA(); renderIntroPhotos(); renderOfficers(); renderGridList('groups'); renderGridList('shirts'); renderGridList('logos'); checkSideMarquees(); startBubbleSystem(); applySystemStates();
+        closeAuthModal(); 
+        renderQA(); 
+        renderIntroPhotos(); 
+        renderOfficers(); 
+        renderGridList('groups'); 
+        renderGridList('shirts'); 
+        renderGridList('logos'); 
+        checkSideMarquees(); 
+        startBubbleSystem(); 
+        applySystemStates();
       } else if (b64Pwd === adminPwdB64) {
         isAdmin = true; isOfficer = true; isBubbleMode = false; isPhotoEditor = false;
-        const btn = document.getElementById('auth-btn-float'); btn.innerText = '管理員'; 
+        const btn = document.getElementById('auth-btn-float'); 
+        btn.innerText = '管理員'; 
         
         document.getElementById('edit-maintenance-btn').style.display = 'inline-block';
         document.getElementById('edit-calendar-btn').style.display = 'inline-block';
@@ -1326,82 +1582,180 @@
         document.getElementById('admin-shirt-box').style.display = 'flex';
         document.getElementById('admin-logo-box').style.display = 'flex';
         
-        closeAuthModal(); renderQA(); renderReports(); renderIntroPhotos(); renderOfficers(); renderGridList('groups'); renderGridList('shirts'); renderGridList('logos'); checkSideMarquees(); startBubbleSystem(); applySystemStates();
+        closeAuthModal(); 
+        renderQA(); 
+        renderReports(); 
+        renderIntroPhotos(); 
+        renderOfficers(); 
+        renderGridList('groups'); 
+        renderGridList('shirts'); 
+        renderGridList('logos'); 
+        checkSideMarquees(); 
+        startBubbleSystem(); 
+        applySystemStates();
       } else if (b64Pwd === officerPwdB64) { 
         isOfficer = true; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
-        const btn = document.getElementById('auth-btn-float'); btn.innerText = '已認證'; 
+        const btn = document.getElementById('auth-btn-float'); 
+        btn.innerText = '已認證'; 
         document.getElementById('edit-calendar-btn').style.display = 'inline-block';
         document.getElementById('cmd-container').classList.add('show');
         
-        closeAuthModal(); renderQA(); checkSideMarquees(); startBubbleSystem(); applySystemStates();
+        closeAuthModal(); 
+        renderQA(); 
+        checkSideMarquees(); 
+        startBubbleSystem(); 
+        applySystemStates();
       } else { 
         alert('密碼錯誤。'); 
       }
     }
 
     function toggleMaintenance() {
-      const content = document.getElementById('maintenance-display'); const toggleText = document.getElementById('toggle-maintenance-text');
+      const content = document.getElementById('maintenance-display'); 
+      const toggleText = document.getElementById('toggle-maintenance-text');
+      
       if (content.classList.contains('expanded')) { 
-        content.classList.remove('expanded'); toggleText.innerText = '[展開]'; 
+        content.classList.remove('expanded'); 
+        toggleText.innerText = '[展開]'; 
       } else { 
-        content.classList.add('expanded'); toggleText.innerText = '[收起]'; 
+        content.classList.add('expanded'); 
+        toggleText.innerText = '[收起]'; 
       }
     }
 
     function toggleEditMaintenance() {
         if (sysFreeze && !isAdmin) { alert("系統凍結中，無法編輯！"); return; }
-        const content = document.getElementById('maintenance-display'); const textarea = document.getElementById('edit-maintenance-textarea'); const saveBtn = document.getElementById('save-maintenance-btn'); const toggleText = document.getElementById('toggle-maintenance-text');
-        if (textarea.style.display === 'block') { textarea.style.display = 'none'; saveBtn.style.display = 'none'; content.style.display = 'block'; toggleText.style.display = 'inline'; } else { content.style.display = 'none'; textarea.style.display = 'block'; saveBtn.style.display = 'block'; toggleText.style.display = 'none'; }
+        const content = document.getElementById('maintenance-display'); 
+        const textarea = document.getElementById('edit-maintenance-textarea'); 
+        const saveBtn = document.getElementById('save-maintenance-btn'); 
+        const toggleText = document.getElementById('toggle-maintenance-text');
+        
+        if (textarea.style.display === 'block') { 
+          textarea.style.display = 'none'; 
+          saveBtn.style.display = 'none'; 
+          content.style.display = 'block'; 
+          toggleText.style.display = 'inline'; 
+        } else { 
+          content.style.display = 'none'; 
+          textarea.style.display = 'block'; 
+          saveBtn.style.display = 'block'; 
+          toggleText.style.display = 'none'; 
+        }
     }
 
     function saveMaintenance() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法儲存！"); return; }
       const newContent = document.getElementById('edit-maintenance-textarea').value.trim();
-      db.collection("config").doc("maintenance").set({ content: newContent }, { merge: true }).then(() => { toggleEditMaintenance(); }).catch((error) => { alert('儲存失敗: ' + error.message); });
+      db.collection("config").doc("maintenance").set({ content: newContent }, { merge: true }).then(() => { 
+        toggleEditMaintenance(); 
+      }).catch((error) => { 
+        alert('儲存失敗: ' + error.message); 
+      });
     }
 
     function toggleCalendar() {
-      const content = document.getElementById('calendar-display'); const toggleText = document.getElementById('toggle-calendar-text');
-      if (content.style.display === 'none' || content.style.display === '') { content.style.display = 'block'; toggleText.innerText = '[收起]'; } else { content.style.display = 'none'; toggleText.innerText = '[點開查看]'; }
+      const content = document.getElementById('calendar-display'); 
+      const toggleText = document.getElementById('toggle-calendar-text');
+      
+      if (content.classList.contains('expanded')) { 
+        content.classList.remove('expanded'); 
+        toggleText.innerText = '[點開查看]'; 
+      } else { 
+        content.classList.add('expanded'); 
+        toggleText.innerText = '[收起]'; 
+      }
     }
 
     function toggleEditCalendar() {
         if (sysFreeze && !isAdmin) { alert("系統凍結中，無法編輯！"); return; }
-        const content = document.getElementById('calendar-display'); const textarea = document.getElementById('edit-calendar-textarea'); const saveBtn = document.getElementById('save-calendar-btn'); const toggleText = document.getElementById('toggle-calendar-text');
-        if (textarea.style.display === 'block') { textarea.style.display = 'none'; saveBtn.style.display = 'none'; content.style.display = 'block'; toggleText.style.display = 'inline'; toggleText.innerText = '[收起]'; } else { content.style.display = 'none'; textarea.style.display = 'block'; saveBtn.style.display = 'block'; toggleText.style.display = 'none'; }
+        const content = document.getElementById('calendar-display'); 
+        const textarea = document.getElementById('edit-calendar-textarea'); 
+        const saveBtn = document.getElementById('save-calendar-btn'); 
+        const toggleText = document.getElementById('toggle-calendar-text');
+        
+        if (textarea.style.display === 'block') { 
+          textarea.style.display = 'none'; 
+          saveBtn.style.display = 'none'; 
+          content.style.display = 'block'; 
+          toggleText.style.display = 'inline'; 
+          toggleText.innerText = '[收起]'; 
+        } else { 
+          content.style.display = 'none'; 
+          textarea.style.display = 'block'; 
+          saveBtn.style.display = 'block'; 
+          toggleText.style.display = 'none'; 
+        }
     }
 
     function saveCalendar() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法儲存！"); return; }
       const newContent = document.getElementById('edit-calendar-textarea').value.trim();
-      db.collection("config").doc("calendar").set({ content: newContent }, { merge: true }).then(() => { toggleEditCalendar(); }).catch((error) => { alert('儲存失敗: ' + error.message); });
+      db.collection("config").doc("calendar").set({ content: newContent }, { merge: true }).then(() => { 
+        toggleEditCalendar(); 
+      }).catch((error) => { 
+        alert('儲存失敗: ' + error.message); 
+      });
     }
 
     function savePasswords() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法更新！"); return; }
-      const newOfficer = document.getElementById('new-officer-pwd').value.trim(); let updates = {}; if (newOfficer) updates.officer = btoa(newOfficer);
-      if (Object.keys(updates).length > 0) { db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => { alert('社幹密碼已更新。'); closePwdModal(); }).catch((error) => { alert('更新失敗: ' + error.message); }); } else { closePwdModal(); }
+      const newOfficer = document.getElementById('new-officer-pwd').value.trim(); 
+      let updates = {}; 
+      if (newOfficer) updates.officer = btoa(newOfficer);
+      
+      if (Object.keys(updates).length > 0) { 
+        db.collection("config").doc("passwords").set(updates, { merge: true }).then(() => { 
+          alert('社幹密碼已更新。'); 
+          closePwdModal(); 
+        }).catch((error) => { 
+          alert('更新失敗: ' + error.message); 
+        }); 
+      } else { 
+        closePwdModal(); 
+      }
     }
 
     function submitReport() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法送出回報！"); return; }
       const text = document.getElementById('report-input').value.trim();
+      
       if (text !== '') {
         const role = isOfficer ? 'officer' : 'user';
-        db.collection("reports").add({ text: text, role: role, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { alert('回報已送出，感謝。'); document.getElementById('report-input').value = ''; if (!isAdmin) closeReportModal(); }).catch((error) => { alert('送出失敗: ' + error.message); });
-      } else { alert('請輸入內容。'); }
+        db.collection("reports").add({ 
+          text: text, 
+          role: role, 
+          timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }).then(() => { 
+          alert('回報已送出，感謝。'); 
+          document.getElementById('report-input').value = ''; 
+          if (!isAdmin) closeReportModal(); 
+        }).catch((error) => { 
+          alert('送出失敗: ' + error.message); 
+        });
+      } else { 
+        alert('請輸入內容。'); 
+      }
     }
 
     function deleteReport(docId) { 
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法刪除！"); return; }
-      if (confirm('確認刪除此回報？')) { db.collection("reports").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); } 
+      if (confirm('確認刪除此回報？')) { 
+        db.collection("reports").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); 
+      } 
     }
 
     function renderReports() {
-      const container = document.getElementById('report-list'); container.innerHTML = '';
-      if (reportsData.length === 0) { container.innerHTML = '<div style="color:#888; font-size:12px; text-align:center;">目前無回報紀錄。</div>'; return; }
+      const container = document.getElementById('report-list'); 
+      container.innerHTML = '';
+      
+      if (reportsData.length === 0) { 
+        container.innerHTML = '<div style="color:#888; font-size:12px; text-align:center;">目前無回報紀錄。</div>'; 
+        return; 
+      }
+      
       reportsData.forEach(item => {
-         const div = document.createElement('div'); div.className = 'report-item ' + (item.role === 'officer' ? 'red-border' : 'yellow-border');
+         const div = document.createElement('div'); 
+         div.className = 'report-item ' + (item.role === 'officer' ? 'red-border' : 'yellow-border');
          const timeString = item.timestamp ? new Date(item.timestamp.toDate()).toLocaleString() : '剛剛';
          div.innerHTML = `
            <div style="font-size:11px; color:#aaa; margin-bottom:4px;">${timeString}</div>
@@ -1415,40 +1769,90 @@
     function postQuestion() {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法發問！"); return; }
       if (isPhotoEditor) { alert('修圖員無發問權限。'); return; }
-      const input = document.getElementById('new-question'); const text = input.value.trim();
+      
+      const input = document.getElementById('new-question'); 
+      const text = input.value.trim();
+      
       if (text !== '') {
         const existing = qaData.find(item => item.q === text);
-        if (existing) { if (existing.a) alert('此問題已有解答。\n\n答覆：' + existing.a); else alert('此問題已存在，等待回覆中。'); input.value = ''; return; }
-        db.collection("qa").add({ q: text, a: null, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { input.value = ''; }).catch((error) => { alert('發布失敗: ' + error.message); });
-      } else { alert('請輸入內容。'); }
+        if (existing) { 
+          if (existing.a) alert('此問題已有解答。\n\n答覆：' + existing.a); 
+          else alert('此問題已存在，等待回覆中。'); 
+          input.value = ''; 
+          return; 
+        }
+        
+        db.collection("qa").add({ 
+          q: text, 
+          a: null, 
+          timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }).then(() => { 
+          input.value = ''; 
+        }).catch((error) => { 
+          alert('發布失敗: ' + error.message); 
+        });
+      } else { 
+        alert('請輸入內容。'); 
+      }
     }
 
     function submitReply(docId) {
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法回覆！"); return; }
-      const replyInput = document.getElementById(`reply-${docId}`); const replyText = replyInput.value.trim();
-      if (replyText !== '') { db.collection("qa").doc(docId).update({ a: replyText }).then(() => { alert('回覆/修改成功！'); }); } else { alert('請輸入回覆內容。'); }
+      
+      const replyInput = document.getElementById(`reply-${docId}`); 
+      const replyText = replyInput.value.trim();
+      
+      if (replyText !== '') { 
+        db.collection("qa").doc(docId).update({ a: replyText }).then(() => { 
+          alert('回覆/修改成功！'); 
+        }); 
+      } else { 
+        alert('請輸入回覆內容。'); 
+      }
     }
 
     function deleteQuestion(docId) { 
       if (sysFreeze && !isAdmin) { alert("系統凍結中，無法刪除！"); return; }
-      if (confirm('確認刪除此問題？')) { db.collection("qa").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); } 
+      if (confirm('確認刪除此問題？')) { 
+        db.collection("qa").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message)); 
+      } 
     }
 
     function renderQA() {
-      const listContainer = document.getElementById('qa-list'); listContainer.innerHTML = '';
+      const listContainer = document.getElementById('qa-list'); 
+      listContainer.innerHTML = '';
+      
       qaData.forEach(item => {
-        const qaItem = document.createElement('div'); qaItem.className = 'qa-item';
+        const qaItem = document.createElement('div'); 
+        qaItem.className = 'qa-item';
+        
         let html = `<div class="qa-header"><div class="qa-q-text">Q: ${item.q}</div>`;
         if (isAdmin || isOfficer) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         html += `</div>`;
+        
         if (item.a) { 
           html += `<div class="qa-a">A: ${item.a}</div>`; 
-          if (isAdmin || isOfficer) { html += `<div class="reply-box" style="margin-top: 8px;"><input type="text" id="reply-${item.id}" placeholder="重新輸入以覆寫回覆..."><button onclick="submitReply('${item.id}')">覆寫</button></div>`; } 
+          if (isAdmin || isOfficer) { 
+            html += `
+              <div class="reply-box" style="margin-top: 8px;">
+                <input type="text" id="reply-${item.id}" placeholder="重新輸入以覆寫回覆...">
+                <button onclick="submitReply('${item.id}')">覆寫</button>
+              </div>
+            `; 
+          } 
         } else { 
           html += `<div class="qa-pending">（等待回覆中）</div>`; 
-          if (isAdmin || isOfficer) { html += `<div class="reply-box"><input type="text" id="reply-${item.id}" placeholder="輸入回覆內容..."><button onclick="submitReply('${item.id}')">送出</button></div>`; } 
+          if (isAdmin || isOfficer) { 
+            html += `
+              <div class="reply-box">
+                <input type="text" id="reply-${item.id}" placeholder="輸入回覆內容...">
+                <button onclick="submitReply('${item.id}')">送出</button>
+              </div>
+            `; 
+          } 
         }
-        qaItem.innerHTML = html; listContainer.appendChild(qaItem);
+        qaItem.innerHTML = html; 
+        listContainer.appendChild(qaItem);
       });
     }
   </script>
