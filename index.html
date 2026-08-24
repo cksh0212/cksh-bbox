@@ -196,6 +196,30 @@
     .announcement-content {
       display: none;
     }
+    
+    /* 維修紀錄滾動與展開樣式 */
+    #maintenance-display {
+      max-height: 80px;
+      overflow-y: auto;
+      font-size: 12px;
+      color: #888;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      margin-top: 5px;
+      padding-right: 4px;
+      transition: max-height 0.3s ease;
+    }
+    #maintenance-display.expanded {
+      max-height: 220px;
+    }
+    #maintenance-display::-webkit-scrollbar {
+      width: 4px;
+    }
+    #maintenance-display::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 2px;
+    }
+
     .toggle-text {
       font-size: 11px;
       color: #888;
@@ -348,8 +372,8 @@
     }
     .section-page {
       width: 20%;
-      min-height: 80vh;
-      padding: 50px 20px;
+      min-height: 85vh;
+      padding: 40px 20px 80px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -357,7 +381,7 @@
     }
     h1 {
       font-size: 2.2rem;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       color: #ff4b2b;
       letter-spacing: 1px;
     }
@@ -368,10 +392,37 @@
       background: #1e1e1e;
       padding: 25px;
       border-radius: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       border: 1px solid rgba(255,255,255,0.03);
       font-size: 1.05rem;
+    }
+
+    /* 基本介紹專用左右滑動展示區 */
+    .horizontal-photo-scroll {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      width: 100%;
+      max-width: 650px;
+      padding: 10px 5px 15px 5px;
+      margin-bottom: 20px;
+      scroll-snap-type: x mandatory;
+    }
+    .horizontal-photo-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+    .horizontal-photo-scroll::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+      border-radius: 4px;
+    }
+    .horizontal-photo-scroll::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+    .intro-photo-card {
+      flex: 0 0 220px;
+      scroll-snap-align: start;
     }
 
     /* Q&A 區塊 */
@@ -486,7 +537,7 @@
       background: #777;
     }
 
-    /* 照片網格 */
+    /* --- 照片網格顯示系統 (合照、社服、社徽) --- */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -501,30 +552,56 @@
       grid-template-columns: 1fr; 
     }
     
-    .officer-scroll-list {
+    /* --- 介紹社幹專用：二維行結構 --- */
+    .officer-rows-container {
       display: flex;
       flex-direction: column;
       gap: 25px;
       width: 100%;
-      max-width: 350px; 
-      max-height: 60vh; 
-      overflow-y: auto;
-      padding: 10px;
+      max-width: 850px;
       margin-top: 10px;
-      border-radius: 15px;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-      background: rgba(20,20,20,0.5);
     }
-    .officer-scroll-list::-webkit-scrollbar {
-      width: 6px;
+    .officer-row-wrapper {
+      background: rgba(30, 30, 30, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .officer-scroll-list::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.1);
-      border-radius: 4px;
+    .officer-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 5px;
     }
-    .officer-scroll-list::-webkit-scrollbar-thumb {
+    .officer-row-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #00c3e3;
+    }
+    .officer-row-track {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-snap-type: x mandatory;
+    }
+    .officer-row-track::-webkit-scrollbar {
+      height: 6px;
+    }
+    .officer-row-track::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+      border-radius: 3px;
+    }
+    .officer-row-track::-webkit-scrollbar-thumb {
       background: #444;
-      border-radius: 4px;
+      border-radius: 3px;
+    }
+    .officer-card-item {
+      flex: 0 0 200px;
+      scroll-snap-align: start;
     }
 
     .photo-card {
@@ -541,7 +618,7 @@
     }
     .photo-img {
       width: 100%;
-      height: 220px;
+      height: 200px;
       object-fit: cover;
       background: #2a2a2a;
       cursor: pointer; 
@@ -556,7 +633,7 @@
       transform: scale(1.05);
     }
     .photo-info {
-      padding: 15px;
+      padding: 12px;
       text-align: center;
       width: 100%;
       background: #1e1e1e; 
@@ -565,11 +642,11 @@
     .photo-title {
       font-weight: bold;
       color: #00c3e3;
-      font-size: 1.1rem;
-      margin-bottom: 5px;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
     }
     .admin-controls {
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .admin-add-box {
       background: #1e1e1e;
@@ -581,7 +658,7 @@
       gap: 10px;
       width: 100%;
       max-width: 400px;
-      margin-top: 30px;
+      margin-top: 25px;
       z-index: 20;
     }
     .admin-add-box input {
@@ -592,6 +669,7 @@
       color: #fff;
     }
 
+    /* --- 點擊看大圖 (Lightbox) 系統 --- */
     #lightbox {
       display: none;
       position: fixed;
@@ -613,9 +691,10 @@
       object-fit: contain;
     }
 
+    /* 雙視圖設計區塊 */
     .design-view {
       position: absolute;
-      top: 50px;
+      top: 40px;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -684,7 +763,8 @@
           <button class="small-btn" id="edit-maintenance-btn" style="display:none;" onclick="toggleEditMaintenance()">編輯</button>
         </div>
       </div>
-      <div class="panel-content" id="maintenance-display" style="font-size:12px; color:#888; white-space: pre-wrap;">讀取中...</div>
+      <div class="toggle-text" id="toggle-maintenance-text" onclick="toggleMaintenance()">[展開/收起]</div>
+      <div class="panel-content" id="maintenance-display">讀取中...</div>
       <textarea class="edit-textarea" id="edit-maintenance-textarea"></textarea>
       <button class="save-btn" id="save-maintenance-btn" onclick="saveMaintenance()">儲存</button>
       
@@ -737,28 +817,40 @@
 
   <div class="content-wrapper">
     <div class="content-track" id="slider-track">
-      <!-- Page 0 -->
+      <!-- Page 0: 基本介紹 -->
       <div class="section-page">
         <h1>🎤 基本介紹</h1>
         <p>歡迎來到建功口技社。這裡是一群熱愛 Beatbox 的學生聚集地。我們透過嘴巴、喉嚨和舌頭，創造出節奏與音樂。無論你是入門新手還是資深玩家，這裡都有你的舞台。</p>
+        
+        <!-- 基本介紹專用左右滑動照片區 -->
+        <div class="horizontal-photo-scroll" id="intro-photo-list"></div>
+
+        <div class="admin-add-box" id="admin-intro-box" style="display: none;">
+          <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增介紹照片</h4>
+          <input type="text" id="new-intro-title" placeholder="照片標題/說明 (例: 社課日常練習)">
+          <input type="text" id="new-intro-photo" placeholder="照片檔名或網址 (例: practice.jpg)">
+          <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('intro')">新增介紹照片</button>
+        </div>
       </div>
       
-      <!-- Page 1 -->
+      <!-- Page 1: 介紹社幹 -->
       <div class="section-page">
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
-        <div class="officer-scroll-list" id="officer-list"></div>
+        <!-- 二維多行展示區 -->
+        <div class="officer-rows-container" id="officer-list"></div>
 
         <div class="admin-add-box" id="admin-officer-box" style="display: none;">
           <h4 style="color: #00c3e3; text-align: center;">[圖庫管理] 新增社幹</h4>
+          <input type="number" id="new-officer-row" placeholder="所屬行數 (預設: 1)" value="1" min="1">
           <input type="text" id="new-officer-name" placeholder="職稱與名稱 (例: 社長 小明)">
           <input type="text" id="new-officer-photo" placeholder="照片檔名或網址 (例: boss.jpg)">
           <button class="action-btn" style="padding: 10px; font-size: 14px;" onclick="addGridItem('officers')">新增幹部</button>
         </div>
       </div>
       
-      <!-- Page 2 -->
+      <!-- Page 2: 各年合照 -->
       <div class="section-page">
         <h1>📸 各年合照</h1>
         <p>建功口技社的歷史軌跡。每一屆的傳承、每一場成發與迎新，我們都用相機記錄下來。</p>
@@ -773,7 +865,7 @@
         </div>
       </div>
       
-      <!-- Page 3 -->
+      <!-- Page 3: 社服與社徽 -->
       <div class="section-page" style="position: relative;">
         <div id="view-shirt" class="design-view active-view">
           <h1>👕 社服設計</h1>
@@ -803,7 +895,7 @@
         </div>
       </div>
       
-      <!-- Page 4 -->
+      <!-- Page 4: Q&A -->
       <div class="section-page">
         <h1>❓ Q&A 互動區</h1>
         <div class="qa-container" id="qa-target-box">
@@ -842,6 +934,7 @@
     
     let qaData = [];
     let reportsData = [];
+    let introPhotosData = [];
     let officersData = [];
     let groupPhotosData = [];
     let shirtsData = []; 
@@ -871,9 +964,14 @@
         if (isAdmin) renderReports();
       });
 
+      // 監聽各圖庫
+      db.collection("intro_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
+        introPhotosData = []; snapshot.forEach(doc => introPhotosData.push({ id: doc.id, ...doc.data() }));
+        renderIntroPhotos();
+      });
       db.collection("officers").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         officersData = []; snapshot.forEach(doc => officersData.push({ id: doc.id, ...doc.data() }));
-        renderGridList('officers');
+        renderOfficers();
       });
       db.collection("group_photos").orderBy("timestamp", "asc").onSnapshot((snapshot) => {
         groupPhotosData = []; snapshot.forEach(doc => groupPhotosData.push({ id: doc.id, ...doc.data() }));
@@ -916,10 +1014,100 @@
       document.getElementById('lightbox-img').src = '';
     }
 
+    /* --- 基本介紹左右滑動照片渲染 --- */
+    function renderIntroPhotos() {
+      const container = document.getElementById('intro-photo-list');
+      container.innerHTML = '';
+      if (introPhotosData.length === 0 && !isAdmin && !isPhotoEditor) {
+         container.style.display = 'none';
+         return;
+      }
+      container.style.display = 'flex';
+      introPhotosData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'photo-card intro-photo-card';
+        const displayUrl = item.photoUrl || 'https://via.placeholder.com/240x180?text=Intro+Photo';
+        let html = `
+          <img class="photo-img" src="${displayUrl}" alt="介紹照片" onclick="openLightbox('${displayUrl}')">
+          <div class="photo-info">
+            <div class="photo-title">${item.title}</div>
+            ${(isAdmin || isPhotoEditor) ? `
+              <div class="admin-controls">
+                <button class="delete-btn" onclick="deleteGridItem('intro', '${item.id}')">刪除</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+        card.innerHTML = html;
+        container.appendChild(card);
+      });
+    }
+
+    /* --- 介紹社幹二維結構渲染 --- */
+    function renderOfficers() {
+      const container = document.getElementById('officer-list');
+      container.innerHTML = '';
+      
+      if (officersData.length === 0 && !isAdmin && !isPhotoEditor) {
+         container.innerHTML = '<div style="color:#888; text-align:center; width:100%; margin-top:20px;">目前尚未新增幹部。</div>';
+         return;
+      }
+
+      // 依 row 分組
+      const rowsMap = {};
+      officersData.forEach(item => {
+        const rowKey = item.row || 1;
+        if (!rowsMap[rowKey]) rowsMap[rowKey] = [];
+        rowsMap[rowKey].push(item);
+      });
+
+      const sortedRows = Object.keys(rowsMap).sort((a, b) => (parseInt(a) || a) - (parseInt(b) || b));
+
+      sortedRows.forEach(rowKey => {
+        const rowWrapper = document.createElement('div');
+        rowWrapper.className = 'officer-row-wrapper';
+        
+        let rowHtml = `
+          <div class="officer-row-header">
+            <span class="officer-row-title">第 ${rowKey} 行幹部</span>
+            ${(isAdmin || isPhotoEditor) ? `<button class="small-btn" onclick="quickAddOfficerRow('${rowKey}')">+ 此行新增</button>` : ''}
+          </div>
+          <div class="officer-row-track">
+        `;
+        
+        rowsMap[rowKey].forEach(officer => {
+          const displayUrl = officer.photoUrl || 'https://via.placeholder.com/200x200?text=No+Image';
+          rowHtml += `
+            <div class="photo-card officer-card-item">
+              <img class="photo-img" src="${displayUrl}" alt="社幹照片" onclick="openLightbox('${displayUrl}')">
+              <div class="photo-info">
+                <div class="photo-title">${officer.title || officer.name}</div>
+                ${(isAdmin || isPhotoEditor) ? `
+                  <div class="admin-controls">
+                    <button class="delete-btn" onclick="deleteGridItem('officers', '${officer.id}')">刪除</button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        });
+
+        rowHtml += `</div>`;
+        rowWrapper.innerHTML = rowHtml;
+        container.appendChild(rowWrapper);
+      });
+    }
+
+    function quickAddOfficerRow(rowNum) {
+      document.getElementById('new-officer-row').value = rowNum;
+      document.getElementById('new-officer-name').focus();
+      document.getElementById('admin-officer-box').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* --- 標準網格列表渲染 (合照、社服、社徽) --- */
     function renderGridList(type) {
       let containerId, dataArray, emptyText;
-      if (type === 'officers') { containerId = 'officer-list'; dataArray = officersData; emptyText = '目前尚未新增幹部。'; }
-      else if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
+      if (type === 'groups') { containerId = 'group-photo-list'; dataArray = groupPhotosData; emptyText = '目前尚未新增合照。'; }
       else if (type === 'shirts') { containerId = 'shirt-list'; dataArray = shirtsData; emptyText = '目前尚未新增社服照片。'; }
       else if (type === 'logos') { containerId = 'logo-list'; dataArray = logosData; emptyText = '目前尚未新增社徽照片。'; }
       
@@ -942,24 +1130,27 @@
           <img class="${imgClass}" src="${displayUrl}" alt="照片" onclick="openLightbox('${displayUrl}')">
           <div class="photo-info">
             <div class="photo-title">${item.title}</div>
+            ${(isAdmin || isPhotoEditor) ? `
+              <div class="admin-controls">
+                <button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button>
+              </div>
+            ` : ''}
+          </div>
         `;
-        
-        if (isAdmin || isPhotoEditor) {
-          html += `
-            <div class="admin-controls">
-              <button class="delete-btn" onclick="deleteGridItem('${type}', '${item.id}')">刪除</button>
-            </div>
-          `;
-        }
-        html += `</div>`;
         card.innerHTML = html;
         container.appendChild(card);
       });
     }
 
     function addGridItem(type) {
-      let titleInputId, photoInputId, collectionName;
-      if (type === 'officers') { titleInputId = 'new-officer-name'; photoInputId = 'new-officer-photo'; collectionName = 'officers'; }
+      let titleInputId, photoInputId, collectionName, extraData = {};
+      if (type === 'intro') { titleInputId = 'new-intro-title'; photoInputId = 'new-intro-photo'; collectionName = 'intro_photos'; }
+      else if (type === 'officers') { 
+        titleInputId = 'new-officer-name'; 
+        photoInputId = 'new-officer-photo'; 
+        collectionName = 'officers';
+        extraData.row = parseInt(document.getElementById('new-officer-row').value) || 1;
+      }
       else if (type === 'groups') { titleInputId = 'new-group-title'; photoInputId = 'new-group-photo'; collectionName = 'group_photos'; }
       else if (type === 'shirts') { titleInputId = 'new-shirt-title'; photoInputId = 'new-shirt-photo'; collectionName = 'shirts'; }
       else if (type === 'logos') { titleInputId = 'new-logo-title'; photoInputId = 'new-logo-photo'; collectionName = 'logos'; }
@@ -972,6 +1163,7 @@
       db.collection(collectionName).add({
         title: title,
         photoUrl: photoUrl,
+        ...extraData,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         document.getElementById(titleInputId).value = '';
@@ -983,7 +1175,8 @@
 
     function deleteGridItem(type, docId) {
       let collectionName;
-      if (type === 'officers') collectionName = 'officers';
+      if (type === 'intro') collectionName = 'intro_photos';
+      else if (type === 'officers') collectionName = 'officers';
       else if (type === 'groups') collectionName = 'group_photos';
       else if (type === 'shirts') collectionName = 'shirts';
       else if (type === 'logos') collectionName = 'logos';
@@ -1007,7 +1200,6 @@
          let b = bubbles[i];
          if (b.cooldown > 0) b.cooldown--; 
          
-         // 自我繁殖機制
          if (!b.isUnclickable && Math.random() < (1 / 600)) {
              triggerSplit(b);
              i--; 
@@ -1108,7 +1300,6 @@
     }
 
     let globalBubbleId = 0;
-    // 新增 isDraggable 參數，預設為 true。如果為 false 則無法被拖曳。
     function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0, isDraggable = true) {
       const container = document.getElementById('bubble-container');
       const el = document.createElement('div');
@@ -1122,10 +1313,7 @@
       if (!isUnclickable) {
          const startInteraction = function(e) {
             e.preventDefault();
-            if (isDraggable) {
-               activeBubble = bubbleObj;
-            }
-            // 記錄點擊初始位置，用於判斷是否為「戳破」
+            if (isDraggable) activeBubble = bubbleObj;
             bubbleObj.clickStartX = e.touches ? e.touches[0].clientX : e.clientX;
             bubbleObj.clickStartY = e.touches ? e.touches[0].clientY : e.clientY;
             bubbleObj.clickStartTime = Date.now();
@@ -1136,9 +1324,7 @@
             let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
             let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
             let dist = Math.hypot(clientX - bubbleObj.clickStartX, clientY - bubbleObj.clickStartY);
-            if (dt < 250 && dist < 15) {
-                triggerSplit(bubbleObj);
-            }
+            if (dt < 250 && dist < 15) triggerSplit(bubbleObj);
             if (activeBubble === bubbleObj) activeBubble = null;
          };
 
@@ -1153,7 +1339,6 @@
       return bubbleObj;
     }
 
-    // 全域拖曳監聽，僅對 isDraggable 為 true 的氣泡生效
     window.addEventListener('mousemove', (e) => {
         if(activeBubble && activeBubble.isDraggable) { 
             activeBubble.x = e.clientX; 
@@ -1195,19 +1380,16 @@
             }
           }
         } else if (isOfficer) {
-          // 社幹專屬分裂邏輯：分裂一次，大小維持不變
           if (b.splits > 0) {
             let count = Math.floor(Math.random() * 2) + 2; 
             for(let i=0; i<count; i++) {
                let startOffsetX = (Math.random() * 40 - 20);
                let sprayVx = (startOffsetX / 2);
                let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
-               // 傳入 b.size 維持大小，且 b.splits-1，並設定為不可拖曳 (isDraggable = false)
                createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 180, false);
             }
           }
         } else {
-          // 一般訪客/修圖員的氣泡分裂邏輯
           let count = Math.floor(Math.random() * 2) + 2; 
           for(let i=0; i<count; i++) {
              let startOffsetX = (Math.random() * 20 - 10);
@@ -1232,7 +1414,6 @@
       let h = window.innerHeight + 100; 
       
       if (isBubbleMode) {
-        // 降低泡泡模式生成頻率
         bubbleInterval = setInterval(() => {
           let count = (Math.floor(Math.random() * 3) + 2) * 2; 
           for(let i=0; i<count; i++) {
@@ -1250,7 +1431,6 @@
           createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180, true);
         }, 5000);
       } else if (isOfficer) {
-        // 社幹模式生成設定：分裂次數(splits)為 1，不可拖曳(isDraggable = false)
         bubbleInterval = setInterval(() => {
           let count = Math.floor(Math.random() * 4) + 1;
           for(let i=0; i<count; i++) {
@@ -1330,6 +1510,7 @@
           document.getElementById('admin-settings-container').style.display = 'none';
           document.getElementById('admin-reports-section').style.display = 'none';
           
+          document.getElementById('admin-intro-box').style.display = 'none';
           document.getElementById('admin-officer-box').style.display = 'none';
           document.getElementById('admin-group-photo-box').style.display = 'none';
           document.getElementById('admin-shirt-box').style.display = 'none';
@@ -1338,7 +1519,8 @@
           document.getElementById('ask-box').style.display = 'flex';
           
           renderQA();
-          renderGridList('officers');
+          renderIntroPhotos();
+          renderOfficers();
           renderGridList('groups');
           renderGridList('shirts');
           renderGridList('logos');
@@ -1388,6 +1570,7 @@
         btn.innerText = '修圖員'; 
         
         document.getElementById('ask-box').style.display = 'none';
+        document.getElementById('admin-intro-box').style.display = 'flex';
         document.getElementById('admin-officer-box').style.display = 'flex';
         document.getElementById('admin-group-photo-box').style.display = 'flex';
         document.getElementById('admin-shirt-box').style.display = 'flex';
@@ -1395,7 +1578,8 @@
         
         closeAuthModal();
         renderQA();
-        renderGridList('officers');
+        renderIntroPhotos();
+        renderOfficers();
         renderGridList('groups');
         renderGridList('shirts');
         renderGridList('logos');
@@ -1410,6 +1594,7 @@
         document.getElementById('admin-settings-container').style.display = 'block';
         document.getElementById('admin-reports-section').style.display = 'block';
         
+        document.getElementById('admin-intro-box').style.display = 'flex';
         document.getElementById('admin-officer-box').style.display = 'flex';
         document.getElementById('admin-group-photo-box').style.display = 'flex';
         document.getElementById('admin-shirt-box').style.display = 'flex';
@@ -1418,7 +1603,8 @@
         closeAuthModal();
         renderQA();
         renderReports();
-        renderGridList('officers');
+        renderIntroPhotos();
+        renderOfficers();
         renderGridList('groups');
         renderGridList('shirts');
         renderGridList('logos');
@@ -1468,6 +1654,18 @@
       }).catch((error) => {
         alert('儲存失敗: ' + error.message);
       });
+    }
+
+    function toggleMaintenance() {
+      const content = document.getElementById('maintenance-display');
+      const toggleText = document.getElementById('toggle-maintenance-text');
+      if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        toggleText.innerText = '[展開]';
+      } else {
+        content.classList.add('expanded');
+        toggleText.innerText = '[收起]';
+      }
     }
 
     function toggleEditMaintenance() {
@@ -1610,10 +1808,8 @@
         if (isAdmin || isOfficer) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         html += `</div>`;
         
-        // 已經有回答的狀態
         if (item.a) {
           html += `<div class="qa-a">A: ${item.a}</div>`;
-          // 如果是管理員或社幹，提供覆寫輸入框
           if (isAdmin || isOfficer) {
             html += `
               <div class="reply-box" style="margin-top: 8px;">
@@ -1623,7 +1819,6 @@
             `;
           }
         } else {
-          // 等待回覆的狀態
           html += `<div class="qa-pending">（等待回覆中）</div>`;
           if (isAdmin || isOfficer) {
             html += `
