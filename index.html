@@ -134,7 +134,6 @@
       background: #ff4b2b;
       box-shadow: 0 2px 5px rgba(255, 75, 43, 0.5);
     }
-    
     #auth-btn-float {
       position: fixed;
       right: 30px;
@@ -487,7 +486,7 @@
       background: #777;
     }
 
-    /* --- 照片網格顯示系統 (合照、社服、社徽使用) --- */
+    /* 照片網格 */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -502,23 +501,20 @@
       grid-template-columns: 1fr; 
     }
     
-    /* --- 社幹專用垂直滾動列表 --- */
     .officer-scroll-list {
       display: flex;
       flex-direction: column;
       gap: 25px;
       width: 100%;
-      max-width: 350px; /* 限制卡片寬度使其像手機版動態牆 */
-      max-height: 60vh; /* 限制高度，啟用內部滾動 */
+      max-width: 350px; 
+      max-height: 60vh; 
       overflow-y: auto;
       padding: 10px;
       margin-top: 10px;
       border-radius: 15px;
-      /* 加點內陰影看起來更像一個容器 */
       box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
       background: rgba(20,20,20,0.5);
     }
-    /* 自訂社幹區塊滾動條 */
     .officer-scroll-list::-webkit-scrollbar {
       width: 6px;
     }
@@ -596,7 +592,6 @@
       color: #fff;
     }
 
-    /* --- 點擊看大圖 (Lightbox) 系統 --- */
     #lightbox {
       display: none;
       position: fixed;
@@ -618,7 +613,6 @@
       object-fit: contain;
     }
 
-    /* 雙視圖設計區塊 */
     .design-view {
       position: absolute;
       top: 50px;
@@ -704,7 +698,7 @@
 
   <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
-      <h3>社幹認證</h3>
+      <h3>系統認證</h3>
       <input type="password" id="auth-password" placeholder="請輸入密碼">
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeAuthModal()">取消</button>
@@ -754,7 +748,6 @@
         <h1>👑 介紹社幹</h1>
         <p>口技社的靈魂人物。這裡將介紹歷任社長、副社長、總務等重要幹部，是帶領社團前進的核心動力。</p>
         
-        <!-- 改為垂直滾動列表 -->
         <div class="officer-scroll-list" id="officer-list"></div>
 
         <div class="admin-add-box" id="admin-officer-box" style="display: none;">
@@ -914,7 +907,6 @@
       requestAnimationFrame(physicsLoop);
     };
 
-    /* --- 點擊看大圖 (Lightbox) --- */
     function openLightbox(imgUrl) {
       document.getElementById('lightbox-img').src = imgUrl;
       document.getElementById('lightbox').style.display = 'flex';
@@ -924,7 +916,6 @@
       document.getElementById('lightbox-img').src = '';
     }
 
-    /* --- 網格卡片渲染與管理系統 --- */
     function renderGridList(type) {
       let containerId, dataArray, emptyText;
       if (type === 'officers') { containerId = 'officer-list'; dataArray = officersData; emptyText = '目前尚未新增幹部。'; }
@@ -976,10 +967,7 @@
       const title = document.getElementById(titleInputId).value.trim();
       const photoUrl = document.getElementById(photoInputId).value.trim();
       
-      if (!title) {
-        alert("請輸入名稱/標題！");
-        return;
-      }
+      if (!title) { alert("請輸入名稱/標題！"); return; }
 
       db.collection(collectionName).add({
         title: title,
@@ -1001,9 +989,7 @@
       else if (type === 'logos') collectionName = 'logos';
       
       if (confirm('確定要刪除這張照片嗎？')) {
-        db.collection(collectionName).doc(docId).delete().catch(error => {
-          alert('刪除失敗: ' + error.message);
-        });
+        db.collection(collectionName).doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message));
       }
     }
 
@@ -1021,6 +1007,7 @@
          let b = bubbles[i];
          if (b.cooldown > 0) b.cooldown--; 
          
+         // 自我繁殖機制
          if (!b.isUnclickable && Math.random() < (1 / 600)) {
              triggerSplit(b);
              i--; 
@@ -1076,7 +1063,6 @@
                let dist = Math.hypot(dx, dy);
                
                if (dist < (b1.size + b2.size) / 2) {
-                   
                    if (b1.cooldown > 0 || b2.cooldown > 0) {
                        let pushForce = 0.8;
                        if (b1.x < b2.x) { b1.vx -= pushForce; b2.vx += pushForce; }
@@ -1122,7 +1108,8 @@
     }
 
     let globalBubbleId = 0;
-    function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0) {
+    // 新增 isDraggable 參數，預設為 true。如果為 false 則無法被拖曳。
+    function createBubble(size, x, y, vx, vy, splits, isUnclickable = false, cooldown = 0, isDraggable = true) {
       const container = document.getElementById('bubble-container');
       const el = document.createElement('div');
       el.className = 'game-bubble' + (isUnclickable ? ' unclickable' : '');
@@ -1130,23 +1117,35 @@
       el.style.height = size + 'px';
       
       globalBubbleId++;
-      let bubbleObj = { id: globalBubbleId, el, x, y, vx, vy, size, splits, isUnclickable, cooldown };
+      let bubbleObj = { id: globalBubbleId, el, x, y, vx, vy, size, splits, isUnclickable, cooldown, isDraggable };
       
       if (!isUnclickable) {
          const startInteraction = function(e) {
             e.preventDefault();
-            activeBubble = bubbleObj;
-            dragStartTime = Date.now();
-            if (e.touches) {
-               dragStartX = e.touches[0].clientX;
-               dragStartY = e.touches[0].clientY;
-            } else {
-               dragStartX = e.clientX;
-               dragStartY = e.clientY;
+            if (isDraggable) {
+               activeBubble = bubbleObj;
             }
+            // 記錄點擊初始位置，用於判斷是否為「戳破」
+            bubbleObj.clickStartX = e.touches ? e.touches[0].clientX : e.clientX;
+            bubbleObj.clickStartY = e.touches ? e.touches[0].clientY : e.clientY;
+            bubbleObj.clickStartTime = Date.now();
          };
+         
+         const endInteraction = function(e) {
+            let dt = Date.now() - bubbleObj.clickStartTime;
+            let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+            let dist = Math.hypot(clientX - bubbleObj.clickStartX, clientY - bubbleObj.clickStartY);
+            if (dt < 250 && dist < 15) {
+                triggerSplit(bubbleObj);
+            }
+            if (activeBubble === bubbleObj) activeBubble = null;
+         };
+
          el.onmousedown = startInteraction;
          el.ontouchstart = startInteraction;
+         el.onmouseup = endInteraction;
+         el.ontouchend = endInteraction;
       }
       
       container.appendChild(el);
@@ -1154,34 +1153,20 @@
       return bubbleObj;
     }
 
+    // 全域拖曳監聽，僅對 isDraggable 為 true 的氣泡生效
     window.addEventListener('mousemove', (e) => {
-        if(activeBubble) { activeBubble.x = e.clientX; activeBubble.y = e.clientY; }
-    });
-    window.addEventListener('mouseup', (e) => {
-        if(activeBubble) {
-            let dt = Date.now() - dragStartTime;
-            let dist = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
-            if(dt < 250 && dist < 15) triggerSplit(activeBubble);
-            activeBubble = null;
+        if(activeBubble && activeBubble.isDraggable) { 
+            activeBubble.x = e.clientX; 
+            activeBubble.y = e.clientY; 
         }
     });
-
     window.addEventListener('touchmove', (e) => {
-        if(activeBubble) {
+        if(activeBubble && activeBubble.isDraggable) {
             activeBubble.x = e.touches[0].clientX;
             activeBubble.y = e.touches[0].clientY;
             e.preventDefault(); 
         }
     }, {passive: false});
-    window.addEventListener('touchend', (e) => {
-        if(activeBubble) {
-            let dt = Date.now() - dragStartTime;
-            let touch = e.changedTouches[0];
-            let dist = Math.hypot(touch.clientX - dragStartX, touch.clientY - dragStartY);
-            if(dt < 250 && dist < 15) triggerSplit(activeBubble);
-            activeBubble = null;
-        }
-    });
 
     function triggerSplit(b) {
         if (isBubbleMode) {
@@ -1191,7 +1176,7 @@
                let sprayVx = (startOffsetX / 3);
                let sprayVy = Math.abs(b.vy) + Math.random() * 1; 
                let newSize = Math.max(Math.random() * b.size, 10); 
-               createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180);
+               createBubble(newSize, b.x + startOffsetX, b.y, sprayVx, sprayVy, Infinity, false, 180, true);
           }
         } else if (isAdmin) {
           if (b.splits > 0) {
@@ -1202,19 +1187,32 @@
                let sprayVx = (startOffsetX / 2) + (Math.random() * 4 - 2); 
                let sprayVy = Math.abs(b.vy) + (Math.random() * 5); 
                let newSize = Math.random() * 8 + 12;
-               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180);
+               createBubble(newSize, b.x + startOffsetX, b.y + startOffsetY, sprayVx, sprayVy, b.splits - 1, false, 180, true);
             }
           } else {
             for(let i=0; i<2; i++) {
-               createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true);
+               createBubble(10, b.x + (Math.random()*20-10), b.y, (Math.random()*8-4), 3, 0, true, 0, false);
+            }
+          }
+        } else if (isOfficer) {
+          // 社幹專屬分裂邏輯：分裂一次，大小維持不變
+          if (b.splits > 0) {
+            let count = Math.floor(Math.random() * 2) + 2; 
+            for(let i=0; i<count; i++) {
+               let startOffsetX = (Math.random() * 40 - 20);
+               let sprayVx = (startOffsetX / 2);
+               let sprayVy = Math.abs(b.vy) + Math.random() * 2; 
+               // 傳入 b.size 維持大小，且 b.splits-1，並設定為不可拖曳 (isDraggable = false)
+               createBubble(b.size, b.x + startOffsetX, b.y, sprayVx, sprayVy, b.splits - 1, false, 180, false);
             }
           }
         } else {
+          // 一般訪客/修圖員的氣泡分裂邏輯
           let count = Math.floor(Math.random() * 2) + 2; 
           for(let i=0; i<count; i++) {
              let startOffsetX = (Math.random() * 20 - 10);
              let sprayVx = (startOffsetX / 2);
-             createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180);
+             createBubble(10, b.x + startOffsetX, b.y, sprayVx, Math.abs(b.vy)*0.8 + 2, 0, true, 180, false);
           }
         }
         b.el.remove();
@@ -1234,30 +1232,32 @@
       let h = window.innerHeight + 100; 
       
       if (isBubbleMode) {
+        // 降低泡泡模式生成頻率
         bubbleInterval = setInterval(() => {
-          let count = (Math.floor(Math.random() * 5) + 2) * 6; 
+          let count = (Math.floor(Math.random() * 3) + 2) * 2; 
           for(let i=0; i<count; i++) {
-            let size = Math.random() * 80 + 20; 
+            let size = Math.random() * 60 + 20; 
             let vy = Math.random() * 0.4 + 0.1; 
             let vx = Math.random() * 2 - 1;
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180); 
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, Infinity, false, 180, true); 
           }
-        }, 800); 
+        }, 1200); 
       } else if (isAdmin || isPhotoEditor) {
         bubbleInterval = setInterval(() => {
           let size = Math.random() * 20 + 30;
           let vy = Math.random() * 0.8 + 0.5;
           let vx = Math.random() * 2 - 1;
-          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180);
+          createBubble(size, getSpawnX(), h, vx, vy, 2, false, 180, true);
         }, 5000);
       } else if (isOfficer) {
+        // 社幹模式生成設定：分裂次數(splits)為 1，不可拖曳(isDraggable = false)
         bubbleInterval = setInterval(() => {
-          let count = Math.floor(Math.random() * 5) + 2;
+          let count = Math.floor(Math.random() * 4) + 1;
           for(let i=0; i<count; i++) {
-            let size = Math.random() * 10 + 10;
+            let size = Math.random() * 15 + 15;
             let vy = Math.random() * 1.5 + 1;
             let vx = Math.random() * 2 - 1;
-            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 0, true, 180);
+            createBubble(size, getSpawnX(), h + (Math.random()*50), vx, vy, 1, false, 180, false);
           }
         }, 1000);
       }
@@ -1290,7 +1290,7 @@
          let startOffsetY = (Math.random() * 100 - 50);
          let vx = (startOffsetX / 3);
          let vy = (startOffsetY / 3);
-         createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true);
+         createBubble(size, cx + startOffsetX, cy + startOffsetY, vx, vy, 0, true, 0, false);
       }
     }
 
@@ -1318,19 +1318,13 @@
 
     /* --- Auth & 登出控制 --- */
     function handleAuthBtnClick() {
-      // 判斷是否已經登入
       if (isOfficer || isAdmin || isBubbleMode || isPhotoEditor) {
         if (confirm("要登出當前帳號嗎？")) {
-          // 清除所有權限狀態
-          isOfficer = false;
-          isAdmin = false;
-          isBubbleMode = false;
-          isPhotoEditor = false;
-          
+          isOfficer = false; isAdmin = false; isBubbleMode = false; isPhotoEditor = false;
           const btn = document.getElementById('auth-btn-float');
-          btn.innerHTML = '社幹<br>認證';
+          btn.innerHTML = '系統<br>認證';
+          btn.disabled = false;
           
-          // 隱藏所有管理員專屬區塊
           document.getElementById('edit-announcement-btn').style.display = 'none';
           document.getElementById('edit-maintenance-btn').style.display = 'none';
           document.getElementById('admin-settings-container').style.display = 'none';
@@ -1341,17 +1335,13 @@
           document.getElementById('admin-shirt-box').style.display = 'none';
           document.getElementById('admin-logo-box').style.display = 'none';
           
-          // 恢復顯示被修圖員隱藏的發問框
           document.getElementById('ask-box').style.display = 'flex';
           
-          // 重新渲染畫面 (清除刪除按鈕)
           renderQA();
           renderGridList('officers');
           renderGridList('groups');
           renderGridList('shirts');
           renderGridList('logos');
-          
-          // 氣泡系統切回未登入模式
           startBubbleSystem(); 
         }
       } else {
@@ -1366,7 +1356,6 @@
     function closeAuthModal() {
       document.getElementById('auth-modal').style.display = 'none';
     }
-
     function openReportModal() {
       document.getElementById('report-modal').style.display = 'flex';
       document.getElementById('report-input').value = '';
@@ -1374,7 +1363,6 @@
     function closeReportModal() {
       document.getElementById('report-modal').style.display = 'none';
     }
-
     function openPwdModal() {
       document.getElementById('pwd-modal').style.display = 'flex';
       document.getElementById('new-officer-pwd').value = '';
@@ -1400,7 +1388,6 @@
         btn.innerText = '修圖員'; 
         
         document.getElementById('ask-box').style.display = 'none';
-        
         document.getElementById('admin-officer-box').style.display = 'flex';
         document.getElementById('admin-group-photo-box').style.display = 'flex';
         document.getElementById('admin-shirt-box').style.display = 'flex';
@@ -1543,9 +1530,7 @@
 
     function deleteReport(docId) {
       if (confirm('確認刪除此回報？')) {
-        db.collection("reports").doc(docId).delete().catch(error => {
-          alert('刪除失敗: ' + error.message);
-        });
+        db.collection("reports").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message));
       }
     }
 
@@ -1601,7 +1586,9 @@
       const replyInput = document.getElementById(`reply-${docId}`);
       const replyText = replyInput.value.trim();
       if (replyText !== '') {
-        db.collection("qa").doc(docId).update({ a: replyText });
+        db.collection("qa").doc(docId).update({ a: replyText }).then(() => {
+            alert('回覆/修改成功！');
+        });
       } else {
         alert('請輸入回覆內容。');
       }
@@ -1609,9 +1596,7 @@
 
     function deleteQuestion(docId) {
       if (confirm('確認刪除此問題？')) {
-        db.collection("qa").doc(docId).delete().catch(error => {
-          alert('刪除失敗: ' + error.message);
-        });
+        db.collection("qa").doc(docId).delete().catch(error => alert('刪除失敗: ' + error.message));
       }
     }
 
@@ -1624,9 +1609,21 @@
         let html = `<div class="qa-header"><div class="qa-q-text">Q: ${item.q}</div>`;
         if (isAdmin || isOfficer) html += `<button class="delete-btn" onclick="deleteQuestion('${item.id}')">刪除</button>`;
         html += `</div>`;
+        
+        // 已經有回答的狀態
         if (item.a) {
           html += `<div class="qa-a">A: ${item.a}</div>`;
+          // 如果是管理員或社幹，提供覆寫輸入框
+          if (isAdmin || isOfficer) {
+            html += `
+              <div class="reply-box" style="margin-top: 8px;">
+                <input type="text" id="reply-${item.id}" placeholder="重新輸入以覆寫回覆...">
+                <button onclick="submitReply('${item.id}')">覆寫</button>
+              </div>
+            `;
+          }
         } else {
+          // 等待回覆的狀態
           html += `<div class="qa-pending">（等待回覆中）</div>`;
           if (isAdmin || isOfficer) {
             html += `
